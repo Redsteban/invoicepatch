@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SuccessHero from '@/components/success/SuccessHero';
 import NextStepsTimeline from '@/components/success/NextStepsTimeline';
@@ -10,7 +10,21 @@ import SocialSharing from '@/components/success/SocialSharing';
 import { motion } from 'framer-motion';
 import { trackConversion } from '@/lib/analytics';
 
-export default function SuccessPage() {
+// Loading component for Suspense fallback
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full"
+      />
+    </div>
+  );
+}
+
+// Component that uses useSearchParams - must be wrapped in Suspense
+function SuccessPageContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [customerData, setCustomerData] = useState(null);
@@ -45,15 +59,7 @@ export default function SuccessPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full"
-        />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -89,5 +95,14 @@ export default function SuccessPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SuccessPageContent />
+    </Suspense>
   );
 } 
