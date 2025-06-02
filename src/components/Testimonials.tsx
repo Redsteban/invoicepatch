@@ -101,50 +101,51 @@ export default function Testimonials() {
           </p>
         </div>
         
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
+        {/* Improved grid layout */}
+        <div className="mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="rounded-2xl bg-gray-50 border border-gray-200 p-8 hover:shadow-md transition-shadow">
+            <div key={index} className="flex flex-col rounded-2xl bg-gray-50 border border-gray-200 p-6 hover:shadow-lg hover:bg-white transition-all duration-300 h-full">
               {/* Rating */}
-              <div className="flex gap-x-1 text-emerald-400 mb-6">
+              <div className="flex gap-x-1 text-emerald-400 mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <StarIcon key={i} className="h-5 w-5" />
+                  <StarIcon key={i} className="h-4 w-4" />
                 ))}
               </div>
               
-              {/* Testimonial */}
-              <blockquote className="text-gray-900 mb-6">
-                <p>"{testimonial.body}"</p>
+              {/* Testimonial - flex-grow to push author to bottom */}
+              <blockquote className="text-gray-900 mb-4 flex-grow">
+                <p className="text-sm leading-relaxed">"{testimonial.body}"</p>
               </blockquote>
               
-              {/* Stats */}
-              <div className="mb-6 space-y-2">
+              {/* Stats - compact layout */}
+              <div className="mb-4 space-y-2 bg-emerald-50 rounded-lg p-3 border border-emerald-100">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Time Saved:</span>
-                  <span className="text-sm font-semibold text-emerald-600">{testimonial.stats.timeSaved}</span>
+                  <span className="text-xs text-gray-600 font-medium">Time Saved:</span>
+                  <span className="text-xs font-bold text-emerald-700">{testimonial.stats.timeSaved}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Improvement:</span>
-                  <span className="text-sm font-semibold text-emerald-600">{testimonial.stats.errorReduction}</span>
+                  <span className="text-xs text-gray-600 font-medium">Improvement:</span>
+                  <span className="text-xs font-bold text-emerald-700">{testimonial.stats.errorReduction}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">System:</span>
-                  <span className="text-sm font-medium text-gray-700">{testimonial.stats.system}</span>
+                  <span className="text-xs text-gray-600 font-medium">System:</span>
+                  <span className="text-xs font-semibold text-gray-800">{testimonial.stats.system}</span>
                 </div>
               </div>
               
-              {/* Author */}
-              <figcaption className="border-t border-gray-200 pt-6">
-                <div className="flex items-center space-x-4">
-                  <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <span className="text-emerald-600 font-semibold text-sm">
+              {/* Author - stays at bottom */}
+              <figcaption className="border-t border-gray-200 pt-4">
+                <div className="flex items-center space-x-3">
+                  <div className="h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-emerald-600 font-bold text-xs">
                       {testimonial.author.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
-                    <div className="text-gray-600">{testimonial.author.handle}</div>
-                    <div className="text-gray-500 text-sm">{testimonial.author.company}</div>
-                    <div className="text-gray-400 text-sm">{testimonial.author.location}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm truncate">{testimonial.author.name}</div>
+                    <div className="text-gray-600 text-xs truncate">{testimonial.author.handle}</div>
+                    <div className="text-gray-500 text-xs truncate">{testimonial.author.company}</div>
+                    <div className="text-gray-400 text-xs">{testimonial.author.location}</div>
                   </div>
                 </div>
               </figcaption>

@@ -1,141 +1,175 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import {
-  testDatabaseConnection,
   addEmailSubscriber,
   getEmailSubscriber,
   createPreOrder,
   trackAnalyticsEvent,
+  getAnalyticsEvents,
   cleanupTestData,
+  testDatabaseConnection,
   type EmailSubscriberData,
   type PreOrderData,
   type AnalyticsEventData
 } from '@/lib/supabase-utils';
 
 export async function GET(request: NextRequest) {
+  // Check if during build time
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV) {
+    return NextResponse.json({
+      success: true,
+      message: 'Build time - Supabase test skipped',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Check if Supabase is configured
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({
+      success: false,
+      message: 'Supabase is not properly configured',
+      details: 'Please check your environment variables',
+      next_steps: [
+        '1. Set NEXT_PUBLIC_SUPABASE_URL in your environment',
+        '2. Set NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment',
+        '3. Set SUPABASE_SERVICE_ROLE_KEY in your environment',
+      ],
+    }, { status: 503 });
+  }
+
+  const testResults: any = {
+    timestamp: new Date().toISOString(),
+    tests: [],
+    summary: {
+      passed: 0,
+      failed: 0,
+      total: 0,
+    },
+  };
+
+  // Helper function to add test result
+  const addTestResult = (name: string, success: boolean, data?: any, error?: string) => {
+    testResults.tests.push({
+      name,
+      success,
+      data,
+      error,
+      timestamp: new Date().toISOString(),
+    });
+    
+    if (success) {
+      testResults.summary.passed++;
+    } else {
+      testResults.summary.failed++;
+    }
+    testResults.summary.total++;
+  };
+
   try {
-    const testEmail = `api-test-${Date.now()}@invoicepatch.com`;
-    const results = [];
+    const testEmail = `test-${Date.now()}@example.com`;
 
-    // Test 1: Database Connection
-    const connectionTest = await testDatabaseConnection();
-    results.push({
-      test: 'database_connection',
-      success: connectionTest.success,
-      data: connectionTest.data,
-      error: connectionTest.error
-    });
-
-    if (!connectionTest.success) {
-      return NextResponse.json({
-        success: false,
-        error: 'Database connection failed',
-        results
-      }, { status: 500 });
+    // Test 1: Database connection
+    try {
+      const connectionResult = await testDatabaseConnection();
+      addTestResult('Database Connection', connectionResult.success, connectionResult.data, connectionResult.error);
+    } catch (error) {
+      addTestResult('Database Connection', false, null, error instanceof Error ? error.message : 'Unknown error');
     }
 
-    // Test 2: Email Subscriber Operations
-    const subscriberData: EmailSubscriberData = {
-      email: testEmail,
-      source: 'api_test',
-      tags: ['test', 'api']
-    };
-
-    const addSubscriberResult = await addEmailSubscriber(subscriberData);
-    results.push({
-      test: 'add_email_subscriber',
-      success: addSubscriberResult.success,
-      data: addSubscriberResult.data,
-      error: addSubscriberResult.error
-    });
-
-    if (addSubscriberResult.success) {
-      const getSubscriberResult = await getEmailSubscriber(testEmail);
-      results.push({
-        test: 'get_email_subscriber',
-        success: getSubscriberResult.success,
-        data: getSubscriberResult.data,
-        error: getSubscriberResult.error
-      });
+    // Test 2: Add email subscriber
+    try {
+      const subscriberData: EmailSubscriberData = {
+        email: testEmail,
+        source: 'api_test',
+        tags: ['test', 'api']
+      };
+      const result = await addEmailSubscriber(subscriberData);
+      addTestResult('Add Email Subscriber', result.success, result.data, result.error);
+    } catch (error) {
+      addTestResult('Add Email Subscriber', false, null, error instanceof Error ? error.message : 'Unknown error');
     }
 
-    // Test 3: Pre-order Operations
-    const preorderData: PreOrderData = {
-      email: testEmail,
-      stripe_session_id: `api_test_${Date.now()}`,
-      company_name: 'API Test Company',
-      contractor_count: 3,
-      current_system: 'manual',
-      biggest_pain_point: 'late_payments',
-      amount_paid: 19.99,
-      plan_type: 'monthly',
-      discount_percentage: 90,
-      status: 'paid'
-    };
+    // Test 3: Get email subscriber
+    try {
+      const result = await getEmailSubscriber(testEmail);
+      addTestResult('Get Email Subscriber', result.success, result.data, result.error);
+    } catch (error) {
+      addTestResult('Get Email Subscriber', false, null, error instanceof Error ? error.message : 'Unknown error');
+    }
 
-    const createPreorderResult = await createPreOrder(preorderData);
-    results.push({
-      test: 'create_preorder',
-      success: createPreorderResult.success,
-      data: createPreorderResult.data,
-      error: createPreorderResult.error
-    });
+    // Test 4: Create pre-order
+    try {
+      const preOrderData: PreOrderData = {
+        email: testEmail,
+        stripe_session_id: `test_session_${Date.now()}`,
+        company_name: 'Test Company',
+        contractor_count: 5,
+        current_system: 'manual',
+        biggest_pain_point: 'late_payments',
+        amount_paid: 0,
+        plan_type: 'monthly',
+        status: 'pending'
+      };
+      const result = await createPreOrder(preOrderData);
+      addTestResult('Create Pre-order', result.success, result.data, result.error);
+    } catch (error) {
+      addTestResult('Create Pre-order', false, null, error instanceof Error ? error.message : 'Unknown error');
+    }
 
-    // Test 4: Analytics Event Tracking
-    const analyticsData: AnalyticsEventData = {
-      event_name: 'api_test_event',
-      email: testEmail,
-      properties: {
-        test_type: 'server_api_test',
-        timestamp: new Date().toISOString(),
-        endpoint: '/api/test-supabase'
-      },
-      page_url: '/api/test-supabase'
-    };
+    // Test 5: Track analytics event
+    try {
+      const analyticsData: AnalyticsEventData = {
+        event_name: 'test_event',
+        email: testEmail,
+        properties: {
+          test: true,
+          endpoint: '/api/test-supabase'
+        },
+        page_url: '/api/test-supabase'
+      };
+      const result = await trackAnalyticsEvent(analyticsData);
+      addTestResult('Track Analytics Event', result.success, result.data, result.error);
+    } catch (error) {
+      addTestResult('Track Analytics Event', false, null, error instanceof Error ? error.message : 'Unknown error');
+    }
 
-    const trackAnalyticsResult = await trackAnalyticsEvent(analyticsData);
-    results.push({
-      test: 'track_analytics_event',
-      success: trackAnalyticsResult.success,
-      data: trackAnalyticsResult.data,
-      error: trackAnalyticsResult.error
-    });
+    // Test 6: Get analytics events
+    try {
+      const result = await getAnalyticsEvents({ event_name: 'test_event' });
+      addTestResult('Get Analytics Events', result.success, { count: result.data?.length || 0 }, result.error);
+    } catch (error) {
+      addTestResult('Get Analytics Events', false, null, error instanceof Error ? error.message : 'Unknown error');
+    }
 
-    // Test 5: Cleanup
-    const cleanupResult = await cleanupTestData(testEmail);
-    results.push({
-      test: 'cleanup_test_data',
-      success: cleanupResult.success,
-      error: cleanupResult.error
-    });
+    // Clean up test data
+    try {
+      const result = await cleanupTestData(testEmail);
+      addTestResult('Cleanup Test Data', result.success, { message: 'Test data cleaned up' }, result.error);
+    } catch (error) {
+      addTestResult('Cleanup Test Data', false, null, error instanceof Error ? error.message : 'Unknown error');
+    }
 
-    // Summary
-    const successfulTests = results.filter(r => r.success).length;
-    const totalTests = results.length;
-    const allPassed = successfulTests === totalTests;
+    // Final assessment
+    const allTestsPassed = testResults.summary.failed === 0;
+    const overallMessage = allTestsPassed 
+      ? '✅ All Supabase utility functions working correctly!'
+      : `⚠️ ${testResults.summary.failed} out of ${testResults.summary.total} tests failed`;
 
     return NextResponse.json({
-      success: allPassed,
-      summary: {
-        total_tests: totalTests,
-        successful: successfulTests,
-        failed: totalTests - successfulTests,
-        test_email: testEmail
-      },
-      results,
-      timestamp: new Date().toISOString(),
-      message: allPassed 
-        ? '✅ All Supabase utility functions working correctly!'
-        : `❌ ${totalTests - successfulTests} test(s) failed`
+      success: allTestsPassed,
+      message: overallMessage,
+      ...testResults,
+    }, { 
+      status: allTestsPassed ? 200 : 500 
     });
 
   } catch (error) {
     console.error('Supabase API test failed:', error);
-    
     return NextResponse.json({
       success: false,
+      message: 'Supabase test suite failed',
       error: error instanceof Error ? error.message : 'Unknown error',
-      message: 'API test failed with exception',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }, { status: 500 });
   }
 }
