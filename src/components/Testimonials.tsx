@@ -48,37 +48,13 @@ const testimonials = [
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.3,
-      delayChildren: 0.2
-    }
-  }
-};
-
 const cardVariants = {
-  hidden: { opacity: 0, y: 50, scale: 0.9 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.6,
-      ease: "easeOut"
-    }
-  }
-};
-
-const statsVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.5,
+      duration: 0.3,
       ease: "easeOut"
     }
   }
@@ -90,10 +66,10 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div 
           className="mx-auto max-w-xl text-center"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.3 }}
         >
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-emerald-600">Testimonials</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -101,81 +77,44 @@ export default function Testimonials() {
           </p>
         </motion.div>
         
-        <motion.div 
-          className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
+        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
           {testimonials.map((testimonial, testimonialIdx) => (
             <motion.div
               key={testimonialIdx}
               className="group relative"
               variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ delay: testimonialIdx * 0.1 }}
               whileHover={{ 
-                y: -10,
-                transition: { duration: 0.3, ease: "easeOut" }
+                y: -5,
+                transition: { duration: 0.2 }
               }}
             >
-              <motion.div 
-                className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 h-full flex flex-col"
-                whileHover={{ 
-                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                  scale: 1.02
-                }}
-                transition={{ duration: 0.3 }}
-              >
+              <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 h-full flex flex-col hover:shadow-xl transition-shadow duration-200">
                 {/* Stars */}
-                <motion.div 
-                  className="flex gap-x-1 mb-4"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                >
+                <div className="flex gap-x-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.4 + i * 0.1, duration: 0.3 }}
-                    >
-                      <StarIcon className="h-5 w-5 text-emerald-400" />
-                    </motion.div>
+                    <StarIcon key={i} className="h-5 w-5 text-emerald-400" />
                   ))}
-                </motion.div>
+                </div>
 
                 {/* Testimonial Text */}
-                <motion.blockquote 
-                  className="text-gray-900 flex-grow"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                >
+                <blockquote className="text-gray-900 flex-grow">
                   <p>"{testimonial.body}"</p>
-                </motion.blockquote>
+                </blockquote>
 
                 {/* Author Info */}
-                <motion.div 
-                  className="mt-6 border-t border-gray-100 pt-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                >
+                <div className="mt-6 border-t border-gray-100 pt-6">
                   <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
                   <div className="text-gray-600">{testimonial.author.handle}</div>
                   <div className="text-sm text-emerald-600 font-medium">{testimonial.author.company}</div>
                   <div className="text-xs text-gray-500">{testimonial.author.location}</div>
-                </motion.div>
+                </div>
 
                 {/* Stats */}
-                <motion.div 
-                  className="mt-4 grid grid-cols-1 gap-2"
-                  variants={statsVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  transition={{ delay: 0.6 }}
-                >
+                <div className="mt-4 grid grid-cols-1 gap-2">
                   <div className="rounded-lg bg-emerald-50 px-3 py-2 text-center">
                     <div className="text-sm font-semibold text-emerald-700">{testimonial.stats.timeSaved}</div>
                     <div className="text-xs text-emerald-600">Time Saved</div>
@@ -188,11 +127,11 @@ export default function Testimonials() {
                     <div className="text-sm font-semibold text-gray-700">{testimonial.stats.system}</div>
                     <div className="text-xs text-gray-600">System Integration</div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

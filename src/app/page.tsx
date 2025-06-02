@@ -10,48 +10,13 @@ import Pricing from '@/components/Pricing';
 import FAQ from '@/components/FAQ';
 import Footer from '@/components/Footer';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.3,
-      delayChildren: 0.2
-    }
-  }
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 50 },
+const simpleVariants = {
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
-      ease: "easeOut"
-    }
-  }
-};
-
-const slideFromRight = {
-  hidden: { opacity: 0, x: 100 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut"
-    }
-  }
-};
-
-const slideFromLeft = {
-  hidden: { opacity: 0, x: -100 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.8,
+      duration: 0.4,
       ease: "easeOut"
     }
   }
@@ -59,21 +24,12 @@ const slideFromLeft = {
 
 export default function Home() {
   return (
-    <motion.main
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div variants={sectionVariants}>
-        <AnimatedBranding />
-      </motion.div>
-      
-      <motion.div variants={sectionVariants}>
-        <Hero />
-      </motion.div>
+    <main>
+      <AnimatedBranding />
+      <Hero />
       
       <motion.div 
-        variants={slideFromLeft}
+        variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -82,7 +38,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
-        variants={slideFromRight}
+        variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -91,7 +47,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
-        variants={sectionVariants}
+        variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -100,7 +56,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
-        variants={slideFromLeft}
+        variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -109,7 +65,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
-        variants={sectionVariants}
+        variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -117,9 +73,7 @@ export default function Home() {
         <FAQ />
       </motion.div>
       
-      <motion.div variants={sectionVariants}>
-        <Footer />
-      </motion.div>
-    </motion.main>
+      <Footer />
+    </main>
   );
 }
