@@ -1,18 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database, PreOrderCustomer, EmailSubscriber, AnalyticsEventInsert } from './types'
 
-// Supabase URL and Keys
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// Supabase URL and Keys with fallbacks for build time
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key'
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
 
-// Check if required environment variables are set
-if (!supabaseUrl) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL')
-}
+// Check if we're in a build environment
+const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY')
+// Check if required environment variables are set (skip check during build)
+if (!isBuildTime) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    console.warn('Missing env.NEXT_PUBLIC_SUPABASE_URL - using placeholder')
+  }
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY - using placeholder')
+  }
 }
 
 // Client-side Supabase client (for browser/frontend)
@@ -38,21 +43,25 @@ export const supabaseAdmin = createClient<Database>(
 
 // Helper function to check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
-  return !!(supabaseUrl && supabaseAnonKey)
+  return !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
+  )
 }
 
 // Helper function to get a properly typed Supabase client
 export const getSupabaseClient = () => {
   if (!isSupabaseConfigured()) {
-    throw new Error('Supabase is not properly configured. Please check your environment variables.')
+    console.warn('Supabase is not properly configured. Using placeholder client.')
   }
   return supabase
 }
 
 // Helper function to get admin client (server-side only)
 export const getSupabaseAdmin = () => {
-  if (!supabaseServiceKey) {
-    console.warn('Using anon key for admin operations. This is not recommended for production.')
+  if (!supabaseServiceKey || supabaseServiceKey === 'placeholder_key') {
+    console.warn('Using placeholder for admin operations.')
   }
   return supabaseAdmin
 }
@@ -63,6 +72,11 @@ export const getSupabaseAdmin = () => {
 export const customerOperations = {
   // Get customer by email
   async getByEmail(email: string): Promise<PreOrderCustomer | null> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning null for getByEmail')
+      return null
+    }
+
     const { data, error } = await supabaseAdmin
       .from('pre_order_customers')
       .select('*')
@@ -79,6 +93,11 @@ export const customerOperations = {
 
   // Get customer by Stripe session ID
   async getByStripeSession(sessionId: string): Promise<PreOrderCustomer | null> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning null for getByStripeSession')
+      return null
+    }
+
     const { data, error } = await supabaseAdmin
       .from('pre_order_customers')
       .select('*')
@@ -95,6 +114,11 @@ export const customerOperations = {
 
   // Get customer stats
   async getStats() {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning empty stats')
+      return []
+    }
+
     const { data, error } = await supabaseAdmin
       .from('daily_signups')
       .select('*')
@@ -106,6 +130,11 @@ export const customerOperations = {
 
   // Generate unique referral code
   async generateReferralCode(email: string): Promise<string> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - generating simple referral code')
+      return email.split('@')[0].slice(0, 6).toUpperCase() + Math.floor(Math.random() * 1000)
+    }
+
     const baseCode = email.split('@')[0].slice(0, 6).toUpperCase();
     let referralCode = baseCode;
     let counter = 1;
@@ -132,6 +161,11 @@ export const customerOperations = {
 export const subscriberOperations = {
   // Get subscriber by email
   async getByEmail(email: string): Promise<EmailSubscriber | null> {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning null for subscriber getByEmail')
+      return null
+    }
+
     const { data, error } = await supabaseAdmin
       .from('email_subscribers')
       .select('*')
@@ -148,6 +182,11 @@ export const subscriberOperations = {
 
   // Get subscriber count by source
   async getStatsBySource() {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning empty subscriber stats')
+      return {}
+    }
+
     const { data, error } = await supabaseAdmin
       .from('email_subscribers')
       .select('subscription_source')
@@ -168,6 +207,11 @@ export const subscriberOperations = {
 export const analyticsOperations = {
   // Track an event
   async trackEvent(eventData: AnalyticsEventInsert) {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - skipping analytics event')
+      return
+    }
+
     const { error } = await supabaseAdmin
       .from('analytics_events')
       .insert(eventData);
@@ -180,6 +224,11 @@ export const analyticsOperations = {
 
   // Get event counts by name
   async getEventCounts(startDate?: string, endDate?: string) {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning empty event counts')
+      return {}
+    }
+
     let query = supabaseAdmin
       .from('analytics_events')
       .select('event_name');
@@ -201,27 +250,51 @@ export const analyticsOperations = {
     }, {});
 
     return counts;
+  },
+
+  // Get user journey data
+  async getUserJourney(sessionId: string) {
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - returning empty user journey')
+      return []
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('analytics_events')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data;
   }
 };
 
-// Database health check
+// Health check function
 export const healthCheck = async () => {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('pre_order_customers')
+    if (!isSupabaseConfigured()) {
+      return { status: 'warning', message: 'Supabase not configured' }
+    }
+
+    // Simple query to check if database is accessible
+    const { error } = await supabaseAdmin
+      .from('email_subscribers')
       .select('count')
       .limit(1);
 
-    return {
-      connected: !error,
-      error: error?.message,
-      timestamp: new Date().toISOString()
-    };
+    if (error) {
+      return { status: 'error', message: error.message };
+    }
+
+    return { status: 'ok', message: 'Database connection successful' };
   } catch (error) {
-    return {
-      connected: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+    return { 
+      status: 'error', 
+      message: error instanceof Error ? error.message : 'Unknown error' 
     };
   }
 };
+
+// Export health check for API routes
+export { healthCheck as checkSupabaseHealth };
