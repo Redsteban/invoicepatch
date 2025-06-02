@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import { 
   ExclamationTriangleIcon,
   ClockIcon,
@@ -92,12 +95,65 @@ const solutions = [
   }
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
+
+const slideInLeft = {
+  hidden: { opacity: 0, x: -50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut"
+    }
+  }
+};
+
+const slideInRight = {
+  hidden: { opacity: 0, x: 50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut"
+    }
+  }
+};
+
 export default function ProblemSolution() {
   return (
-    <div className="bg-gray-50 py-24 sm:py-32">
+    <div className="bg-gray-50 py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Problems Section */}
-        <div className="mx-auto max-w-2xl lg:text-center mb-16">
+        <motion.div 
+          className="mx-auto max-w-2xl lg:text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-base font-semibold leading-7 text-gray-600">The Oilfield Reconciliation Problem</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             AFE Data Lives in ERP, Service Contractors Recreate It Manually
@@ -106,80 +162,137 @@ export default function ProblemSolution() {
             Operations managers have well data and AFE codes in their ERP systems. Service contractors recreate it manually on invoices. 
             This disconnect creates billing errors, payment delays, and weekend reconciliation hell.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Manager Problems */}
-        <div className="mb-16">
-          <div className="flex items-center mb-8">
-            <UserGroupIcon className="h-8 w-8 text-gray-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">
-              Operations Manager Pain Points
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {managerProblems.map((problem, index) => (
-              <div key={index} className="relative rounded-xl bg-white p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                      <problem.icon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+        {/* Problems Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          {/* Manager Problems */}
+          <motion.div
+            variants={slideInLeft}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <div className="flex items-center mb-6">
+              <UserGroupIcon className="h-8 w-8 text-gray-600 mr-3" />
+              <h3 className="text-xl font-bold text-gray-900">
+                Operations Manager Pain Points
+              </h3>
+            </div>
+            
+            <motion.div 
+              className="space-y-4"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {managerProblems.map((problem, index) => (
+                <motion.div 
+                  key={index} 
+                  className="relative rounded-xl bg-white p-6 shadow-sm border border-gray-200 group"
+                  variants={itemVariants}
+                  whileHover={{ 
+                    y: -5,
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      <motion.div 
+                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 group-hover:bg-red-100"
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        <problem.icon className="h-6 w-6 text-red-600" aria-hidden="true" />
+                      </motion.div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                        {problem.title}
+                      </h4>
+                      <p className="text-gray-600 mb-4 text-sm">
+                        {problem.description}
+                      </p>
+                      <span className="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
+                        {problem.stat}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                      "{problem.title}"
-                    </h4>
-                    <p className="text-gray-600 mb-4">
-                      {problem.description}
-                    </p>
-                    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-                      {problem.stat}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
 
-        {/* Contractor Problems */}
-        <div className="mb-24">
-          <div className="flex items-center mb-8">
-            <UserIcon className="h-8 w-8 text-gray-600 mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">
-              Service Contractor Pain Points
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {contractorProblems.map((problem, index) => (
-              <div key={index} className="relative rounded-xl bg-white p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                      <problem.icon className="h-6 w-6 text-gray-600" aria-hidden="true" />
+          {/* Contractor Problems */}
+          <motion.div
+            variants={slideInRight}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <div className="flex items-center mb-6">
+              <UserIcon className="h-8 w-8 text-gray-600 mr-3" />
+              <h3 className="text-xl font-bold text-gray-900">
+                Service Contractor Pain Points
+              </h3>
+            </div>
+            
+            <motion.div 
+              className="space-y-4"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {contractorProblems.map((problem, index) => (
+                <motion.div 
+                  key={index} 
+                  className="relative rounded-xl bg-white p-6 shadow-sm border border-gray-200 group"
+                  variants={itemVariants}
+                  whileHover={{ 
+                    y: -5,
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      <motion.div 
+                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 group-hover:bg-blue-100"
+                        whileHover={{ rotate: -360 }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        <problem.icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                      </motion.div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                        {problem.title}
+                      </h4>
+                      <p className="text-gray-600 mb-4 text-sm">
+                        {problem.description}
+                      </p>
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                        {problem.stat}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                      "{problem.title}"
-                    </h4>
-                    <p className="text-gray-600 mb-4">
-                      {problem.description}
-                    </p>
-                    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-                      {problem.stat}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Solution Section */}
-        <div className="mx-auto max-w-2xl lg:text-center mb-16">
+        <motion.div 
+          className="mx-auto max-w-2xl lg:text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
           <h2 className="text-base font-semibold leading-7 text-emerald-600">The ERP Sync Solution</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             One Source of Truth: Your ERP to Their Mobile App
@@ -188,16 +301,35 @@ export default function ProblemSolution() {
             InvoicePatch connects your SAP, JDE, or Oracle system directly to service contractor mobile apps. 
             Same AFE codes, same well names, same rates - zero reconciliation needed.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           {solutions.map((solution, index) => (
-            <div key={index} className="relative rounded-xl bg-white p-6 shadow-sm border border-emerald-200 hover:shadow-md transition-shadow">
+            <motion.div 
+              key={index} 
+              className="relative rounded-xl bg-white p-6 shadow-sm border border-emerald-200 group"
+              variants={itemVariants}
+              whileHover={{ 
+                y: -5,
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                transition: { duration: 0.3 }
+              }}
+            >
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50">
+                  <motion.div 
+                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 group-hover:bg-emerald-100"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <solution.icon className="h-6 w-6 text-emerald-600" aria-hidden="true" />
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="flex-1">
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">
@@ -206,14 +338,18 @@ export default function ProblemSolution() {
                   <p className="text-gray-600 mb-4">
                     {solution.description}
                   </p>
-                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                    {solution.stat}
-                  </span>
+                  <motion.span 
+                    className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    ✓ {solution.stat}
+                  </motion.span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Solution Workflow */}
         <div className="rounded-2xl bg-white border border-gray-200 p-8 shadow-sm">
