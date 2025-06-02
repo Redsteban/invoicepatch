@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-05-28.basil',
-});
+// Initialize Stripe only if the secret key is available
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-05-28.basil',
+    })
+  : null;
 
 // ConvertKit API integration
 const CONVERTKIT_API_KEY = process.env.CONVERTKIT_API_KEY;
@@ -99,6 +102,22 @@ async function triggerEmailSequence(customerData: CustomerData) {
 }
 
 export async function GET(request: NextRequest) {
+  // Check if during build time
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV) {
+    return NextResponse.json({
+      error: 'Build time - customer data not available',
+      message: 'This endpoint is not available during build'
+    }, { status: 503 });
+  }
+
+  // Check if Stripe is configured
+  if (!stripe) {
+    return NextResponse.json({
+      error: 'Stripe not configured',
+      message: 'Payment processing is not configured'
+    }, { status: 503 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('session_id');
@@ -167,6 +186,14 @@ export async function GET(request: NextRequest) {
 
 // Optional: Create customer data endpoint for manual triggers
 export async function POST(request: NextRequest) {
+  // Check if during build time
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV) {
+    return NextResponse.json({
+      error: 'Build time - customer data not available',
+      message: 'This endpoint is not available during build'
+    }, { status: 503 });
+  }
+
   try {
     const body = await request.json();
     const { email, action } = body;
@@ -203,11 +230,15 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: `${action} processed for ${email}`
+    });
+
   } catch (error) {
-    console.error('Error handling customer action:', error);
+    console.error('Error processing customer action:', error);
     return NextResponse.json(
-      { error: 'Failed to handle action' },
+      { error: 'Failed to process action' },
       { status: 500 }
     );
   }
