@@ -355,21 +355,21 @@ export default function Pricing() {
         plan={selectedTier} 
       />
       
-      <div className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <section className="bg-white py-12 sm:py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-base font-semibold leading-7 text-emerald-600">Pricing</h2>
-            <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
               Choose Your Integration Plan
             </p>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-gray-600">
               Transparent pricing based on your business size and integration needs. 
               All plans include Canadian tax compliance and mobile contractor apps.
             </p>
           </div>
 
           {/* ROI Calculator Teaser */}
-          <div className="mt-12 rounded-2xl bg-emerald-50 border border-emerald-200 p-8 max-w-4xl mx-auto">
+          <div className="mt-8 sm:mt-12 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 p-6 sm:p-8 max-w-4xl mx-auto">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-emerald-900 mb-4">
                 💡 Calculate Your ROI
@@ -504,7 +504,7 @@ export default function Pricing() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 } 

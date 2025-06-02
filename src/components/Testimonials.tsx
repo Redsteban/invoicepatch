@@ -62,8 +62,8 @@ const cardVariants = {
 
 export default function Testimonials() {
   return (
-    <div className="bg-white py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div 
           className="mx-auto max-w-xl text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -71,13 +71,13 @@ export default function Testimonials() {
           viewport={{ once: true }}
           transition={{ duration: 0.3 }}
         >
-          <h2 className="text-lg font-semibold leading-8 tracking-tight text-emerald-600">Testimonials</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-base font-semibold leading-7 tracking-tight text-emerald-600">Testimonials</h2>
+          <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
             Real Results from Oil & Gas Operations
           </p>
         </motion.div>
         
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm leading-6 text-gray-900 sm:mt-20 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
+        <div className="mx-auto mt-12 sm:mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 text-sm leading-6 text-gray-900 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
           {testimonials.map((testimonial, testimonialIdx) => (
             <motion.div
               key={testimonialIdx}
@@ -133,6 +133,6 @@ export default function Testimonials() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 } 
