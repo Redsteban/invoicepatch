@@ -62,75 +62,92 @@ const cardVariants = {
 
 export default function Testimonials() {
   return (
-    <section className="bg-white py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          className="mx-auto max-w-xl text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.3 }}
-        >
-          <h2 className="text-base font-semibold leading-7 tracking-tight text-emerald-600">Testimonials</h2>
-          <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
-            Real Results from Oil & Gas Operations
-          </p>
-        </motion.div>
-        
-        <div className="mx-auto mt-12 sm:mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 text-sm leading-6 text-gray-900 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
-          {testimonials.map((testimonial, testimonialIdx) => (
-            <motion.div
-              key={testimonialIdx}
-              className="group relative"
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              transition={{ delay: testimonialIdx * 0.1 }}
-              whileHover={{ 
-                y: -5,
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 h-full flex flex-col hover:shadow-xl transition-shadow duration-200">
-                {/* Stars */}
-                <div className="flex gap-x-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon key={i} className="h-5 w-5 text-emerald-400" />
-                  ))}
-                </div>
-
-                {/* Testimonial Text */}
-                <blockquote className="text-gray-900 flex-grow">
-                  <p>"{testimonial.body}"</p>
-                </blockquote>
-
-                {/* Author Info */}
-                <div className="mt-6 border-t border-gray-100 pt-6">
-                  <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
-                  <div className="text-gray-600">{testimonial.author.handle}</div>
-                  <div className="text-sm text-emerald-600 font-medium">{testimonial.author.company}</div>
-                  <div className="text-xs text-gray-500">{testimonial.author.location}</div>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-4 grid grid-cols-1 gap-2">
-                  <div className="rounded-lg bg-emerald-50 px-3 py-2 text-center">
-                    <div className="text-sm font-semibold text-emerald-700">{testimonial.stats.timeSaved}</div>
-                    <div className="text-xs text-emerald-600">Time Saved</div>
+    <section className="bg-white" style={{ minHeight: '100vh' }}>
+      <div className="w-full py-12 sm:py-16 lg:py-20" style={{
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)'
+      }}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="mx-auto max-w-xl text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.3 }}
+            style={{
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden'
+            }}
+          >
+            <h2 className="text-base font-semibold leading-7 tracking-tight text-emerald-600">Testimonials</h2>
+            <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
+              Real Results from Oil & Gas Operations
+            </p>
+          </motion.div>
+          
+          <div className="mx-auto mt-12 sm:mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 text-sm leading-6 text-gray-900 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
+            {testimonials.map((testimonial, testimonialIdx) => (
+              <motion.div
+                key={testimonialIdx}
+                className="group relative"
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ delay: testimonialIdx * 0.1 }}
+                whileHover={{ 
+                  y: -5,
+                  transition: { duration: 0.2 }
+                }}
+                style={{
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  transform: 'translateZ(0)',
+                  WebkitTransform: 'translateZ(0)'
+                }}
+              >
+                <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 h-full flex flex-col hover:shadow-xl transition-shadow duration-200">
+                  {/* Stars */}
+                  <div className="flex gap-x-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon key={i} className="h-5 w-5 text-emerald-400" />
+                    ))}
                   </div>
-                  <div className="rounded-lg bg-blue-50 px-3 py-2 text-center">
-                    <div className="text-sm font-semibold text-blue-700">{testimonial.stats.errorReduction}</div>
-                    <div className="text-xs text-blue-600">Error Reduction</div>
+
+                  {/* Testimonial Text */}
+                  <blockquote className="text-gray-900 flex-grow">
+                    <p>"{testimonial.body}"</p>
+                  </blockquote>
+
+                  {/* Author Info */}
+                  <div className="mt-6 border-t border-gray-100 pt-6">
+                    <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
+                    <div className="text-gray-600">{testimonial.author.handle}</div>
+                    <div className="text-sm text-emerald-600 font-medium">{testimonial.author.company}</div>
+                    <div className="text-xs text-gray-500">{testimonial.author.location}</div>
                   </div>
-                  <div className="rounded-lg bg-gray-50 px-3 py-2 text-center">
-                    <div className="text-sm font-semibold text-gray-700">{testimonial.stats.system}</div>
-                    <div className="text-xs text-gray-600">System Integration</div>
+
+                  {/* Stats */}
+                  <div className="mt-4 grid grid-cols-1 gap-2">
+                    <div className="rounded-lg bg-emerald-50 px-3 py-2 text-center">
+                      <div className="text-sm font-semibold text-emerald-700">{testimonial.stats.timeSaved}</div>
+                      <div className="text-xs text-emerald-600">Time Saved</div>
+                    </div>
+                    <div className="rounded-lg bg-blue-50 px-3 py-2 text-center">
+                      <div className="text-sm font-semibold text-blue-700">{testimonial.stats.errorReduction}</div>
+                      <div className="text-xs text-blue-600">Error Reduction</div>
+                    </div>
+                    <div className="rounded-lg bg-gray-50 px-3 py-2 text-center">
+                      <div className="text-sm font-semibold text-gray-700">{testimonial.stats.system}</div>
+                      <div className="text-xs text-gray-600">System Integration</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
