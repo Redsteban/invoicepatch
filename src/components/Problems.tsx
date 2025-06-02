@@ -14,32 +14,32 @@ import {
 const contractorProblems = [
   {
     icon: CurrencyDollarIcon,
-    title: 'Missing invoice deadlines costs you $200-500 per missed payment',
-    description: 'Every late submission means delayed cash flow and potential contract penalties.',
-    impact: '$200-500 lost per incident',
+    title: 'Missing service company invoice deadlines costs you $500-1000 per missed payment',
+    description: 'Every late submission to drilling companies or service companies means delayed cash flow and potential contract penalties. Field schedules wait for no one.',
+    impact: '$500-1000 lost per incident',
   },
   {
     icon: DocumentTextIcon,
-    title: 'Manual tracking leads to forgotten charges and lost receipts',
-    description: 'Sticky notes and photos scattered across your phone - important billable hours slip through the cracks.',
-    impact: '15-20% revenue loss',
+    title: 'Tracking AFE codes, well IDs, and per-foot rates manually leads to billing errors',
+    description: 'Juggling multiple AFE numbers, well locations, and service types across your phone and notebook - important billable hours and equipment charges slip through the cracks.',
+    impact: '15-25% revenue loss',
   },
   {
     icon: ClockIcon,
-    title: 'Late submissions delay your paycheck by weeks',
-    description: 'While you wait for approval cycles, your bills keep coming and cash flow suffers.',
-    impact: '2-4 week delays',
+    title: 'Late submissions to service companies delay your paycheck by weeks',
+    description: 'While you wait for approval from drilling supervisors and project managers, your equipment payments and crew wages keep coming due.',
+    impact: '2-6 week delays',
   },
   {
     icon: ExclamationTriangleIcon,
-    title: 'GST/PST calculations are confusing and error-prone',
-    description: 'Tax mistakes can trigger audits and costly penalties from the CRA.',
-    impact: 'Audit risk & penalties',
+    title: 'HST/PST on equipment vs services is confusing and audit-prone',
+    description: 'Different tax rates for equipment rental vs services, plus per diems and travel allowances from remote sites create compliance nightmares.',
+    impact: 'CRA audit risk & penalties',
   },
   {
     icon: EyeSlashIcon,
-    title: 'No visibility into invoice status or payment timeline',
-    description: 'You submit invoices into a black hole with no idea when you\'ll get paid.',
+    title: 'No visibility into invoice status with drilling companies',
+    description: 'You submit invoices to service companies and drilling contractors with no idea where they are in the approval chain or when you\'ll get paid.',
     impact: 'Cash flow uncertainty',
   },
 ];
@@ -47,32 +47,32 @@ const contractorProblems = [
 const managerProblems = [
   {
     icon: CalendarDaysIcon,
-    title: '8-12 hours every weekend processing contractor invoices',
-    description: 'Your weekends disappear into spreadsheets, email chains, and manual data entry.',
-    impact: '8-12 hours weekly',
+    title: '8-15 hours every weekend processing oilfield contractor invoices',
+    description: 'Your weekends disappear into spreadsheets reconciling wireline, coil tubing, frac crew, and drilling contractor invoices with field reports.',
+    impact: '8-15 hours weekly',
   },
   {
     icon: DocumentMagnifyingGlassIcon,
-    title: 'Chasing missing documentation and correcting errors',
-    description: 'Constant back-and-forth with contractors to get complete, accurate submissions.',
-    impact: '40% require follow-up',
+    title: 'Chasing missing AFE codes, well IDs, and service documentation',
+    description: 'Constant back-and-forth with pressure pumping crews, directional drillers, and consultants to get complete, accurate submissions with correct well names.',
+    impact: '50% require follow-up',
   },
   {
     icon: ComputerDesktopIcon,
-    title: 'Manual data entry into accounting systems',
-    description: 'Copy-pasting invoice details increases errors and wastes valuable time.',
-    impact: '3-5 minutes per invoice',
+    title: 'Manual data entry into SAP, JDE, and field management systems',
+    description: 'Copy-pasting invoice details from service contractors into multiple systems increases errors and wastes valuable time during critical operations.',
+    impact: '5-8 minutes per invoice',
   },
   {
     icon: ChatBubbleLeftRightIcon,
-    title: 'Dealing with contractor complaints about late payments',
-    description: 'Frustrated contractors calling about payment status you can\'t easily track.',
-    impact: 'Relationship strain',
+    title: 'Dealing with service contractor complaints about late payments',
+    description: 'Frustrated drilling contractors, mud loggers, and consultants calling about payment status you can\'t easily track across multiple AFEs.',
+    impact: 'Vendor relationship strain',
   },
   {
     icon: ShieldExclamationIcon,
-    title: 'Compliance headaches with Canadian tax requirements',
-    description: 'Ensuring HST/GST compliance across provinces while managing deadlines.',
+    title: 'Compliance headaches with equipment vs service tax requirements',
+    description: 'Ensuring HST/GST compliance on equipment rental vs services across provinces while managing per diems and remote site allowances.',
     impact: 'Audit exposure',
   },
 ];
@@ -89,7 +89,7 @@ export default function Problems() {
             How Much is Manual Invoicing Really Costing You?
           </p>
           <p className="mt-6 text-lg leading-8 text-slate-600">
-            Every week, Canadian contractors and their managers lose thousands of dollars and countless hours 
+            Every week, Canadian oil & gas contractors and their managers lose thousands of dollars and countless hours 
             to an outdated, manual invoicing process.
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function Problems() {
             <div className="bg-blue-50 rounded-full p-3 mr-4">
               <ExclamationTriangleIcon className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-800">If You&apos;re a Contractor...</h3>
+            <h3 className="text-2xl font-bold text-slate-800">If You&apos;re an Oilfield Contractor...</h3>
           </div>
           
           {/* First row - 3 cards */}
@@ -168,7 +168,7 @@ export default function Problems() {
             <div className="bg-blue-50 rounded-full p-3 mr-4">
               <ComputerDesktopIcon className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-800">If You&apos;re a Manager...</h3>
+            <h3 className="text-2xl font-bold text-slate-800">If You&apos;re an Operations Manager...</h3>
           </div>
           
           {/* First row - 3 cards */}
@@ -237,7 +237,7 @@ export default function Problems() {
               Sound Familiar? You&apos;re Not Alone.
             </h3>
             <p className="text-slate-600 mb-4">
-              Over 10,000 Canadian contractors and managers deal with these exact problems every week.
+              Over 10,000 Canadian oil & gas contractors and managers deal with these exact problems every week.
             </p>
             <p className="text-blue-600 font-semibold">
               But what if there was a better way?

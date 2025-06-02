@@ -24,21 +24,21 @@ const socialPlatforms = [
     name: "LinkedIn",
     icon: "/icons/linkedin.svg",
     color: "bg-[#0077B5] hover:bg-[#005582]",
-    message: "Just secured my spot as a founding member of InvoicePatch! 🚀\n\nAs a contractor, I'm tired of chasing payments and losing money to administrative tasks. InvoicePatch is building the solution we've all been waiting for:\n\n✅ 2-minute invoice creation\n✅ GPS-powered mileage tracking\n✅ Automated payment reminders\n✅ Canadian tax compliance\n✅ Real-time payment tracking\n\nI locked in 90% off for life and got early access to the beta. If you're a contractor or run a construction business, you need to check this out.\n\n#InvoicePatch #Construction #Contractors #FoundingMember #PaymentSolutions #CanadianBusiness",
+    message: "Just secured my spot as a founding member of InvoicePatch! 🚀\n\nAs an oilfield contractor, I'm tired of chasing payments from service companies and losing money to administrative tasks. InvoicePatch is building the solution we've all been waiting for:\n\n✅ 2-minute invoice creation\n✅ AFE/Well ID auto-population\n✅ Automated payment reminders\n✅ Canadian tax compliance (HST/PST on equipment vs services)\n✅ Real-time payment tracking\n✅ Per diem and travel allowance tracking\n\nI locked in 90% off for life and got early access to the beta. If you're a drilling contractor, service company, or oilfield consultant, you need to check this out.\n\n#InvoicePatch #OilAndGas #OilfieldContractors #FoundingMember #PaymentSolutions #CanadianEnergy",
     shareUrl: "https://www.linkedin.com/sharing/share-offsite/"
   },
   {
     name: "Twitter",
     icon: "/icons/twitter.svg", 
     color: "bg-[#1DA1F2] hover:bg-[#0d8bd9]",
-    message: "Just became a founding member of @InvoicePatch! 🎉\n\nFinally, a payment solution built FOR contractors, BY contractors.\n\n• 90% off for life ✅\n• Early beta access ✅ \n• GPS mileage tracking ✅\n• 2-min invoices ✅\n\nContractors, this is what we've been waiting for! 🚀\n\n#InvoicePatch #Contractors #FoundingMember",
+    message: "Just became a founding member of @InvoicePatch! 🎉\n\nFinally, a payment solution built FOR oilfield contractors, BY contractors.\n\n• 90% off for life ✅\n• Early beta access ✅ \n• AFE code sync ✅\n• 2-min invoices ✅\n• Per diem tracking ✅\n\nOilfield contractors, this is what we've been waiting for! 🚀\n\n#InvoicePatch #OilAndGas #OilfieldContractors #FoundingMember",
     shareUrl: "https://twitter.com/intent/tweet"
   },
   {
     name: "Facebook",
     icon: "/icons/facebook.svg",
     color: "bg-[#1877F2] hover:bg-[#166fe5]",
-    message: "I just joined InvoicePatch as a founding member! 🎉\n\nIf you're a contractor like me, you know the pain of chasing payments and spending hours on paperwork instead of actual work.\n\nInvoicePatch is building the first payment platform designed specifically for Canadian contractors:\n\n🔧 2-minute invoice creation\n📱 GPS-powered mileage tracking  \n💰 Automated payment reminders\n📊 Real-time payment tracking\n🇨🇦 Full Canadian tax compliance\n\nI got 90% off for life and early access to the beta. The founding member community is already 247 contractors strong!\n\nIf you run a contracting business, you should definitely check this out. Link in comments! 👇",
+    message: "I just joined InvoicePatch as a founding member! 🎉\n\nIf you're an oilfield contractor like me, you know the pain of chasing payments from service companies and spending hours on paperwork instead of actual field work.\n\nInvoicePatch is building the first payment platform designed specifically for Canadian oil & gas contractors:\n\n🔧 2-minute invoice creation with AFE codes\n📱 GPS-powered mileage tracking for remote sites\n💰 Automated payment reminders\n📊 Real-time payment tracking\n🇨🇦 Full Canadian tax compliance (equipment vs services)\n⛽ Per diem and travel allowance tracking\n\nI got 90% off for life and early access to the beta. The founding member community is already 247 oilfield contractors strong!\n\nIf you work for drilling companies, service companies, or as an oilfield consultant, you should definitely check this out. Link in comments! 👇",
     shareUrl: "https://www.facebook.com/sharer/sharer.php"
   }
 ];
@@ -116,7 +116,7 @@ export default function SocialSharing({ customerData }: SocialSharingProps) {
           Spread the Word & Get Rewarded
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Help other contractors discover InvoicePatch! Share your founding member status 
+          Help other oilfield contractors discover InvoicePatch! Share your founding member status 
           and earn rewards when friends join.
         </p>
       </motion.div>

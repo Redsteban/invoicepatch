@@ -95,20 +95,20 @@ export default function Hero() {
           <div className="mb-8 flex justify-center">
             <div className="relative rounded-full bg-emerald-50 px-4 py-2 text-sm leading-6 text-emerald-700 ring-1 ring-emerald-600/20">
               <ClockIcon className="inline h-4 w-4 mr-2" />
-              Managers spend 8+ hours weekly on invoice reconciliation
+              Oil & gas managers spend 8+ hours weekly on contractor invoice reconciliation
             </div>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl">
             Stop Spending <span className="text-emerald-600">8 Hours Every Week</span>{' '}
-            Reconciling Contractor Invoices
+            Reconciling Oilfield Contractor Invoices
           </h1>
           
           {/* Subheadline */}
           <p className="mt-6 text-xl leading-8 text-gray-600 max-w-3xl mx-auto">
-            InvoicePatch syncs your work order data directly to contractor invoices. 
-            Get pre-validated invoices that match your system - approve in minutes, not hours.
+            InvoicePatch syncs your AFE and well data directly to service contractor invoices. 
+            Get pre-validated invoices with correct well IDs and project codes - approve in minutes, not hours.
           </p>
 
           {/* Value Props */}
@@ -156,13 +156,13 @@ export default function Hero() {
           {/* System Compatibility */}
           <div className="mt-16">
             <p className="text-sm font-semibold text-gray-500 mb-6">
-              Syncs with your existing system
+              Syncs with your existing ERP system
             </p>
             <div className="flex items-center justify-center space-x-8 opacity-60">
-              <div className="bg-emerald-600 text-white px-3 py-2 rounded font-bold text-sm">QuickBooks</div>
-              <div className="bg-gray-800 text-white px-3 py-2 rounded font-bold text-sm">Sage 50</div>
-              <div className="bg-emerald-600 text-white px-3 py-2 rounded font-bold text-sm">Xero</div>
-              <div className="bg-gray-600 text-white px-3 py-2 rounded font-bold text-sm">Excel</div>
+              <div className="bg-orange-600 text-white px-3 py-2 rounded font-bold text-sm">SAP</div>
+              <div className="bg-gray-800 text-white px-3 py-2 rounded font-bold text-sm">JD Edwards</div>
+              <div className="bg-blue-600 text-white px-3 py-2 rounded font-bold text-sm">Oracle</div>
+              <div className="bg-emerald-600 text-white px-3 py-2 rounded font-bold text-sm">NetSuite</div>
             </div>
           </div>
 
@@ -176,10 +176,10 @@ export default function Hero() {
               ))}
             </div>
             <blockquote className="text-lg text-gray-700 mb-3">
-              "Went from spending my entire Friday on invoice reconciliation to approving everything in 30 minutes. This is a game-changer for operations teams."
+              "Went from spending my entire Friday reconciling service contractor invoices to approving everything in 30 minutes. This is a game-changer for oil & gas operations teams."
             </blockquote>
             <cite className="text-sm text-gray-500">
-              — Sarah Chen, Operations Manager, Toronto General Construction
+              — Sarah Chen, Operations Manager, Suncor Energy Services
             </cite>
           </div>
         </div>

@@ -2,87 +2,87 @@ import { StarIcon } from '@heroicons/react/20/solid';
 
 const testimonials = [
   {
-    body: "Friday afternoons used to be my nightmare - 8 hours of matching contractor invoices to our QuickBooks data. Now I approve everything in under an hour because the data perfectly matches our system. My weekends are back.",
+    body: "Friday afternoons used to be my nightmare - 8 hours of matching contractor invoices to our SAP data. Coil tubing crews, frac contractors, pipeline inspectors - all different billing formats. Now I approve everything in under an hour because the data perfectly matches our system. My weekends are back.",
     author: {
       name: 'Sarah Chen',
       handle: 'Operations Manager',
-      company: 'Toronto General Construction',
-      location: 'Ontario'
+      company: 'Suncor Energy Services',
+      location: 'Alberta'
     },
     stats: {
       timeSaved: '7+ hours weekly',
       errorReduction: '95% fewer errors',
-      system: 'QuickBooks Online'
+      system: 'SAP + QuickBooks'
     }
   },
   {
-    body: "The billing errors were killing us. Contractors would submit invoices with wrong project codes, missing charges, incorrect rates. We'd catch maybe 60% in review. Now the data comes straight from our Sage system - it's impossible to be wrong.",
+    body: "The billing errors were killing us. Wireline contractors would submit invoices with wrong well IDs, missing standby time, incorrect per-foot rates. We'd catch maybe 60% in review. Now the data comes straight from our field management system - it's impossible to be wrong.",
     author: {
       name: 'Mike Rodriguez',
       handle: 'Finance Director', 
-      company: 'Prairie Wind Construction',
+      company: 'Precision Drilling Corp',
       location: 'Alberta'
     },
     stats: {
       timeSaved: '12 hours weekly',
       errorReduction: '100% data accuracy',
-      system: 'Sage 50 Canadian'
+      system: 'Sage 300 + Field Apps'
     }
   },
   {
-    body: "I used to dread contractor invoices. Project ABC-123 becomes 'Johnson Kitchen' becomes 'Residential Job #3' - different names everywhere. InvoicePatch syncs our exact project codes. Zero confusion, zero reconciliation time.",
+    body: "I used to dread consultant invoices. AFE 24-015 becomes 'Cardium Horizontal' becomes 'Well #47' - different names everywhere. Every geologist and engineer bills differently. InvoicePatch syncs our exact AFE codes and well names. Zero confusion, zero reconciliation time.",
     author: {
       name: 'Jennifer Walsh',
       handle: 'Project Controller',
-      company: 'Atlantic Building Solutions',
-      location: 'Nova Scotia'  
+      company: 'Canadian Natural Resources',
+      location: 'Alberta'  
     },
     stats: {
       timeSaved: '6 hours weekly',
       errorReduction: '90% fewer corrections',
-      system: 'Xero + Excel'
+      system: 'Oracle + Excel'
     }
   },
   {
-    body: "We were losing 15-20% revenue to undercharging because contractors didn't know our current rates. The back-and-forth to fix invoices was endless. Now they see approved rates in real-time and bill correctly the first time.",
+    body: "We were losing 15-20% revenue to undercharging because service contractors didn't know our current day rates for different rig types. The back-and-forth to fix cementing and acidizing invoices was endless. Now they see approved rates in real-time and bill correctly the first time.",
     author: {
       name: 'David Kim', 
       handle: 'Operations Manager',
-      company: 'West Coast Renovations',
+      company: 'Halliburton Canada',
       location: 'British Columbia'
     },
     stats: {
       timeSaved: '10 hours weekly',
       errorReduction: '20% revenue recovery',
-      system: 'QuickBooks Desktop'
+      system: 'JDE + Field Systems'
     }
   },
   {
-    body: "Month-end reconciliation was a 3-day ordeal. Spreadsheets everywhere, phone calls to contractors, manual corrections. InvoicePatch eliminated all of that - our books close in hours instead of days.",
+    body: "Month-end reconciliation was a 3-day ordeal. Pressure pumping crews, mud loggers, directional drillers - all on different schedules and billing cycles. Spreadsheets everywhere, calls to field supervisors, manual corrections. InvoicePatch eliminated all of that - our books close in hours instead of days.",
     author: {
       name: 'Lisa Thompson',
       handle: 'Finance Manager',
-      company: 'Central Plains Construction',
-      location: 'Manitoba'
+      company: 'Trican Well Service',
+      location: 'Saskatchewan'
     },
     stats: {
       timeSaved: '20+ hours monthly',
       errorReduction: '0 reconciliation needed',
-      system: 'Custom ERP + Excel'
+      system: 'NetSuite + Custom Apps'
     }
   },
   {
-    body: "The tax nightmare was real - different provinces, different rates, contractors confused about HST vs PST+GST. InvoicePatch calculates everything automatically based on project location. Tax season went from chaos to smooth.",
+    body: "The tax nightmare was real - different provinces, different rates, cross-border contractors confused about HST vs PST+GST on equipment vs services. Plus per diems and travel allowances from remote sites. InvoicePatch calculates everything automatically based on project location and service type. Tax season went from chaos to smooth.",
     author: {
       name: 'Robert Wilson',
       handle: 'Accounting Director',
-      company: 'Northern Canada Builders',
+      company: 'Enbridge Pipeline Services',
       location: 'Multiple Provinces'
     },
     stats: {
       timeSaved: '40+ hours during tax season',
       errorReduction: 'Automated tax compliance',
-      system: 'Multiple accounting systems'
+      system: 'Multiple ERP systems'
     }
   }
 ];
@@ -94,10 +94,10 @@ export default function Testimonials() {
         <div className="mx-auto max-w-xl text-center">
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-emerald-600">Testimonials</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            "We Got Our Weekends Back"
+            "We Got Our Field Time Back"
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Real stories from managers who eliminated invoice reconciliation hell
+            Real stories from oil & gas managers who eliminated contractor invoice reconciliation hell
           </p>
         </div>
         
@@ -157,7 +157,7 @@ export default function Testimonials() {
         <div className="mt-16 text-center">
           <div className="rounded-2xl bg-emerald-50 border border-emerald-200 px-6 py-12 max-w-3xl mx-auto">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Join 500+ Managers Who Eliminated Reconciliation Hell
+              Join 500+ Oil & Gas Managers Who Eliminated Reconciliation Hell
             </h3>
             <p className="text-lg text-gray-600 mb-8">
               Average time savings: 13 hours per week. Average cost savings: $2,600+ monthly.
