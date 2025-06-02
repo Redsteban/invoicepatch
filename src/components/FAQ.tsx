@@ -1,7 +1,8 @@
 'use client';
 
-import { Disclosure } from '@headlessui/react';
+import { useState } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 
 const faqs = [
   {
@@ -39,10 +40,22 @@ const faqs = [
 ];
 
 export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggleFAQ = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
-    <div className="bg-white py-24 sm:py-32">
+    <div className="bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
+        <motion.div 
+          className="mx-auto max-w-2xl text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3 }}
+        >
           <h2 className="text-base font-semibold leading-7 text-emerald-600">FAQ</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Common Questions About Eliminating Reconciliation
@@ -50,39 +63,59 @@ export default function FAQ() {
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Answers to questions we hear from managers ready to stop spending weekends on invoice reconciliation
           </p>
-        </div>
+        </motion.div>
         
         <div className="mt-16">
           <dl className="space-y-6">
             {faqs.map((faq, index) => (
-              <Disclosure as="div" key={index} className="border border-gray-200 rounded-xl">
-                {({ open }: { open: boolean }) => (
-                  <>
-                    <dt>
-                      <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900 p-6 hover:bg-gray-50 transition-colors">
-                        <span className="text-lg font-semibold leading-7">{faq.question}</span>
-                        <span className="ml-6 flex h-7 items-center">
-                          <ChevronDownIcon
-                            className={`h-6 w-6 transform transition-transform ${
-                              open ? 'rotate-180' : ''
-                            }`}
-                            aria-hidden="true"
-                          />
-                        </span>
-                      </Disclosure.Button>
-                    </dt>
-                    <Disclosure.Panel as="dd" className="px-6 pb-6">
-                      <p className="text-base leading-7 text-gray-600">{faq.answer}</p>
-                    </Disclosure.Panel>
-                  </>
+              <motion.div 
+                key={index} 
+                className="border border-gray-200 rounded-xl overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.3 }}
+              >
+                <dt>
+                  <button 
+                    onClick={() => toggleFAQ(index)}
+                    className="flex w-full items-start justify-between text-left text-gray-900 p-6 hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <span className="text-lg font-semibold leading-7 pr-4">{faq.question}</span>
+                    <span className="ml-6 flex h-7 items-center flex-shrink-0">
+                      <ChevronDownIcon
+                        className={`h-6 w-6 transform transition-transform duration-200 ${
+                          openIndex === index ? 'rotate-180' : ''
+                        }`}
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </button>
+                </dt>
+                {openIndex === index && (
+                  <motion.dd 
+                    className="px-6 pb-6"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <p className="text-base leading-7 text-gray-600">{faq.answer}</p>
+                  </motion.dd>
                 )}
-              </Disclosure>
+              </motion.div>
             ))}
           </dl>
         </div>
         
         {/* Bottom CTA */}
-        <div className="mt-16 text-center">
+        <motion.div 
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.3 }}
+        >
           <div className="rounded-2xl bg-gray-50 border border-gray-200 px-6 py-12">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Still Have Questions?
@@ -91,15 +124,15 @@ export default function FAQ() {
               Schedule a 15-minute call to see exactly how this works with your system
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button className="rounded-lg bg-emerald-600 px-8 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500">
+              <button className="rounded-lg bg-emerald-600 px-8 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors duration-200 hover:scale-105 transform">
                 Schedule Call
               </button>
-              <button className="rounded-lg border border-emerald-600 bg-white px-8 py-3 text-base font-semibold text-emerald-600 hover:bg-emerald-50">
+              <button className="rounded-lg border border-emerald-600 bg-white px-8 py-3 text-base font-semibold text-emerald-600 hover:bg-emerald-50 transition-colors duration-200">
                 See Demo First
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
