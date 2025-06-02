@@ -7,87 +7,88 @@ import {
   ArrowPathIcon,
   EyeIcon,
   UserGroupIcon,
-  UserIcon
+  UserIcon,
+  DocumentMagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const managerProblems = [
   {
-    title: "Contractor says Project ABC, your system shows XYZ-789",
-    description: "Every invoice becomes a detective game. Which project code did they actually mean? You spend time cross-referencing their descriptions with your system.",
-    icon: DocumentDuplicateIcon,
-    stat: "85% of invoices have mismatched codes"
+    title: "Manual verification of AFE codes against service contractor invoices",
+    description: "Your system shows contractor worked on AFE 24-015 Cardium Horizontal well, but their invoice shows 'Johnson Well #3'. Time to dig through field reports and make phone calls to verify.",
+    icon: DocumentMagnifyingGlassIcon,
+    stat: "40% of oilfield invoices require verification"
   },
   {
-    title: "They charge $400/day, approved rate is $450/day",
-    description: "Contractors undercharge because they don't have access to your current rate cards. You catch the error, but now you need to go back and forth to fix it.",
-    icon: CurrencyDollarIcon,
-    stat: "15-20% revenue lost to undercharging"
-  },
-  {
-    title: "Missing work days that are tracked in your system",
-    description: "Your system shows contractor worked Tuesday and Thursday, but their invoice only shows Tuesday. Time to dig through records and make phone calls.",
-    icon: ClockIcon,
-    stat: "30% of billable time missed"
-  },
-  {
-    title: "8+ hours weekly correlating their data with yours",
-    description: "Friday afternoon becomes reconciliation hell. Line by line, invoice by invoice, checking their submissions against your project management system.",
+    title: "Weekend reconciliation hell with multiple service contractors",
+    description: "Friday afternoon becomes reconciliation nightmare. Pressure pumping invoices, wireline charges, coil tubing rates, directional drilling fees - all need manual verification against SAP or JDE.",
     icon: ExclamationTriangleIcon,
-    stat: "Managers report 8-12 hours weekly"
+    stat: "Managers report 10-15 hours weekly"
+  },
+  {
+    title: "Service contractors undercharge without real-time rate access",
+    description: "Coil tubing crew charges $800/day, approved rate is $950/day. Contractor doesn't know current rates. You catch the error, but revenue is lost and invoices need rework.",
+    icon: CurrencyDollarIcon,
+    stat: "15-25% revenue lost to undercharging"
+  },
+  {
+    title: "Missing standby time and equipment charges in field invoices",
+    description: "Your field reports show contractor on standby Tuesday and Thursday, but their invoice only shows active hours. Time to dig through field supervisor logs and make calls.",
+    icon: ClockIcon,
+    stat: "35% of billable time missed"
   }
 ];
 
 const contractorProblems = [
   {
-    title: "Guessing at project codes and missing charges",
-    description: "You know you worked on the Johnson kitchen reno, but what's the actual project code? Was it residential or commercial billing? Guess wrong, get paid wrong.",
+    title: "Guessing at AFE codes and well IDs without field data access",
+    description: "You know you worked on the Cardium Horizontal well, but was it AFE 24-015 or 24-016? Is this Eagle Ford or Bakken pricing? Wrong codes mean delayed payments and angry office staff.",
     icon: DocumentDuplicateIcon,
-    stat: "Average 2-3 billing errors per invoice"
+    stat: "Average 3-5 billing errors per invoice"
   },
   {
-    title: "No access to client's approved rates and work orders",
-    description: "Did the overtime rate change? Are materials billable on this project? You're working blind without access to the client's current project data.",
+    title: "No access to service company's current rates and per-foot pricing",
+    description: "Did the standby rate change? Is this wellhead vs surface pricing? Are mobilization charges billable? You're working blind without real-time access to approved rate schedules.",
     icon: EyeIcon,
-    stat: "40% unsure of current rates"
+    stat: "50% unsure of current rates"
   },
   {
-    title: "Late submissions because you forgot deadlines",
-    description: "Different clients want invoices on different schedules. Was this one due on the 15th or 30th? Late invoices mean delayed payments.",
+    title: "Missing invoice deadlines due to complex field schedules",
+    description: "Drilling ops run 24/7 with different completion cycles. Was the Precision invoice due the 15th or month-end? Late submissions to service companies mean 6-week payment delays.",
     icon: ClockIcon,
-    stat: "25% of contractors miss deadlines"
+    stat: "40% of oilfield contractors miss deadlines"
   },
   {
-    title: "Tax paperwork chaos across multiple clients",
-    description: "HST for Ontario client, PST+GST for BC client, different rates for different provinces. Tax season becomes a nightmare of spreadsheets.",
+    title: "Equipment vs services tax complexity across provinces",
+    description: "HST on coil tubing equipment rental, PST+GST on services, different rates for per diems and travel allowances. Cross-border jobs create compliance nightmares with CRA audits.",
     icon: ExclamationTriangleIcon,
-    stat: "Hours of tax reconciliation"
+    stat: "Hours of tax reconciliation per month"
   }
 ];
 
 const solutions = [
   {
-    title: "Work order data syncs directly to contractor apps",
-    description: "Project codes, locations, rates, and deadlines flow automatically from your system to their mobile app. No more guessing games.",
+    title: "AFE and well data syncs directly to service contractor apps",
+    description: "Well IDs, AFE codes, authorized rates, and billing deadlines flow automatically from your ERP system to contractor mobile apps. No more guessing at project codes.",
     icon: ArrowPathIcon,
     stat: "100% data accuracy"
   },
   {
-    title: "Pre-filled invoices with validated information",
-    description: "Contractors submit invoices that are already populated with your exact project data. They just add hours and hit submit.",
+    title: "Pre-filled invoices with validated AFE and well information",
+    description: "Service contractors submit invoices that are already populated with your exact well names, AFE codes, and approved rates. They just add hours and equipment time, hit submit.",
     icon: CheckCircleIcon,
-    stat: "90% reduction in errors"
+    stat: "95% reduction in billing errors"
   },
   {
-    title: "One-click approval since everything matches",
-    description: "No more line-by-line checking. Since the data came from your system, you can approve with confidence in seconds.",
+    title: "One-click approval since all data matches your ERP",
+    description: "No more line-by-line verification of AFE codes and well names. Since the data came from your SAP/JDE system, you can approve with confidence in seconds.",
     icon: EyeIcon,
-    stat: "95% faster approvals"
+    stat: "98% faster approvals"
   },
   {
-    title: "Real-time visibility into project costs",
-    description: "See hours logged and costs incurred in real-time. No more surprises when invoices arrive at month-end.",
+    title: "Real-time visibility into well costs and AFE spending",
+    description: "See hours logged, equipment charges, and AFE burn rates in real-time. No more surprises when service contractor invoices arrive at month-end.",
     icon: CurrencyDollarIcon,
-    stat: "Live budget tracking"
+    stat: "Live AFE budget tracking"
   }
 ];
 
@@ -97,13 +98,13 @@ export default function ProblemSolution() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Problems Section */}
         <div className="mx-auto max-w-2xl lg:text-center mb-16">
-          <h2 className="text-base font-semibold leading-7 text-gray-600">The Reconciliation Problem</h2>
+          <h2 className="text-base font-semibold leading-7 text-gray-600">The Oilfield Reconciliation Problem</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            The Same Data Lives in Two Different Places
+            AFE Data Lives in ERP, Service Contractors Recreate It Manually
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Managers have project data in their system. Contractors recreate it manually. 
-            This disconnect creates errors, delays, and wasted time for everyone.
+            Operations managers have well data and AFE codes in their ERP systems. Service contractors recreate it manually on invoices. 
+            This disconnect creates billing errors, payment delays, and weekend reconciliation hell.
           </p>
         </div>
 
@@ -112,7 +113,7 @@ export default function ProblemSolution() {
           <div className="flex items-center mb-8">
             <UserGroupIcon className="h-8 w-8 text-gray-600 mr-3" />
             <h3 className="text-2xl font-bold text-gray-900">
-              Manager Pain Points
+              Operations Manager Pain Points
             </h3>
           </div>
           
@@ -147,7 +148,7 @@ export default function ProblemSolution() {
           <div className="flex items-center mb-8">
             <UserIcon className="h-8 w-8 text-gray-600 mr-3" />
             <h3 className="text-2xl font-bold text-gray-900">
-              Contractor Pain Points
+              Service Contractor Pain Points
             </h3>
           </div>
           
@@ -179,13 +180,13 @@ export default function ProblemSolution() {
 
         {/* Solution Section */}
         <div className="mx-auto max-w-2xl lg:text-center mb-16">
-          <h2 className="text-base font-semibold leading-7 text-emerald-600">The Sync Solution</h2>
+          <h2 className="text-base font-semibold leading-7 text-emerald-600">The ERP Sync Solution</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            One Source of Truth for Everyone
+            One Source of Truth: Your ERP to Their Mobile App
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            InvoicePatch connects your system directly to contractor apps. 
-            Same data, same format, zero reconciliation needed.
+            InvoicePatch connects your SAP, JDE, or Oracle system directly to service contractor mobile apps. 
+            Same AFE codes, same well names, same rates - zero reconciliation needed.
           </p>
         </div>
 
