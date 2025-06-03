@@ -14,13 +14,17 @@ import {
 } from '@heroicons/react/24/outline';
 
 import InvoiceCalculator from '@/components/manager/InvoiceCalculator';
-import { 
-  AlbertaInvoiceCalculation,
-  AlbertaTaxUtils,
+import {
+  calculateDailyAlbertaTax,
+  calculateWeeklyAlbertaTax,
+  calculateAnnualGSTEstimate,
+  validateTaxCalculation,
   formatCAD,
   ALBERTA_GST_RATE,
   STANDARD_TRAVEL_RATE_PER_KM,
-  calculateAnnualGSTEstimate
+  DailyWorkData,
+  WeeklyWorkData,
+  AlbertaInvoiceCalculation
 } from '@/lib/albertaTax';
 
 const TaxDemoPage = () => {
@@ -84,7 +88,7 @@ const TaxDemoPage = () => {
   };
 
   const runScenario = (scenario: any) => {
-    const calculation = AlbertaTaxUtils.calculate(scenario.data);
+    const calculation = calculateDailyAlbertaTax(scenario.data);
     setCurrentCalculation(calculation);
   };
 
@@ -192,9 +196,9 @@ const TaxDemoPage = () => {
                         <span className="text-gray-600">Taxable Services:</span>
                         <span className="font-bold">{formatCAD(currentCalculation.taxableSubtotal)}</span>
                       </div>
-                      <div className="flex justify-between text-red-600">
+                      <div className="flex justify-between items-center text-red-600">
                         <span>GST ({(ALBERTA_GST_RATE * 100).toFixed(0)}%):</span>
-                        <span className="font-bold">{formatCAD(currentCalculation.gst)}</span>
+                        <span className="font-bold">{formatCAD(currentCalculation.gstAmount)}</span>
                       </div>
                       <div className="flex justify-between text-green-600">
                         <span>Tax-Free Reimbursements:</span>
@@ -288,7 +292,7 @@ const TaxDemoPage = () => {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               {scenarios.map((scenario, index) => {
-                const calculation = AlbertaTaxUtils.calculate(scenario.data);
+                const calculation = calculateDailyAlbertaTax(scenario.data);
                 
                 return (
                   <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
@@ -336,9 +340,9 @@ const TaxDemoPage = () => {
                           <span className="text-gray-600">Taxable Subtotal:</span>
                           <span>{formatCAD(calculation.taxableSubtotal)}</span>
                         </div>
-                        <div className="flex justify-between text-red-600">
-                          <span>GST:</span>
-                          <span>{formatCAD(calculation.gst)}</span>
+                        <div className="flex justify-between items-center text-red-600">
+                          <span>GST ({(ALBERTA_GST_RATE * 100).toFixed(0)}%):</span>
+                          <span className="font-bold">{formatCAD(calculation.gstAmount)}</span>
                         </div>
                         <div className="flex justify-between text-green-600">
                           <span>Reimbursements:</span>

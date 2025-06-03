@@ -62,94 +62,67 @@ const cardVariants = {
 
 export default function Testimonials() {
   return (
-    <section className="bg-white" style={{ minHeight: '100vh' }}>
-      <div className="w-full py-12 sm:py-16 lg:py-20" style={{
-        WebkitBackfaceVisibility: 'hidden',
-        backfaceVisibility: 'hidden',
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)'
-      }}>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="mx-auto max-w-xl text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            style={{
-              WebkitBackfaceVisibility: 'hidden',
-              backfaceVisibility: 'hidden'
-            }}
-          >
-            <h2 className="text-base font-semibold leading-7 tracking-tight text-emerald-600">Testimonials</h2>
-            <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
-              Real Results from Oil & Gas Operations
-            </p>
-          </motion.div>
-          
-          <div className="mx-auto mt-12 sm:mt-16 grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 text-sm leading-6 text-gray-900 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-3">
-            {testimonials.map((testimonial, testimonialIdx) => (
-              <motion.div
-                key={testimonialIdx}
-                className="group relative"
-                variants={cardVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ delay: testimonialIdx * 0.1 }}
-                whileHover={{ 
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
-                style={{
-                  WebkitBackfaceVisibility: 'hidden',
-                  backfaceVisibility: 'hidden',
-                  transform: 'translateZ(0)',
-                  WebkitTransform: 'translateZ(0)'
-                }}
-              >
-                <div className="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-900/5 h-full flex flex-col hover:shadow-xl transition-shadow duration-200">
-                  {/* Stars */}
-                  <div className="flex gap-x-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className="h-5 w-5 text-emerald-400" />
-                    ))}
-                  </div>
+    <div className="bg-gray-50 py-12 sm:py-16 lg:py-20 mobile-container">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6 break-words">
+            What Our Users Say
+          </h2>
+          <p className="text-lg sm:text-xl text-gray-600 leading-relaxed break-words">
+            Real feedback from managers and contractors using InvoicePatch
+          </p>
+        </div>
 
-                  {/* Testimonial Text */}
-                  <blockquote className="text-gray-900 flex-grow">
-                    <p>"{testimonial.body}"</p>
-                  </blockquote>
-
-                  {/* Author Info */}
-                  <div className="mt-6 border-t border-gray-100 pt-6">
-                    <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
-                    <div className="text-gray-600">{testimonial.author.handle}</div>
-                    <div className="text-sm text-emerald-600 font-medium">{testimonial.author.company}</div>
-                    <div className="text-xs text-gray-500">{testimonial.author.location}</div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="mt-4 grid grid-cols-1 gap-2">
-                    <div className="rounded-lg bg-emerald-50 px-3 py-2 text-center">
-                      <div className="text-sm font-semibold text-emerald-700">{testimonial.stats.timeSaved}</div>
-                      <div className="text-xs text-emerald-600">Time Saved</div>
-                    </div>
-                    <div className="rounded-lg bg-blue-50 px-3 py-2 text-center">
-                      <div className="text-sm font-semibold text-blue-700">{testimonial.stats.errorReduction}</div>
-                      <div className="text-xs text-blue-600">Error Reduction</div>
-                    </div>
-                    <div className="rounded-lg bg-gray-50 px-3 py-2 text-center">
-                      <div className="text-sm font-semibold text-gray-700">{testimonial.stats.system}</div>
-                      <div className="text-xs text-gray-600">System Integration</div>
-                    </div>
-                  </div>
+        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={testimonial.author.name}
+              className="flex flex-col justify-between bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 hover:shadow-lg transition-shadow duration-200"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+            >
+              <div>
+                <div className="flex gap-1 mb-4 sm:mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <StarIcon key={i} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+                  ))}
                 </div>
-              </motion.div>
-            ))}
+                <blockquote className="text-base sm:text-lg leading-7 sm:leading-8 text-gray-900 mb-6 sm:mb-8 break-words">
+                  "{testimonial.body}"
+                </blockquote>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg sm:text-xl font-bold text-gray-600">
+                    {testimonial.author.name.split(' ').map(n => n[0]).join('')}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-base sm:text-lg font-semibold text-gray-900 break-words">{testimonial.author.name}</div>
+                  <div className="text-sm sm:text-base text-gray-600 break-words">{testimonial.author.handle}</div>
+                  <div className="text-sm text-gray-500 break-words">{testimonial.author.company}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-12 sm:mt-16 text-center">
+          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 break-words">
+            Join hundreds of satisfied customers who've eliminated invoice reconciliation
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+            <button className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-emerald-600 border border-transparent rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 touch-target">
+              Start Your Free Trial
+            </button>
+            <button className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target">
+              Schedule Demo
+            </button>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 } 

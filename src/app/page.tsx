@@ -25,7 +25,7 @@ const simpleVariants = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white mobile-container overflow-x-hidden">
+    <main className="min-h-screen bg-white overflow-x-hidden w-full">
       <MobileNavigation />
       <AnimatedBranding />
       <Hero />
@@ -59,6 +59,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
+        id="pricing"
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"

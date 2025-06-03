@@ -102,18 +102,18 @@ export default function Hero() {
         />
       </div>
       
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24">
         <div className="mx-auto max-w-6xl text-center">
           {/* Problem Badge */}
           <motion.div 
-            className="mb-4 sm:mb-6 md:mb-8 flex justify-center px-2"
+            className="mb-6 sm:mb-8 md:mb-10 flex justify-center px-2"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
           >
-            <div className="relative rounded-full bg-red-50 px-3 py-2 text-xs sm:text-sm leading-5 sm:leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center max-w-full">
-              <ExclamationTriangleIcon className="inline h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 flex-shrink-0" />
-              <span className="break-words">
+            <div className="relative rounded-full bg-red-50 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center max-w-full break-words">
+              <ExclamationTriangleIcon className="inline h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+              <span className="font-medium">
                 <span className="hidden sm:inline">Oilfield contractors lose $500-1000 per missed invoice deadline</span>
                 <span className="sm:hidden">Contractors lose $500+ per missed deadline</span>
               </span>
@@ -122,94 +122,167 @@ export default function Hero() {
 
           {/* Main Headline */}
           <motion.h1 
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight break-words hyphens-auto"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            <span className="text-blue-600 block sm:inline break-words">
+            <span className="text-blue-600 block break-words">
               Stop Playing Invoice Detective
             </span>
-            <span className="block sm:inline break-words"> 
+            <span className="block break-words text-gray-900"> 
               Every Friday Afternoon
             </span>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p 
-            className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl font-medium sm:font-semibold lg:font-bold leading-6 sm:leading-7 md:leading-8 lg:leading-9 text-gray-600 max-w-4xl mx-auto"
+            className="mt-6 sm:mt-8 text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed text-gray-600 max-w-4xl mx-auto break-words"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
           >
-            <span className="break-words">
-              Upload your project data once. Contractors submit pre-matched invoices. 
-              Approve everything in minutes, not hours.
-            </span>
+            Upload your project data once. Contractors submit pre-matched invoices. 
+            Approve everything in minutes, not hours.
           </motion.p>
 
           {/* CTA Section */}
           <motion.div 
-            className="mt-6 sm:mt-8 md:mt-10 flex flex-col gap-3 sm:gap-4 px-4 sm:px-0"
+            className="mt-8 sm:mt-10 md:mt-12 flex flex-col gap-4 sm:gap-6"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
           >
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 lg:gap-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto">
               <Link
-                href="/contractor-dashboard"
-                className="mobile-button w-full sm:w-auto rounded-lg bg-emerald-600 px-4 sm:px-6 py-3 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors duration-200 hover:scale-105 transform group touch-target"
+                href="/invoice-setup"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-emerald-600 border border-transparent rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 touch-target group"
               >
-                <span className="flex items-center justify-center">
-                  Contractor Interface
-                  <ArrowRightIcon className="ml-2 h-4 w-4 inline group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                <span className="flex flex-col items-center sm:flex-row sm:items-center">
+                  <span className="flex items-center">
+                    Start Free Trial
+                    <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                  </span>
+                  <span className="text-sm text-emerald-100 mt-1 sm:mt-0 sm:ml-2 font-normal">
+                    Set up your invoice in 2 minutes
+                  </span>
                 </span>
-                <div className="text-xs text-emerald-100 mt-1 font-normal">Manual entry, time tracking, mobile invoicing</div>
               </Link>
               
               <Link
-                href="/manager-reconciliation"
-                className="mobile-button w-full sm:w-auto rounded-lg bg-blue-600 px-4 sm:px-6 py-3 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors duration-200 hover:scale-105 transform group touch-target"
+                href="/contractor-dashboard"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target group"
               >
-                <span className="flex items-center justify-center">
-                  Manager Interface
-                  <DocumentTextIcon className="ml-2 h-4 w-4 inline group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="flex flex-col items-center sm:flex-row sm:items-center">
+                  <span className="flex items-center">
+                    Contractor Interface
+                    <DocumentTextIcon className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  </span>
+                  <span className="text-sm text-blue-100 mt-1 sm:mt-0 sm:ml-2 font-normal">
+                    Mobile entry, time tracking, invoicing
+                  </span>
                 </span>
-                <div className="text-xs text-blue-100 mt-1 font-normal">ERP sync, bulk approvals, reconciliation</div>
               </Link>
             </div>
             
             <div className="flex justify-center">
-              <button className="mobile-button w-full sm:w-auto flex items-center justify-center text-sm font-semibold leading-6 text-gray-900 hover:text-emerald-600 transition-colors duration-200 py-3 touch-target">
+              <button className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target">
                 <PlayCircleIcon className="mr-2 h-5 w-5 flex-shrink-0" />
                 Watch 2-min demo
               </button>
             </div>
           </motion.div>
 
-          {/* Stats Grid */}
+          {/* Stats Grid - Mobile Optimized */}
           <motion.div 
-            className="mt-10 sm:mt-12 md:mt-16 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 px-2 sm:px-0"
+            className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 max-w-4xl mx-auto"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
           >
-            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600 break-words">8+ hours</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Average time saved per week</dt>
+            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-emerald-600 break-words">8+ hours</dd>
+              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Average time saved per week</dt>
             </div>
-            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-blue-600">95%</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Billing error reduction</dt>
+            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-blue-600">95%</dd>
+              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Billing error reduction</dt>
             </div>
-            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">3x</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Faster payment processing</dt>
+            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-emerald-600">3x</dd>
+              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Faster payment processing</dt>
             </div>
+          </motion.div>
+
+          {/* Countdown Timer - Mobile Responsive */}
+          <motion.div 
+            className="mt-12 sm:mt-16 md:mt-20 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-6 sm:p-8 max-w-3xl mx-auto"
+            variants={simpleVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.5 }}
+          >
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-orange-900 mb-4 text-center break-words">
+              🔥 Limited Early Access
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.days}</div>
+                <div className="text-xs sm:text-sm text-orange-700 font-medium">Days</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.hours}</div>
+                <div className="text-xs sm:text-sm text-orange-700 font-medium">Hours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.minutes}</div>
+                <div className="text-xs sm:text-sm text-orange-700 font-medium">Minutes</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.seconds}</div>
+                <div className="text-xs sm:text-sm text-orange-700 font-medium">Seconds</div>
+              </div>
+            </div>
+            
+            {/* Email Signup Form */}
+            {!isSubmitted ? (
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex-1">
+                  <input
+                    type="email"
+                    {...register('email', { 
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address'
+                      }
+                    })}
+                    placeholder="Enter your email for early access"
+                    className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 touch-target"
+                    disabled={isSubmitting}
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 break-words">{errors.email.message}</p>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto px-6 py-3 text-base font-semibold text-white bg-orange-600 border border-transparent rounded-lg shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
+                >
+                  {isSubmitting ? 'Securing...' : 'Secure My Spot'}
+                </button>
+              </form>
+            ) : (
+              <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                <CheckCircleIcon className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <p className="text-green-800 font-medium">Thank you! We'll notify you when early access opens.</p>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

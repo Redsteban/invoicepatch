@@ -173,21 +173,21 @@ const MobileNavigation = () => {
                 {/* CTA Buttons */}
                 <div className="space-y-3">
                   <Link
-                    href="/contractor-dashboard"
+                    href="/invoice-setup"
                     onClick={() => setIsOpen(false)}
                     className="mobile-button w-full flex items-center justify-center px-4 py-3 text-base font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 touch-target"
                   >
                     <DocumentTextIcon className="h-5 w-5 mr-2" />
-                    Contractor Interface
+                    Start Free Trial
                   </Link>
 
                   <Link
-                    href="/manager-reconciliation"
+                    href="/contractor-dashboard"
                     onClick={() => setIsOpen(false)}
                     className="mobile-button w-full flex items-center justify-center px-4 py-3 text-base font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 touch-target"
                   >
-                    <ChartBarIcon className="h-5 w-5 mr-2" />
-                    Manager Interface
+                    <DocumentTextIcon className="h-5 w-5 mr-2" />
+                    Contractor Interface
                   </Link>
 
                   <button className="mobile-button w-full flex items-center justify-center px-4 py-3 text-base font-semibold text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 touch-target">

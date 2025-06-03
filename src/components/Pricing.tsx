@@ -174,140 +174,161 @@ function PaymentModal({ isOpen, onClose, plan }: {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto mobile-scroll">
-        <div className="sticky top-0 bg-white border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800 pr-2">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-auto max-h-[90vh] overflow-hidden mobile-scroll">
+        <div className="sticky top-0 bg-white border-b px-4 sm:px-6 py-4 flex justify-between items-center z-10">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 pr-2 break-words">
             Contact Sales - {plan.name}
           </h2>
           <button
             onClick={handleClose}
             disabled={isLoading}
-            className="mobile-button text-gray-400 hover:text-gray-600 disabled:opacity-50 touch-target"
+            className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 transition-colors rounded-lg touch-target"
+            aria-label="Close modal"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <div className="flex">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0" />
-                <div className="ml-3">
-                  <p className="text-sm text-red-700 break-words">{error}</p>
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                <div className="flex">
+                  <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700 break-words leading-relaxed">{error}</p>
+                  </div>
                 </div>
               </div>
+            )}
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                id="email"
+                {...register('email', { 
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Invalid email address'
+                  }
+                })}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                placeholder="your.email@company.com"
+                disabled={isLoading}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600 break-words">{errors.email.message}</p>
+              )}
             </div>
-          )}
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
-            </label>
-            <input
-              id="email"
-              type="email"
-              {...register('email', { 
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
-                }
-              })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
-              placeholder="your.email@company.com"
-            />
-            {errors.email && (
-              <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-2">
+                Company Name *
+              </label>
+              <input
+                type="text"
+                id="company_name"
+                {...register('company_name', { required: 'Company name is required' })}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                placeholder="Your Company Inc."
+                disabled={isLoading}
+              />
+              {errors.company_name && (
+                <p className="mt-1 text-sm text-red-600 break-words">{errors.company_name.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
-              Company Name *
-            </label>
-            <input
-              id="company_name"
-              type="text"
-              {...register('company_name', { required: 'Company name is required' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
-              placeholder="Your Company Inc."
-            />
-            {errors.company_name && (
-              <p className="text-red-600 text-sm mt-1">{errors.company_name.message}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="contractor_count" className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Contractors *
+              </label>
+              <select
+                id="contractor_count"
+                {...register('contractor_count', { required: 'Please select contractor count' })}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                disabled={isLoading}
+              >
+                <option value="">Select range...</option>
+                <option value="1-10">1-10 contractors</option>
+                <option value="11-25">11-25 contractors</option>
+                <option value="26-50">26-50 contractors</option>
+                <option value="51-100">51-100 contractors</option>
+                <option value="100+">100+ contractors</option>
+              </select>
+              {errors.contractor_count && (
+                <p className="mt-1 text-sm text-red-600 break-words">{errors.contractor_count.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="contractor_count" className="block text-sm font-medium text-gray-700 mb-1">
-              Number of Contractors *
-            </label>
-            <select
-              id="contractor_count"
-              {...register('contractor_count', { required: 'Contractor count is required' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
-            >
-              <option value="">Select range</option>
-              <option value="1-10">1-10 contractors</option>
-              <option value="11-25">11-25 contractors</option>
-              <option value="26-50">26-50 contractors</option>
-              <option value="51-100">51-100 contractors</option>
-              <option value="100+">100+ contractors</option>
-            </select>
-            {errors.contractor_count && (
-              <p className="text-red-600 text-sm mt-1">{errors.contractor_count.message}</p>
-            )}
-          </div>
+            <div>
+              <label htmlFor="current_invoicing_method" className="block text-sm font-medium text-gray-700 mb-2">
+                Current Invoicing Method *
+              </label>
+              <select
+                id="current_invoicing_method"
+                {...register('current_invoicing_method', { required: 'Please select current method' })}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                disabled={isLoading}
+              >
+                <option value="">Select method...</option>
+                <option value="email">Email PDFs</option>
+                <option value="paper">Paper invoices</option>
+                <option value="erp_manual">Manual ERP entry</option>
+                <option value="spreadsheet">Excel/Spreadsheets</option>
+                <option value="other">Other system</option>
+              </select>
+              {errors.current_invoicing_method && (
+                <p className="mt-1 text-sm text-red-600 break-words">{errors.current_invoicing_method.message}</p>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="current_invoicing_method" className="block text-sm font-medium text-gray-700 mb-1">
-              Current Invoicing Method
-            </label>
-            <select
-              id="current_invoicing_method"
-              {...register('current_invoicing_method')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
-            >
-              <option value="">Select current method</option>
-              <option value="email">Email attachments</option>
-              <option value="paper">Paper invoices</option>
-              <option value="erp">Direct ERP entry</option>
-              <option value="portal">Contractor portal</option>
-              <option value="mixed">Mixed methods</option>
-            </select>
-          </div>
+            <div>
+              <label htmlFor="biggest_pain_point" className="block text-sm font-medium text-gray-700 mb-2">
+                Biggest Pain Point (Optional)
+              </label>
+              <textarea
+                id="biggest_pain_point"
+                {...register('biggest_pain_point')}
+                rows={3}
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 resize-none touch-target"
+                placeholder="What's your biggest challenge with invoice processing?"
+                disabled={isLoading}
+              />
+            </div>
 
-          <div>
-            <label htmlFor="biggest_pain_point" className="block text-sm font-medium text-gray-700 mb-1">
-              Biggest Invoice Pain Point
-            </label>
-            <textarea
-              id="biggest_pain_point"
-              {...register('biggest_pain_point')}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Tell us about your biggest invoicing challenge..."
-            />
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mobile-button w-full sm:flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg text-base font-semibold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
-            >
-              {isLoading ? 'Submitting...' : 'Contact Sales'}
-            </button>
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={isLoading}
-              className="mobile-button w-full sm:w-auto bg-gray-600 text-white py-3 px-4 rounded-lg text-base font-semibold hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+            <div className="border-t pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <button
+                type="button"
+                onClick={handleClose}
+                disabled={isLoading}
+                className="w-full sm:flex-1 px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:flex-1 px-6 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Submitting...
+                  </span>
+                ) : (
+                  'Contact Sales'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -395,28 +416,28 @@ export default function Pricing() {
           </div>
 
           {/* Pricing Cards - Mobile First Stacking */}
-          <div className="isolate mx-auto mt-12 sm:mt-16 lg:mt-20 space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:max-w-none lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
+          <div className="isolate mx-auto mt-12 sm:mt-16 lg:mt-20 grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12 max-w-6xl">
             {tiers.map((tier, index) => (
               <div
                 key={tier.id}
-                className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 ring-1 relative ${
+                className={`rounded-xl sm:rounded-2xl p-6 sm:p-8 ring-1 relative transition-all duration-200 hover:shadow-lg ${
                   tier.mostPopular
-                    ? 'bg-emerald-600 ring-emerald-600'
-                    : 'bg-white ring-gray-200'
+                    ? 'bg-emerald-600 ring-emerald-600 scale-100 sm:scale-105'
+                    : 'bg-white ring-gray-200 hover:ring-gray-300'
                 }`}
               >
                 {tier.mostPopular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="rounded-full bg-emerald-600 px-4 py-1 text-sm font-semibold text-white ring-4 ring-white whitespace-nowrap">
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="rounded-full bg-emerald-600 px-3 py-1 sm:px-4 sm:py-2 text-sm font-semibold text-white ring-4 ring-white whitespace-nowrap">
                       Most Popular
                     </span>
                   </div>
                 )}
                 
-                <div className="flex items-center justify-between gap-x-4">
+                <div className="flex items-center justify-between gap-x-4 mb-4">
                   <h3
                     id={tier.id}
-                    className={`text-lg sm:text-xl font-semibold leading-8 break-words ${
+                    className={`text-xl sm:text-2xl font-bold leading-8 break-words ${
                       tier.mostPopular ? 'text-white' : 'text-gray-900'
                     }`}
                   >
@@ -424,19 +445,19 @@ export default function Pricing() {
                   </h3>
                 </div>
                 
-                <p className={`mt-4 text-sm sm:text-base leading-6 break-words ${
+                <p className={`mb-6 text-base sm:text-lg leading-7 break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
                 }`}>
                   {tier.description}
                 </p>
                 
-                <p className={`mt-6 text-xl sm:text-2xl font-bold tracking-tight ${
+                <p className={`mb-2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight ${
                   tier.mostPopular ? 'text-white' : 'text-gray-900'
                 }`}>
                   Custom Pricing
                 </p>
                 
-                <p className={`mt-2 text-xs sm:text-sm break-words ${
+                <p className={`mb-6 text-sm sm:text-base break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-500'
                 }`}>
                   {tier.note}
@@ -444,27 +465,27 @@ export default function Pricing() {
                 
                 <button
                   onClick={() => handleContactSales(tier)}
-                  className={`mobile-button mt-6 block w-full rounded-md px-3 py-3 text-center text-sm font-semibold leading-6 touch-target focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  className={`w-full inline-flex items-center justify-center px-6 py-4 text-base font-semibold rounded-lg shadow-sm transition-colors duration-200 touch-target focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                     tier.mostPopular
-                      ? 'bg-white text-emerald-600 hover:bg-gray-100 focus-visible:outline-white'
-                      : 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-emerald-600'
+                      ? 'bg-white text-emerald-600 hover:bg-gray-100 focus:ring-white'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
                   }`}
                 >
                   {tier.cta}
                 </button>
                 
-                <ul role="list" className={`mt-8 space-y-3 text-sm leading-6 break-words ${
+                <ul role="list" className={`mt-8 space-y-4 text-sm sm:text-base leading-7 break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
                 }`}>
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex gap-x-3">
+                    <li key={feature} className="flex gap-x-3 items-start">
                       <CheckIcon
-                        className={`h-6 w-5 flex-none ${
+                        className={`h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 mt-0.5 ${
                           tier.mostPopular ? 'text-white' : 'text-emerald-600'
                         }`}
                         aria-hidden="true"
                       />
-                      <span className="break-words">{feature}</span>
+                      <span className="break-words leading-relaxed">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -493,24 +514,25 @@ export default function Pricing() {
 
           {/* CTA */}
           <div className="mt-12 sm:mt-16 text-center">
-            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 mb-4 break-words">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6 break-words">
               Ready to Get Started?
             </h3>
-            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 break-words">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto break-words leading-relaxed">
               Schedule a demo to see how integration will work with your specific business system
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto">
               <Link
                 href="/invoice-builder"
-                className="mobile-button w-full sm:w-auto rounded-md bg-emerald-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500 touch-target"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-emerald-600 border border-transparent rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 touch-target"
               >
                 See Demo
               </Link>
               <button 
                 onClick={() => handleContactSales(tiers[1])}
-                className="mobile-button w-full sm:w-auto text-base font-semibold leading-6 text-gray-900 hover:text-emerald-600 py-3 touch-target"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target"
               >
-                Contact Sales <span aria-hidden="true">→</span>
+                Contact Sales
+                <span className="ml-2" aria-hidden="true">→</span>
               </button>
             </div>
           </div>
