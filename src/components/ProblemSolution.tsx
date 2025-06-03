@@ -21,7 +21,7 @@ export default function ProblemSolution() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 mb-3 sm:mb-4">
-            The Problem: Manual Reconciliation Hell
+            The Problem: Automate invoices correlation in minutes, not hours
           </h2>
           <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
             Managers have AFE codes in ERP systems. Contractors recreate them manually on invoices. 

@@ -24,7 +24,7 @@ const simpleVariants = {
 
 export default function Home() {
   return (
-    <main>
+    <main className="min-h-screen bg-white mobile-container overflow-x-hidden">
       <AnimatedBranding />
       <Hero />
       

@@ -75,17 +75,17 @@ const simpleVariants = {
 export default function Features() {
   return (
     <div className="bg-white py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main Features Section */}
         <motion.div 
-          className="mx-auto max-w-2xl lg:text-center"
+          className="mx-auto max-w-2xl lg:text-center px-4 sm:px-0"
           variants={simpleVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
           <h2 className="text-base font-semibold leading-7 text-emerald-600">Core Features</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
             Built to Eliminate Manual Reconciliation
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
@@ -93,8 +93,8 @@ export default function Features() {
           </p>
         </motion.div>
 
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 lg:max-w-none lg:grid-cols-2">
+        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none px-4 sm:px-0">
+          <dl className="grid max-w-xl grid-cols-1 gap-x-6 gap-y-8 sm:gap-x-8 sm:gap-y-12 lg:max-w-none lg:grid-cols-2">
             {features.map((feature, index) => (
               <motion.div 
                 key={feature.name} 
@@ -127,14 +127,14 @@ export default function Features() {
 
         {/* Time Savings Breakdown */}
         <motion.div 
-          className="mt-20 sm:mt-24"
+          className="mt-20 sm:mt-24 px-4 sm:px-0"
           variants={simpleVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
           <div className="mx-auto max-w-2xl lg:text-center mb-12">
-            <h3 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 lg:text-3xl">
               Exactly How You'll Save Time
             </h3>
             <p className="mt-4 text-lg leading-8 text-gray-600">
@@ -143,8 +143,8 @@ export default function Features() {
           </div>
 
           <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200">
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-              <div className="grid grid-cols-4 gap-4 text-sm font-semibold text-gray-700">
+            <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm font-semibold text-gray-700">
                 <div>Current Task</div>
                 <div className="text-center">Before</div>
                 <div className="text-center">After</div>
@@ -156,14 +156,14 @@ export default function Features() {
               {timeComparison.map((item, index) => (
                 <motion.div 
                   key={item.task}
-                  className="px-6 py-4 hover:bg-gray-50 transition-colors duration-200"
+                  className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors duration-200"
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.3 }}
                 >
-                  <div className="grid grid-cols-4 gap-4 text-sm">
-                    <div className="font-medium text-gray-900">{item.task}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm">
+                    <div className="font-medium text-gray-900 col-span-2 sm:col-span-1">{item.task}</div>
                     <div className="text-center text-red-600 font-medium">{item.before}</div>
                     <div className="text-center text-emerald-600 font-medium">{item.after}</div>
                     <div className="text-center text-blue-600 font-semibold">{item.savings}</div>
@@ -172,12 +172,10 @@ export default function Features() {
               ))}
             </div>
             
-            <div className="bg-emerald-50 px-6 py-4 border-t border-emerald-200">
-              <div className="grid grid-cols-4 gap-4 text-sm font-bold">
-                <div className="text-gray-900">Total Weekly Savings</div>
-                <div></div>
-                <div></div>
-                <div className="text-center text-emerald-700 text-lg">12+ hours</div>
+            <div className="bg-emerald-50 px-4 sm:px-6 py-4 border-t border-emerald-200">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm font-bold">
+                <div className="text-gray-900 col-span-2 sm:col-span-3">Total Weekly Savings</div>
+                <div className="text-center text-emerald-700 text-base sm:text-lg">12+ hours</div>
               </div>
             </div>
           </div>
@@ -185,27 +183,27 @@ export default function Features() {
 
         {/* Integration Section */}
         <motion.div 
-          className="mt-20 sm:mt-24"
+          className="mt-20 sm:mt-24 px-4 sm:px-0"
           variants={simpleVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
           <div className="mx-auto max-w-2xl lg:text-center mb-12">
-            <h3 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 lg:text-3xl">
               Works with Your Existing Systems
             </h3>
             <p className="mt-4 text-lg leading-8 text-gray-600">
-              Direct integration with major ERP systems used in oil & gas
+              Direct integration with systems used daily by oil & gas companies
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
             {[
-              { name: 'SAP', description: 'Full AFE sync' },
-              { name: 'JD Edwards', description: 'Real-time data' },
-              { name: 'Oracle', description: 'Automated workflow' },
-              { name: 'NetSuite', description: 'Instant updates' }
+              { name: 'FieldCap', description: 'Direct sync' },
+              { name: 'FireSpark', description: 'Real-time data' },
+              { name: 'AFE Manager', description: 'Cost tracking' },
+              { name: 'WellView', description: 'Production data' }
             ].map((system, index) => (
               <motion.div 
                 key={system.name}

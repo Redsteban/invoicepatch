@@ -102,63 +102,75 @@ export default function Hero() {
         />
       </div>
       
-      <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
         <div className="mx-auto max-w-6xl text-center">
           {/* Problem Badge */}
           <motion.div 
-            className="mb-8 flex justify-center"
+            className="mb-6 sm:mb-8 flex justify-center px-2 sm:px-4"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
           >
-            <div className="relative rounded-full bg-red-50 px-4 py-2 text-sm leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200">
-              <ExclamationTriangleIcon className="inline h-4 w-4 mr-2" />
-              Oilfield contractors lose $500-1000 per missed invoice deadline
+            <div className="relative rounded-full bg-red-50 px-3 py-2 text-xs sm:text-sm leading-5 sm:leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center">
+              <ExclamationTriangleIcon className="inline h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Oilfield contractors lose $500-1000 per missed invoice deadline</span>
+              <span className="sm:hidden">Contractors lose $500+ per missed deadline</span>
             </div>
           </motion.div>
 
           {/* Main Headline */}
           <motion.h1 
-            className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-4 sm:mb-6 px-2 sm:px-4 lg:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            <span className="text-emerald-600">Get Paid Faster.</span>
-            <br />
-            <span className="text-blue-600">Stop Reconciliation Hell.</span>
+            <span className="text-blue-600">Stop Playing Invoice Detective Every Friday Afternoon</span>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p 
-            className="mt-6 text-lg leading-8 text-gray-600 max-w-3xl mx-auto"
+            className="mt-4 sm:mt-6 text-lg sm:text-xl lg:text-2xl font-semibold sm:font-bold leading-6 sm:leading-7 lg:leading-8 text-gray-600 max-w-4xl mx-auto px-3 sm:px-4 lg:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
           >
-            InvoicePatch syncs your ERP data directly to contractor mobile apps. 
-            Same AFE codes, same well names, same rates. Zero reconciliation needed.
+            Upload your project data once. Contractors submit pre-matched invoices. Approve everything in minutes, not hours.
           </motion.p>
 
           {/* CTA Section */}
           <motion.div 
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6"
+            className="mt-8 sm:mt-10 flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 sm:gap-4 lg:gap-6 px-3 sm:px-4 lg:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
           >
             <Link
-              href="/invoice-builder"
-              className="rounded-md bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors duration-200 hover:scale-105 transform"
+              href="/contractor-dashboard"
+              className="mobile-button w-full sm:w-auto rounded-lg sm:rounded-md bg-emerald-600 px-4 sm:px-6 py-4 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors duration-200 hover:scale-105 transform group"
             >
-              Try Invoice Builder
-              <ArrowRightIcon className="ml-2 h-4 w-4 inline" />
+              <span className="flex items-center justify-center">
+                Contractor Interface
+                <ArrowRightIcon className="ml-2 h-4 w-4 inline group-hover:translate-x-1 transition-transform" />
+              </span>
+              <div className="text-xs text-emerald-100 mt-1 font-normal">Manual entry, time tracking, mobile invoicing</div>
             </Link>
             
-            <button className="flex items-center text-sm font-semibold leading-6 text-gray-900 hover:text-emerald-600 transition-colors duration-200">
+            <Link
+              href="/manager-reconciliation"
+              className="mobile-button w-full sm:w-auto rounded-lg sm:rounded-md bg-blue-600 px-4 sm:px-6 py-4 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors duration-200 hover:scale-105 transform group"
+            >
+              <span className="flex items-center justify-center">
+                Manager Interface
+                <DocumentTextIcon className="ml-2 h-4 w-4 inline group-hover:scale-110 transition-transform" />
+              </span>
+              <div className="text-xs text-blue-100 mt-1 font-normal">ERP sync, bulk approvals, reconciliation</div>
+            </Link>
+            
+            <button className="mobile-button w-full sm:w-auto flex items-center justify-center text-sm font-semibold leading-6 text-gray-900 hover:text-emerald-600 transition-colors duration-200 py-2">
               <PlayCircleIcon className="mr-2 h-5 w-5" />
               Watch 2-min demo
             </button>
@@ -166,23 +178,23 @@ export default function Hero() {
 
           {/* Stats Grid */}
           <motion.div 
-            className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3"
+            className="mt-12 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 px-3 sm:px-4 lg:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
           >
-            <div className="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt className="text-base leading-7 text-gray-600">Average time saved per week</dt>
-              <dd className="order-first text-3xl font-semibold tracking-tight text-emerald-600 sm:text-5xl">8+ hours</dd>
+            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
+              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">8+ hours</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Average time saved per week</dt>
             </div>
-            <div className="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt className="text-base leading-7 text-gray-600">Billing error reduction</dt>
-              <dd className="order-first text-3xl font-semibold tracking-tight text-blue-600 sm:text-5xl">95%</dd>
+            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
+              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-blue-600">95%</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Billing error reduction</dt>
             </div>
-            <div className="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt className="text-base leading-7 text-gray-600">Faster payment processing</dt>
-              <dd className="order-first text-3xl font-semibold tracking-tight text-emerald-600 sm:text-5xl">3x</dd>
+            <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
+              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">3x</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Faster payment processing</dt>
             </div>
           </motion.div>
         </div>
