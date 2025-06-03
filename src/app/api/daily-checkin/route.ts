@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+
+// Check if environment variables are available
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Only import and initialize Supabase if environment variables are present
+let supabase: any = null;
+
+if (supabaseUrl && supabaseServiceKey) {
+  const { createClient } = require('@supabase/supabase-js');
+  supabase = createClient(supabaseUrl, supabaseServiceKey);
+}
+
+// Import other dependencies
 import {
   calculateDailyAlbertaTax,
   validateTaxCalculation,
   DailyWorkData,
   AlbertaInvoiceCalculation
 } from '@/lib/albertaTax';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 interface DailyCheckInSubmission {
   date: string;
@@ -28,6 +36,14 @@ interface DailyCheckInSubmission {
 }
 
 export async function POST(request: NextRequest) {
+  // Return error if Supabase is not configured
+  if (!supabase) {
+    return NextResponse.json(
+      { error: 'Database not configured. Please set up Supabase environment variables.' },
+      { status: 503 }
+    );
+  }
+
   try {
     const data: DailyCheckInSubmission = await request.json();
 
@@ -202,6 +218,14 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to retrieve daily check-in data
 export async function GET(request: NextRequest) {
+  // Return error if Supabase is not configured
+  if (!supabase) {
+    return NextResponse.json(
+      { error: 'Database not configured. Please set up Supabase environment variables.' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const trialId = searchParams.get('trial');
@@ -255,6 +279,8 @@ export async function GET(request: NextRequest) {
 }
 
 async function updateTrialStatistics(trialId: string) {
+  if (!supabase) return;
+  
   try {
     // Get all check-ins for this trial
     const { data: checkIns, error } = await supabase
@@ -268,8 +294,8 @@ async function updateTrialStatistics(trialId: string) {
       return;
     }
 
-    const workDays = checkIns.filter(c => c.worked_today).length;
-    const totalEarnings = checkIns.reduce((sum, c) => sum + (c.daily_total || 0), 0);
+    const workDays = checkIns.filter((c: any) => c.worked_today).length;
+    const totalEarnings = checkIns.reduce((sum: number, c: any) => sum + (c.daily_total || 0), 0);
     const lastCheckIn = checkIns.length > 0 ? checkIns[0].check_in_date : null;
 
     // Update trial with latest statistics
