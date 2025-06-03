@@ -90,11 +90,11 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative bg-white overflow-hidden">
+    <div className="relative bg-white overflow-hidden mobile-container">
       {/* Simplified Background decoration */}
-      <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+      <div className="absolute inset-x-0 -top-20 sm:-top-40 -z-10 transform-gpu overflow-hidden blur-3xl">
         <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-emerald-400 to-emerald-600 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          className="relative left-[calc(50%-5.5rem)] sm:left-[calc(50%-11rem)] aspect-[1155/678] w-[18rem] sm:w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-emerald-400 to-emerald-600 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style={{
             clipPath:
               'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
@@ -102,99 +102,113 @@ export default function Hero() {
         />
       </div>
       
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
         <div className="mx-auto max-w-6xl text-center">
           {/* Problem Badge */}
           <motion.div 
-            className="mb-6 sm:mb-8 flex justify-center px-2 sm:px-4"
+            className="mb-4 sm:mb-6 md:mb-8 flex justify-center px-2"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
           >
-            <div className="relative rounded-full bg-red-50 px-3 py-2 text-xs sm:text-sm leading-5 sm:leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center">
-              <ExclamationTriangleIcon className="inline h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Oilfield contractors lose $500-1000 per missed invoice deadline</span>
-              <span className="sm:hidden">Contractors lose $500+ per missed deadline</span>
+            <div className="relative rounded-full bg-red-50 px-3 py-2 text-xs sm:text-sm leading-5 sm:leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center max-w-full">
+              <ExclamationTriangleIcon className="inline h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 flex-shrink-0" />
+              <span className="break-words">
+                <span className="hidden sm:inline">Oilfield contractors lose $500-1000 per missed invoice deadline</span>
+                <span className="sm:hidden">Contractors lose $500+ per missed deadline</span>
+              </span>
             </div>
           </motion.div>
 
           {/* Main Headline */}
           <motion.h1 
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-4 sm:mb-6 px-2 sm:px-4 lg:px-0"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
           >
-            <span className="text-blue-600">Stop Playing Invoice Detective Every Friday Afternoon</span>
+            <span className="text-blue-600 block sm:inline break-words">
+              Stop Playing Invoice Detective
+            </span>
+            <span className="block sm:inline break-words"> 
+              Every Friday Afternoon
+            </span>
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p 
-            className="mt-4 sm:mt-6 text-lg sm:text-xl lg:text-2xl font-semibold sm:font-bold leading-6 sm:leading-7 lg:leading-8 text-gray-600 max-w-4xl mx-auto px-3 sm:px-4 lg:px-0"
+            className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl font-medium sm:font-semibold lg:font-bold leading-6 sm:leading-7 md:leading-8 lg:leading-9 text-gray-600 max-w-4xl mx-auto"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
           >
-            Upload your project data once. Contractors submit pre-matched invoices. Approve everything in minutes, not hours.
+            <span className="break-words">
+              Upload your project data once. Contractors submit pre-matched invoices. 
+              Approve everything in minutes, not hours.
+            </span>
           </motion.p>
 
           {/* CTA Section */}
           <motion.div 
-            className="mt-8 sm:mt-10 flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 sm:gap-4 lg:gap-6 px-3 sm:px-4 lg:px-0"
+            className="mt-6 sm:mt-8 md:mt-10 flex flex-col gap-3 sm:gap-4 px-4 sm:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
           >
-            <Link
-              href="/contractor-dashboard"
-              className="mobile-button w-full sm:w-auto rounded-lg sm:rounded-md bg-emerald-600 px-4 sm:px-6 py-4 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors duration-200 hover:scale-105 transform group"
-            >
-              <span className="flex items-center justify-center">
-                Contractor Interface
-                <ArrowRightIcon className="ml-2 h-4 w-4 inline group-hover:translate-x-1 transition-transform" />
-              </span>
-              <div className="text-xs text-emerald-100 mt-1 font-normal">Manual entry, time tracking, mobile invoicing</div>
-            </Link>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 lg:gap-6">
+              <Link
+                href="/contractor-dashboard"
+                className="mobile-button w-full sm:w-auto rounded-lg bg-emerald-600 px-4 sm:px-6 py-3 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 transition-colors duration-200 hover:scale-105 transform group touch-target"
+              >
+                <span className="flex items-center justify-center">
+                  Contractor Interface
+                  <ArrowRightIcon className="ml-2 h-4 w-4 inline group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </span>
+                <div className="text-xs text-emerald-100 mt-1 font-normal">Manual entry, time tracking, mobile invoicing</div>
+              </Link>
+              
+              <Link
+                href="/manager-reconciliation"
+                className="mobile-button w-full sm:w-auto rounded-lg bg-blue-600 px-4 sm:px-6 py-3 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors duration-200 hover:scale-105 transform group touch-target"
+              >
+                <span className="flex items-center justify-center">
+                  Manager Interface
+                  <DocumentTextIcon className="ml-2 h-4 w-4 inline group-hover:scale-110 transition-transform flex-shrink-0" />
+                </span>
+                <div className="text-xs text-blue-100 mt-1 font-normal">ERP sync, bulk approvals, reconciliation</div>
+              </Link>
+            </div>
             
-            <Link
-              href="/manager-reconciliation"
-              className="mobile-button w-full sm:w-auto rounded-lg sm:rounded-md bg-blue-600 px-4 sm:px-6 py-4 sm:py-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors duration-200 hover:scale-105 transform group"
-            >
-              <span className="flex items-center justify-center">
-                Manager Interface
-                <DocumentTextIcon className="ml-2 h-4 w-4 inline group-hover:scale-110 transition-transform" />
-              </span>
-              <div className="text-xs text-blue-100 mt-1 font-normal">ERP sync, bulk approvals, reconciliation</div>
-            </Link>
-            
-            <button className="mobile-button w-full sm:w-auto flex items-center justify-center text-sm font-semibold leading-6 text-gray-900 hover:text-emerald-600 transition-colors duration-200 py-2">
-              <PlayCircleIcon className="mr-2 h-5 w-5" />
-              Watch 2-min demo
-            </button>
+            <div className="flex justify-center">
+              <button className="mobile-button w-full sm:w-auto flex items-center justify-center text-sm font-semibold leading-6 text-gray-900 hover:text-emerald-600 transition-colors duration-200 py-3 touch-target">
+                <PlayCircleIcon className="mr-2 h-5 w-5 flex-shrink-0" />
+                Watch 2-min demo
+              </button>
+            </div>
           </motion.div>
 
           {/* Stats Grid */}
           <motion.div 
-            className="mt-12 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 px-3 sm:px-4 lg:px-0"
+            className="mt-10 sm:mt-12 md:mt-16 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 px-2 sm:px-0"
             variants={simpleVariants}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
           >
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">8+ hours</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Average time saved per week</dt>
+              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600 break-words">8+ hours</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Average time saved per week</dt>
             </div>
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-blue-600">95%</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Billing error reduction</dt>
+              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-blue-600">95%</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Billing error reduction</dt>
             </div>
             <div className="mx-auto flex max-w-xs flex-col gap-y-2 sm:gap-y-4 text-center">
-              <dd className="order-first text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">3x</dd>
-              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600">Faster payment processing</dt>
+              <dd className="order-first text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold tracking-tight text-emerald-600">3x</dd>
+              <dt className="text-sm sm:text-base leading-5 sm:leading-7 text-gray-600 break-words">Faster payment processing</dt>
             </div>
           </motion.div>
         </div>

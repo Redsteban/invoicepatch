@@ -174,37 +174,38 @@ function PaymentModal({ isOpen, onClose, plan }: {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto mobile-scroll">
+        <div className="sticky top-0 bg-white border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 pr-2">
             Contact Sales - {plan.name}
           </h2>
           <button
             onClick={handleClose}
             disabled={isLoading}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            className="mobile-button text-gray-400 hover:text-gray-600 disabled:opacity-50 touch-target"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-4">
               <div className="flex">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0" />
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                  <p className="text-sm text-red-700 break-words">{error}</p>
                 </div>
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address *
             </label>
             <input
+              id="email"
               type="email"
               {...register('email', { 
                 required: 'Email is required',
@@ -213,8 +214,8 @@ function PaymentModal({ isOpen, onClose, plan }: {
                   message: 'Invalid email address'
                 }
               })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="your@company.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
+              placeholder="your.email@company.com"
             />
             {errors.email && (
               <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
@@ -222,13 +223,14 @@ function PaymentModal({ isOpen, onClose, plan }: {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
               Company Name *
             </label>
             <input
+              id="company_name"
               type="text"
               {...register('company_name', { required: 'Company name is required' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
               placeholder="Your Company Inc."
             />
             {errors.company_name && (
@@ -237,16 +239,18 @@ function PaymentModal({ isOpen, onClose, plan }: {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="contractor_count" className="block text-sm font-medium text-gray-700 mb-1">
               Number of Contractors *
             </label>
             <select
-              {...register('contractor_count', { required: 'Please select contractor count' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              id="contractor_count"
+              {...register('contractor_count', { required: 'Contractor count is required' })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
             >
               <option value="">Select range</option>
               <option value="1-10">1-10 contractors</option>
-              <option value="11-50">11-50 contractors</option>
+              <option value="11-25">11-25 contractors</option>
+              <option value="26-50">26-50 contractors</option>
               <option value="51-100">51-100 contractors</option>
               <option value="100+">100+ contractors</option>
             </select>
@@ -256,45 +260,51 @@ function PaymentModal({ isOpen, onClose, plan }: {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Invoicing Method *
+            <label htmlFor="current_invoicing_method" className="block text-sm font-medium text-gray-700 mb-1">
+              Current Invoicing Method
             </label>
             <select
-              {...register('current_invoicing_method', { required: 'Please select current method' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              id="current_invoicing_method"
+              {...register('current_invoicing_method')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent touch-target"
             >
-              <option value="">Select method</option>
-              <option value="QuickBooks">QuickBooks</option>
-              <option value="Sage 50">Sage 50</option>
-              <option value="Xero">Xero</option>
-              <option value="Excel/Spreadsheets">Excel/Spreadsheets</option>
-              <option value="Custom ERP">Custom ERP</option>
-              <option value="Other">Other</option>
+              <option value="">Select current method</option>
+              <option value="email">Email attachments</option>
+              <option value="paper">Paper invoices</option>
+              <option value="erp">Direct ERP entry</option>
+              <option value="portal">Contractor portal</option>
+              <option value="mixed">Mixed methods</option>
             </select>
-            {errors.current_invoicing_method && (
-              <p className="text-red-600 text-sm mt-1">{errors.current_invoicing_method.message}</p>
-            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Biggest Pain Point
+            <label htmlFor="biggest_pain_point" className="block text-sm font-medium text-gray-700 mb-1">
+              Biggest Invoice Pain Point
             </label>
             <textarea
+              id="biggest_pain_point"
               {...register('biggest_pain_point')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               rows={3}
-              placeholder="What's your biggest challenge with contractor invoicing?"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder="Tell us about your biggest invoicing challenge..."
             />
           </div>
 
-          <div className="pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mobile-button w-full sm:flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg text-base font-semibold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
             >
               {isLoading ? 'Submitting...' : 'Contact Sales'}
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="mobile-button w-full sm:w-auto bg-gray-600 text-white py-3 px-4 rounded-lg text-base font-semibold hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+            >
+              Cancel
             </button>
           </div>
         </form>
@@ -355,48 +365,49 @@ export default function Pricing() {
         plan={selectedTier} 
       />
       
-      <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <section id="pricing" className="bg-white py-12 sm:py-16 lg:py-20 mobile-container">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-base font-semibold leading-7 text-emerald-600">Pricing</h2>
-            <p className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl">
+            <p className="mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl break-words">
               Choose Your Integration Plan
             </p>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-gray-600">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-gray-600 break-words">
               Transparent pricing based on your business size and integration needs. 
               All plans include Canadian tax compliance and mobile contractor apps.
             </p>
           </div>
 
           {/* ROI Calculator Teaser */}
-          <div className="mt-8 sm:mt-12 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 p-6 sm:p-8 max-w-4xl mx-auto">
+          <div className="mt-8 sm:mt-12 rounded-xl bg-emerald-50 border border-emerald-200 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
             <div className="text-center">
-              <h3 className="text-xl font-semibold text-emerald-900 mb-4">
+              <h3 className="text-lg sm:text-xl font-semibold text-emerald-900 mb-4">
                 💡 Calculate Your ROI
               </h3>
-              <p className="text-emerald-800 mb-4">
+              <p className="text-sm sm:text-base text-emerald-800 mb-4 break-words">
                 Most businesses save 15+ hours per week and reduce billing errors by 90%. 
                 See your potential savings with our ROI calculator.
               </p>
-              <button className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500">
+              <button className="mobile-button rounded-md bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-500 touch-target">
                 Calculate My Savings
               </button>
             </div>
           </div>
 
-          <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
-            {tiers.map((tier) => (
+          {/* Pricing Cards - Mobile First Stacking */}
+          <div className="isolate mx-auto mt-12 sm:mt-16 lg:mt-20 space-y-6 sm:space-y-8 lg:space-y-0 lg:grid lg:max-w-none lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
+            {tiers.map((tier, index) => (
               <div
                 key={tier.id}
-                className={`rounded-3xl p-8 ring-1 xl:p-10 ${
+                className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 ring-1 relative ${
                   tier.mostPopular
-                    ? 'bg-emerald-600 ring-emerald-600 relative'
+                    ? 'bg-emerald-600 ring-emerald-600'
                     : 'bg-white ring-gray-200'
                 }`}
               >
                 {tier.mostPopular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="rounded-full bg-emerald-600 px-4 py-1 text-sm font-semibold text-white ring-4 ring-white">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className="rounded-full bg-emerald-600 px-4 py-1 text-sm font-semibold text-white ring-4 ring-white whitespace-nowrap">
                       Most Popular
                     </span>
                   </div>
@@ -405,7 +416,7 @@ export default function Pricing() {
                 <div className="flex items-center justify-between gap-x-4">
                   <h3
                     id={tier.id}
-                    className={`text-lg font-semibold leading-8 ${
+                    className={`text-lg sm:text-xl font-semibold leading-8 break-words ${
                       tier.mostPopular ? 'text-white' : 'text-gray-900'
                     }`}
                   >
@@ -413,19 +424,19 @@ export default function Pricing() {
                   </h3>
                 </div>
                 
-                <p className={`mt-4 text-sm leading-6 ${
+                <p className={`mt-4 text-sm sm:text-base leading-6 break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
                 }`}>
                   {tier.description}
                 </p>
                 
-                <p className={`mt-6 text-2xl font-bold tracking-tight ${
+                <p className={`mt-6 text-xl sm:text-2xl font-bold tracking-tight ${
                   tier.mostPopular ? 'text-white' : 'text-gray-900'
                 }`}>
                   Custom Pricing
                 </p>
                 
-                <p className={`mt-2 text-xs ${
+                <p className={`mt-2 text-xs sm:text-sm break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-500'
                 }`}>
                   {tier.note}
@@ -433,7 +444,7 @@ export default function Pricing() {
                 
                 <button
                   onClick={() => handleContactSales(tier)}
-                  className={`mt-6 block w-full rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  className={`mobile-button mt-6 block w-full rounded-md px-3 py-3 text-center text-sm font-semibold leading-6 touch-target focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
                     tier.mostPopular
                       ? 'bg-white text-emerald-600 hover:bg-gray-100 focus-visible:outline-white'
                       : 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline-emerald-600'
@@ -442,7 +453,7 @@ export default function Pricing() {
                   {tier.cta}
                 </button>
                 
-                <ul role="list" className={`mt-8 space-y-3 text-sm leading-6 ${
+                <ul role="list" className={`mt-8 space-y-3 text-sm leading-6 break-words ${
                   tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
                 }`}>
                   {tier.features.map((feature) => (
@@ -453,7 +464,7 @@ export default function Pricing() {
                         }`}
                         aria-hidden="true"
                       />
-                      {feature}
+                      <span className="break-words">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -462,17 +473,17 @@ export default function Pricing() {
           </div>
 
           {/* FAQ Section */}
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">
+          <div className="mt-12 sm:mt-16 lg:mt-20">
+            <h3 className="text-xl sm:text-2xl font-bold text-center text-gray-900 mb-6 sm:mb-8">
               Pricing Questions
             </h3>
-            <dl className="space-y-6 max-w-4xl mx-auto">
+            <dl className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
               {faqs.map((faq) => (
-                <div key={faq.id} className="rounded-lg bg-gray-50 p-6">
-                  <dt className="text-base font-semibold leading-7 text-gray-900">
+                <div key={faq.id} className="rounded-lg bg-gray-50 p-4 sm:p-6">
+                  <dt className="text-sm sm:text-base font-semibold leading-7 text-gray-900 break-words">
                     {faq.question}
                   </dt>
-                  <dd className="mt-2 text-base leading-7 text-gray-600">
+                  <dd className="mt-2 text-sm sm:text-base leading-7 text-gray-600 break-words">
                     {faq.answer}
                   </dd>
                 </div>
@@ -481,23 +492,23 @@ export default function Pricing() {
           </div>
 
           {/* CTA */}
-          <div className="mt-16 text-center">
-            <h3 className="text-2xl font-bold tracking-tight text-gray-900 mb-4">
+          <div className="mt-12 sm:mt-16 text-center">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 mb-4 break-words">
               Ready to Get Started?
             </h3>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 break-words">
               Schedule a demo to see how integration will work with your specific business system
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/invoice-builder"
-                className="rounded-md bg-emerald-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500"
+                className="mobile-button w-full sm:w-auto rounded-md bg-emerald-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500 touch-target"
               >
                 See Demo
               </Link>
               <button 
                 onClick={() => handleContactSales(tiers[1])}
-                className="text-base font-semibold leading-6 text-gray-900 hover:text-emerald-600"
+                className="mobile-button w-full sm:w-auto text-base font-semibold leading-6 text-gray-900 hover:text-emerald-600 py-3 touch-target"
               >
                 Contact Sales <span aria-hidden="true">→</span>
               </button>

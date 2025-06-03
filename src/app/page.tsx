@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import MobileNavigation from '@/components/MobileNavigation';
 import AnimatedBranding from '@/components/AnimatedBranding';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -25,6 +26,7 @@ const simpleVariants = {
 export default function Home() {
   return (
     <main className="min-h-screen bg-white mobile-container overflow-x-hidden">
+      <MobileNavigation />
       <AnimatedBranding />
       <Hero />
       
@@ -38,6 +40,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
+        id="features"
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
@@ -65,6 +68,7 @@ export default function Home() {
       </motion.div>
       
       <motion.div 
+        id="demo"
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
