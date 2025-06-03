@@ -1,32 +1,89 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { useState } from 'react';
-import ContractorNavigation from '@/components/contractor/ContractorNavigation';
-import Dashboard from '@/components/contractor/Dashboard';
-import ActiveProjects from '@/components/contractor/ActiveProjects';
-import InvoiceManagement from '@/components/contractor/InvoiceManagement';
-import BusinessAnalytics from '@/components/contractor/BusinessAnalytics';
-import DocumentCenter from '@/components/contractor/DocumentCenter';
-import InvoiceBuilder from '@/components/contractor/InvoiceBuilder';
+import {
+  HomeIcon,
+  SparklesIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  BriefcaseIcon,
+  FolderIcon
+} from '@heroicons/react/24/outline';
+import Dashboard from '../../components/contractor/Dashboard';
+import AutomationShowcase from '../../components/contractor/AutomationShowcase';
+import IntelligentTimeTracking from '../../components/contractor/IntelligentTimeTracking';
+import InvoiceManagement from '../../components/contractor/InvoiceManagement';
+import BusinessAnalytics from '../../components/contractor/BusinessAnalytics';
+import ActiveProjects from '../../components/contractor/ActiveProjects';
+import DocumentCenter from '../../components/contractor/DocumentCenter';
 
-type ActiveView = 'dashboard' | 'active-projects' | 'invoice-management' | 'invoice-builder' | 'business-analytics' | 'document-center';
+type TabType = 'overview' | 'automation' | 'timetracking' | 'invoices' | 'analytics' | 'projects' | 'documents';
 
 export default function ContractorDashboardPage() {
-  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
 
-  const renderActiveView = () => {
-    switch (activeView) {
-      case 'dashboard':
+  const tabs = [
+    {
+      id: 'overview' as TabType,
+      name: 'Overview',
+      icon: HomeIcon,
+      description: 'Dashboard summary and quick actions'
+    },
+    {
+      id: 'automation' as TabType,
+      name: 'Automation',
+      icon: SparklesIcon,
+      description: 'Stack payroll automation system'
+    },
+    {
+      id: 'timetracking' as TabType,
+      name: 'Smart Time Tracking',
+      icon: ClockIcon,
+      description: 'Intelligent work period detection'
+    },
+    {
+      id: 'invoices' as TabType,
+      name: 'Invoice Management',
+      icon: DocumentTextIcon,
+      description: 'Create and manage invoices'
+    },
+    {
+      id: 'projects' as TabType,
+      name: 'Active Projects',
+      icon: BriefcaseIcon,
+      description: 'Current project tracking'
+    },
+    {
+      id: 'analytics' as TabType,
+      name: 'Business Analytics',
+      icon: ChartBarIcon,
+      description: 'Performance insights and reports'
+    },
+    {
+      id: 'documents' as TabType,
+      name: 'Document Center',
+      icon: FolderIcon,
+      description: 'File management and storage'
+    }
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
         return <Dashboard />;
-      case 'active-projects':
-        return <ActiveProjects />;
-      case 'invoice-management':
+      case 'automation':
+        return <AutomationShowcase />;
+      case 'timetracking':
+        return <IntelligentTimeTracking />;
+      case 'invoices':
         return <InvoiceManagement />;
-      case 'invoice-builder':
-        return <InvoiceBuilder onBack={() => setActiveView('dashboard')} />;
-      case 'business-analytics':
+      case 'projects':
+        return <ActiveProjects />;
+      case 'analytics':
         return <BusinessAnalytics />;
-      case 'document-center':
+      case 'documents':
         return <DocumentCenter />;
       default:
         return <Dashboard />;
@@ -34,69 +91,88 @@ export default function ContractorDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-      <ContractorNavigation activeView={activeView} setActiveView={setActiveView} />
-      
-      <main className="flex-1 ml-0 lg:ml-64 pt-16 lg:pt-0">
-        <div className="px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
-          {/* Contractor Interface Banner */}
-          <div className="mb-4 sm:mb-6 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg p-4 sm:p-6 shadow-lg">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="bg-white bg-opacity-20 rounded-lg p-3 mb-3 sm:mb-0 sm:mr-4 w-fit">
-                  <svg className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold">Contractor Interface</h2>
-                  <p className="text-emerald-100 text-sm sm:text-base">
-                    Manual time entry, expense tracking, and mobile invoicing for field workers
-                  </p>
-                  <div className="mt-2 flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-emerald-100 space-y-1 sm:space-y-0 sm:space-x-4">
-                    <span className="flex items-center">
-                      <span className="mr-1">✓</span>
-                      <span>Manual time & expense entry</span>
-                    </span>
-                    <span className="flex items-center">
-                      <span className="mr-1">✓</span>
-                      <span>Photo receipt capture</span>
-                    </span>
-                    <span className="flex items-center">
-                      <span className="mr-1">✓</span>
-                      <span>GPS location tracking</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-left lg:text-right mt-3 lg:mt-0">
-                <div className="text-xs sm:text-sm text-emerald-100">Your Interface</div>
-                <div className="text-base sm:text-lg font-bold">Mobile-First Design</div>
-                <div className="text-xs text-emerald-200">Works offline in remote locations</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Trial Mode Banner */}
-          <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg p-3 sm:p-4 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="mb-3 sm:mb-0">
-                <h2 className="text-base sm:text-lg font-bold">🚀 Trial Mode Active</h2>
-                <p className="text-blue-100 text-sm">
-                  Experience the full contractor dashboard with sample data. All features are fully functional for testing.
-                </p>
-              </div>
-              <div className="text-left sm:text-right">
-                <button className="w-full sm:w-auto bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors text-sm">
-                  Start Full Setup
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {renderActiveView()}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Contractor Dashboard</h1>
+          <p className="text-gray-600 mt-2">
+            Complete Stack Production Testing automation and intelligent time tracking system
+          </p>
         </div>
-      </main>
+
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`p-3 rounded-lg text-left transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'hover:bg-gray-50 text-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <tab.icon className={`h-4 w-4 ${
+                    activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'
+                  }`} />
+                  <span className="font-medium text-sm">{tab.name}</span>
+                </div>
+                <p className="text-xs text-gray-500 hidden lg:block">{tab.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {renderTabContent()}
+        </motion.div>
+
+        {/* Feature Highlights */}
+        <div className="bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-lg p-6 mt-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Complete Stack Integration Benefits</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <h4 className="font-semibold text-blue-700 mb-2">Never Miss Deadlines</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Automatic invoice generation every Saturday</li>
+                <li>• Smart period boundary detection</li>
+                <li>• Progressive deadline reminders</li>
+                <li>• GPS-verified time tracking</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-emerald-700 mb-2">Intelligent Automation</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Pattern recognition and learning</li>
+                <li>• Pre-populated with standard rates</li>
+                <li>• Smart work day suggestions</li>
+                <li>• Missing time recovery alerts</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-purple-700 mb-2">Field Work Optimization</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Live timer with break tracking</li>
+                <li>• Weather condition logging</li>
+                <li>• Photo and voice documentation</li>
+                <li>• Travel time calculation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 
