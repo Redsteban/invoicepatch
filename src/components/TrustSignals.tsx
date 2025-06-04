@@ -41,7 +41,7 @@ function SecurityBadge({ title, subtitle, icon: Icon, color }: {
   color: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <motion.div
@@ -69,7 +69,7 @@ function SecurityBadge({ title, subtitle, icon: Icon, color }: {
 
 function CompanyCard({ company, index }: { company: CompanyLogo; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <motion.div

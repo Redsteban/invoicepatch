@@ -34,7 +34,7 @@ export default function Home() {
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <ProblemSolution />
       </motion.div>
@@ -44,7 +44,7 @@ export default function Home() {
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <Features />
       </motion.div>
@@ -53,7 +53,7 @@ export default function Home() {
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <Testimonials />
       </motion.div>
@@ -63,7 +63,7 @@ export default function Home() {
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <Pricing />
       </motion.div>
@@ -73,7 +73,7 @@ export default function Home() {
         variants={simpleVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <FAQ />
       </motion.div>

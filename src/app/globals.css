@@ -478,3 +478,55 @@
   .mobile-spacing-md { @apply p-2 sm:p-4; }
   .mobile-spacing-lg { @apply p-3 sm:p-6; }
 }
+
+/* Mobile visibility fixes - force display of critical sections */
+@media (max-width: 768px) {
+  #pricing,
+  section[id="pricing"],
+  .pricing-section {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Ensure pricing cards are visible */
+  #pricing .grid,
+  #pricing [class*="grid"] {
+    display: grid !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure all pricing card items are visible */
+  #pricing [class*="grid"] > div {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Force visibility for animation containers */
+  [data-framer-motion],
+  .motion-div {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Additional mobile safety for animations */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  [data-framer-motion] {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

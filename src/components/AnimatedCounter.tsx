@@ -30,7 +30,7 @@ function AnimatedNumber({
 }) {
   const [displayValue, setDisplayValue] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
   
   useEffect(() => {
     if (!isInView) return;

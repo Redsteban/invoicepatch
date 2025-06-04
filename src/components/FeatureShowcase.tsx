@@ -34,7 +34,7 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   const IconComponent = feature.icon;
 
