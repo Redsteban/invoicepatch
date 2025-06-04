@@ -22,8 +22,9 @@ import {
 } from '@heroicons/react/24/outline';
 import InvoiceIntakeUpload from '@/components/manager/InvoiceIntakeUpload';
 import InvoiceProcessingEngine from '@/components/manager/InvoiceProcessingEngine';
-import ReconciliationDashboard from '@/components/manager/ReconciliationDashboard';
+import IntelligentReconciliation from '@/components/manager/IntelligentReconciliation';
 import ExtractionReview from '@/components/manager/ExtractionReview';
+import ReconciliationAnalytics from '@/components/manager/ReconciliationAnalytics';
 
 type ActiveTab = 'intake' | 'processing' | 'review' | 'reconciliation' | 'analytics';
 
@@ -92,9 +93,9 @@ export default function ManagerIntakePage() {
       case 'review':
         return <ExtractionReview />;
       case 'reconciliation':
-        return <ReconciliationDashboard />;
+        return <IntelligentReconciliation />;
       case 'analytics':
-        return <ProcessingAnalytics stats={processingStats} />;
+        return <ReconciliationAnalytics />;
       default:
         return <InvoiceIntakeUpload />;
     }
