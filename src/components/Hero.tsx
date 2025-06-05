@@ -440,7 +440,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0, rotateX: 0 }}
             transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
           >
-            Stop Wasting 8 Hours Every Week on{' '}
+            Process All Contractor Payments in Minutes, Not Hours or Days{' '}
             <motion.span 
               className="text-emerald-600 relative inline-block"
               initial={{ opacity: 0 }}

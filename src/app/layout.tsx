@@ -16,7 +16,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "InvoicePatch - Intelligent Invoice Reconciliation for Managers",
-  description: "Stop wasting 8 hours every week on invoice reconciliation. Upload contractor invoices and watch AI handle matching, validation, and exception detection in minutes.",
+  description: "Process all contractor payments in minutes, not hours or days. Upload contractor invoices and watch AI handle matching, validation, and exception detection in minutes.",
   keywords: "invoicing, contractors, Canada, CRA compliant, HST, GST, payment tracking, automated reminders",
   authors: [{ name: "InvoicePatch Team" }],
   creator: "InvoicePatch",
