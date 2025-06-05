@@ -19,15 +19,15 @@ interface InstantProposalGeneratorProps {
   demoData: DemoData;
 }
 
-// Steve Jobs-inspired animation variants
-const jobsVariants = {
-  hidden: { opacity: 0, y: 8 },
+// Clean animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94], // Apple's signature easing
+      duration: 0.3,
+      ease: "easeOut"
     }
   }
 };
@@ -38,39 +38,34 @@ const staggerContainer = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.2
+      delayChildren: 0.1
     }
   }
 };
 
-// Atomic Components - Clean, purposeful, reusable
+// Clean metric card component
 const MetricCard = ({ icon, label, value, highlight = false }: any) => (
   <motion.div 
     className={`
-      atom-card p-6 text-center
-      ${highlight ? 'bg-gradient-to-br from-amber-500/10 to-teal-500/10 border-amber-400/30' : 'border-slate-700/30'}
-      transform-gpu will-change-transform
+      p-6 text-center rounded-lg border
+      ${highlight 
+        ? 'bg-[#f0f9ff] border-[#3b82f6]/20' 
+        : 'bg-[#f9fafb] border-[#e5e7eb]'
+      }
     `}
-    variants={jobsVariants}
+    variants={fadeInUp}
     whileHover={{ 
       y: -2,
-      transition: { duration: 0.2, ease: "easeOut" }
-    }}
-    style={{
-      background: highlight 
-        ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%)'
-        : 'linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
-      backdropFilter: 'blur(8px)',
-      boxShadow: highlight ? 'var(--shadow-3d)' : '0 4px 14px rgba(0, 0, 0, 0.1)'
+      transition: { duration: 0.2 }
     }}
   >
-    <div className={`text-3xl mb-3 ${highlight ? 'text-amber-400' : 'text-teal-400'}`}>
+    <div className={`text-3xl mb-3 ${highlight ? 'text-[#3b82f6]' : 'text-[#6b7280]'}`}>
       {icon}
     </div>
-    <div className={`text-2xl font-light mb-1 ${highlight ? 'text-amber-200' : 'text-white'}`}>
+    <div className={`text-2xl font-semibold mb-1 ${highlight ? 'text-[#1a1a1a]' : 'text-[#1a1a1a]'}`}>
       {value}
     </div>
-    <div className={`text-sm font-medium ${highlight ? 'text-amber-300/80' : 'text-slate-400'}`}>
+    <div className={`text-sm ${highlight ? 'text-[#6b7280]' : 'text-[#9ca3af]'}`}>
       {label}
     </div>
   </motion.div>
@@ -81,28 +76,17 @@ const PrimaryButton = ({ children, onClick, loading = false, className = '' }: a
     onClick={onClick}
     disabled={loading}
     className={`
-      atom-button bg-gradient-to-r from-amber-500 to-amber-600 
-      text-slate-900 px-8 py-4 rounded-xl font-medium text-lg
-      hover:from-amber-400 hover:to-amber-500
-      disabled:opacity-50 disabled:cursor-not-allowed
-      transform-gpu will-change-transform
-      transition-all duration-200 ease-out
-      inline-flex items-center space-x-2
+      bg-[#3b82f6] text-white px-8 py-4 rounded-lg font-medium text-lg
+      hover:bg-[#2563eb] disabled:opacity-50 disabled:cursor-not-allowed
+      transition-colors duration-200 inline-flex items-center space-x-2
       ${className}
     `}
-    whileHover={!loading ? { 
-      scale: 1.02,
-      y: -1,
-      boxShadow: '0 8px 25px rgba(251, 191, 36, 0.3)'
-    } : {}}
+    whileHover={!loading ? { scale: 1.02 } : {}}
     whileTap={!loading ? { scale: 0.98 } : {}}
-    style={{
-      boxShadow: '0 4px 14px rgba(251, 191, 36, 0.2)'
-    }}
   >
     {loading ? (
       <>
-        <div className="w-5 h-5 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin"></div>
+        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
         <span>Generating...</span>
       </>
     ) : (
@@ -129,7 +113,7 @@ const InstantProposalGenerator: React.FC<InstantProposalGeneratorProps> = ({ dem
       const pageHeight = doc.internal.pageSize.getHeight();
       let yPosition = 30;
 
-      // Header with modern styling
+      // Header
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
       doc.text('InvoicePatch Custom Proposal', pageWidth / 2, yPosition, { align: 'center' });
@@ -198,35 +182,21 @@ const InstantProposalGenerator: React.FC<InstantProposalGeneratorProps> = ({ dem
       const roiData = [
         ['Current Monthly Cost', `$${demoData.currentMonthlyCost.toLocaleString()}`],
         ['InvoicePatch Monthly Cost', '$299'],
-        ['Monthly Savings', `$${demoData.savings.toLocaleString()}`]
+        ['Monthly Savings', `$${demoData.savings.toLocaleString()}`],
+        ['Annual Savings', `$${demoData.annualSavings.toLocaleString()}`],
+        ['ROI', `${demoData.roiPercentage}%`]
       ];
 
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      
-      roiData.forEach((row, index) => {
-        const y = yPosition + (index * 10);
-        doc.text(row[0] + ':', 30, y);
-        doc.setFont('helvetica', 'bold');
-        doc.text(row[1], pageWidth - 50, y, { align: 'right' });
+      // Simple table
+      roiData.forEach(([label, value]) => {
         doc.setFont('helvetica', 'normal');
+        doc.text(label + ':', 25, yPosition);
+        doc.setFont('helvetica', 'bold');
+        doc.text(value, 120, yPosition);
+        yPosition += 8;
       });
 
-      yPosition += 40;
-
-      // ROI Summary Box
-      doc.setFillColor(245, 245, 245);
-      doc.rect(20, yPosition, pageWidth - 40, 25, 'F');
-      
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`${demoData.roiPercentage}% ROI`, pageWidth / 2, yPosition + 10, { align: 'center' });
-      
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Annual Savings: $${demoData.annualSavings.toLocaleString()}`, pageWidth / 2, yPosition + 18, { align: 'center' });
-
-      yPosition += 35;
+      yPosition += 15;
 
       // Implementation Timeline
       doc.setFontSize(16);
@@ -235,276 +205,247 @@ const InstantProposalGenerator: React.FC<InstantProposalGeneratorProps> = ({ dem
       yPosition += 10;
 
       const timeline = [
-        ['Week 1:', 'Setup & Integration - Connect your existing systems, configure workflows'],
-        ['Week 2:', 'Training & Go-Live - Team training, first automated reconciliations'],
-        ['Week 3:', 'Full Automation - Complete workflow automation, savings begin']
+        'Week 1: Setup and configuration',
+        'Week 2: Team training and testing',
+        'Week 3: Full deployment',
+        'Week 4: Optimization and support'
       ];
 
       doc.setFontSize(11);
-      timeline.forEach((item, index) => {
-        doc.setFont('helvetica', 'bold');
-        doc.text(item[0], 25, yPosition);
-        doc.setFont('helvetica', 'normal');
-        doc.text(item[1], 45, yPosition);
-        yPosition += 10;
+      doc.setFont('helvetica', 'normal');
+      timeline.forEach((item) => {
+        doc.text(`• ${item}`, 25, yPosition);
+        yPosition += 7;
       });
 
+      yPosition += 15;
+
+      // Next Steps
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Next Steps', 20, yPosition);
       yPosition += 10;
 
-      // Call to Action
-      doc.setFillColor(55, 65, 81);
-      doc.rect(20, yPosition, pageWidth - 40, 20, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Ready to Get Started?', pageWidth / 2, yPosition + 8, { align: 'center' });
-      doc.setFontSize(10);
+      const nextSteps = [
+        '1. Schedule a personalized demo',
+        '2. Review specific integration requirements',
+        '3. Begin 14-day free trial',
+        '4. Start saving time and money'
+      ];
+
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text('Contact us today to secure your proposal pricing', pageWidth / 2, yPosition + 15, { align: 'center' });
+      nextSteps.forEach((item) => {
+        doc.text(item, 25, yPosition);
+        yPosition += 7;
+      });
 
       // Footer
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(8);
-      doc.text('InvoicePatch - Professional Invoice Reconciliation', pageWidth / 2, pageHeight - 15, { align: 'center' });
-      doc.text('30-day money-back guarantee • Cancel anytime', pageWidth / 2, pageHeight - 10, { align: 'center' });
+      if (yPosition > pageHeight - 40) {
+        doc.addPage();
+        yPosition = 30;
+      }
+
+      yPosition = pageHeight - 30;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'italic');
+      doc.text('Generated by InvoicePatch - invoicepatch.com', pageWidth / 2, yPosition, { align: 'center' });
 
       // Save the PDF
-      const today = new Date().toISOString().split('T')[0];
-      doc.save(`InvoicePatch-Proposal-${today}.pdf`);
+      doc.save('InvoicePatch-Custom-Proposal.pdf');
       
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      alert('Failed to generate PDF. Please try again.');
     } finally {
       setIsGeneratingPDF(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Steve Jobs-inspired: Focus on the message */}
-      <motion.div 
-        className="bg-gradient-to-r from-amber-500/10 via-teal-500/5 to-violet-500/10 border-b border-slate-800/50"
-        variants={jobsVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="text-center mb-12"
+        >
           <motion.h1 
-            className="text-5xl md:text-6xl font-extralight text-white mb-6 tracking-tight"
-            variants={jobsVariants}
-            style={{
-              fontFamily: '-apple-system, BlinkMacSystemFont, system-ui, sans-serif',
-              letterSpacing: '-0.02em'
-            }}
+            className="text-4xl font-bold text-[#1a1a1a] mb-4"
+            variants={fadeInUp}
           >
-            Your Custom
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-teal-400 font-light">
-              ROI Analysis
-            </span>
+            Your Custom InvoicePatch Proposal
           </motion.h1>
-          
           <motion.p 
-            className="text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed mb-8"
-            variants={jobsVariants}
+            className="text-xl text-[#6b7280] max-w-2xl mx-auto"
+            variants={fadeInUp}
           >
-            Based on your specific business requirements and current workflow
+            Based on your specific business needs, here's how InvoicePatch can transform your invoice reconciliation process.
           </motion.p>
-
-          <motion.div variants={jobsVariants}>
-            <PrimaryButton onClick={generatePDF} loading={isGeneratingPDF}>
-              Download Proposal
-            </PrimaryButton>
-          </motion.div>
-        </div>
-      </motion.div>
-      
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        {/* Current vs Future State - Steve Jobs style comparison */}
-        <motion.div 
-          className="grid lg:grid-cols-2 gap-12 mb-16"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.4 }}
-        >
-          {/* Current State */}
-          <motion.div variants={jobsVariants}>
-            <h2 className="text-2xl font-light text-white mb-8 text-center">Current State</h2>
-            <div className="space-y-4">
-              <MetricCard
-                icon={<div>👥</div>}
-                label="Contractors to manage"
-                value={demoData.contractors}
-              />
-              <MetricCard
-                icon={<ClockIcon className="w-8 h-8 mx-auto" />}
-                label="Hours/week reconciling"
-                value={`${demoData.hoursPerWeek}h`}
-              />
-              <MetricCard
-                icon={<div>💰</div>}
-                label="Monthly labor cost"
-                value={`$${demoData.monthlyCost.toLocaleString()}`}
-              />
-              <MetricCard
-                icon={<div>⚠️</div>}
-                label="Error rate"
-                value={`${demoData.errorRate}%`}
-              />
-            </div>
-          </motion.div>
-
-          {/* Future State */}
-          <motion.div variants={jobsVariants}>
-            <h2 className="text-2xl font-light text-white mb-8 text-center">With InvoicePatch</h2>
-            <div className="space-y-4">
-              <MetricCard
-                icon={<div>⚡</div>}
-                label="Processing time"
-                value="30s"
-                highlight
-              />
-              <MetricCard
-                icon={<CheckCircleIcon className="w-8 h-8 mx-auto" />}
-                label="Work reduction"
-                value="96%"
-                highlight
-              />
-              <MetricCard
-                icon={<div>💡</div>}
-                label="Monthly savings"
-                value={`$${demoData.savings.toLocaleString()}`}
-                highlight
-              />
-              <MetricCard
-                icon={<div>🎯</div>}
-                label="Accuracy rate"
-                value="99.7%"
-                highlight
-              />
-            </div>
-          </motion.div>
         </motion.div>
 
-        {/* ROI Hero Section - Steve Jobs style focus */}
+        {/* Current Situation */}
         <motion.div 
-          className="text-center mb-16"
-          variants={jobsVariants}
+          className="mb-12"
+          variants={fadeInUp}
           initial="hidden"
           animate="visible"
-          transition={{ delay: 0.8 }}
         >
-          <motion.div 
-            className="inline-block p-12 rounded-2xl"
-            style={{
-              background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(20, 184, 166, 0.15) 100%)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(251, 191, 36, 0.2)',
-              boxShadow: '0 8px 32px rgba(251, 191, 36, 0.15)'
-            }}
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="text-6xl font-extralight text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-teal-400 mb-4">
-              {demoData.roiPercentage}%
-            </div>
-            <div className="text-2xl font-light text-white mb-2">Return on Investment</div>
-            <div className="text-lg text-slate-400">
-              Annual Savings: <span className="text-amber-400 font-medium">${demoData.annualSavings.toLocaleString()}</span>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Implementation Timeline - Simplified Steve Jobs style */}
-        <motion.div 
-          className="mb-16"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 1.0 }}
-        >
-          <motion.h2 
-            className="text-3xl font-light text-white text-center mb-12"
-            variants={jobsVariants}
-          >
-            Three Week Implementation
-          </motion.h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { week: '1', title: 'Setup', desc: 'Connect systems, configure workflows' },
-              { week: '2', title: 'Training', desc: 'Team training, first reconciliations' },
-              { week: '3', title: 'Automation', desc: 'Full workflow automation live' }
-            ].map((phase, index) => (
-              <motion.div 
-                key={index}
-                className="text-center"
-                variants={jobsVariants}
-              >
-                <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-teal-500 rounded-full flex items-center justify-center text-slate-900 font-bold text-xl mx-auto mb-4">
-                  {phase.week}
-                </div>
-                <h3 className="text-xl font-light text-white mb-2">{phase.title}</h3>
-                <p className="text-slate-400 font-light">{phase.desc}</p>
-              </motion.div>
-            ))}
+          <h2 className="text-2xl font-semibold text-[#1a1a1a] mb-6">Your Current Situation</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <MetricCard
+              icon="👥"
+              label="Contractors to Manage"
+              value={demoData.contractors}
+            />
+            <MetricCard
+              icon={<ClockIcon className="w-8 h-8" />}
+              label="Hours per Week"
+              value={`${demoData.hoursPerWeek}h`}
+            />
+            <MetricCard
+              icon={<CalculatorIcon className="w-8 h-8" />}
+              label="Monthly Labor Cost"
+              value={`$${demoData.monthlyCost.toLocaleString()}`}
+            />
+            <MetricCard
+              icon="⚠️"
+              label="Error Rate"
+              value={`${demoData.errorRate}%`}
+            />
           </div>
         </motion.div>
 
-        {/* Final CTA */}
+        {/* With InvoicePatch */}
         <motion.div 
-          className="text-center"
-          variants={jobsVariants}
+          className="mb-12"
+          variants={fadeInUp}
           initial="hidden"
           animate="visible"
-          transition={{ delay: 1.2 }}
         >
-          <p className="text-slate-500 text-sm mb-6 font-light">
-            30-day money-back guarantee • Cancel anytime
-          </p>
+          <h2 className="text-2xl font-semibold text-[#1a1a1a] mb-6">With InvoicePatch</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <MetricCard
+              icon={<CheckCircleIcon className="w-8 h-8" />}
+              label="Processing Time"
+              value="30 seconds"
+              highlight={true}
+            />
+            <MetricCard
+              icon="📈"
+              label="Accuracy Rate"
+              value="99.7%"
+              highlight={true}
+            />
+            <MetricCard
+              icon="💰"
+              label="Monthly Savings"
+              value={`$${demoData.savings.toLocaleString()}`}
+              highlight={true}
+            />
+            <MetricCard
+              icon="🎯"
+              label="ROI"
+              value={`${demoData.roiPercentage}%`}
+              highlight={true}
+            />
+          </div>
+        </motion.div>
+
+        {/* ROI Summary */}
+        <motion.div 
+          className="bg-[#f0f9ff] border border-[#3b82f6]/20 rounded-lg p-8 mb-12"
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <h3 className="text-xl font-semibold text-[#1a1a1a] mb-4 text-center">
+            Annual ROI Summary
+          </h3>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-[#3b82f6] mb-2">
+              ${demoData.annualSavings.toLocaleString()}
+            </div>
+            <div className="text-[#6b7280]">
+              in annual savings vs. current manual process
+            </div>
+          </div>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div 
+          className="text-center"
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <PrimaryButton
+            onClick={generatePDF}
+            loading={isGeneratingPDF}
+            className="mb-6"
+          >
+            Download Full Proposal
+          </PrimaryButton>
+          
+          <div className="space-y-4">
+            <p className="text-[#6b7280]">
+              Ready to get started? Schedule a personalized demo to see InvoicePatch in action.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/manager-demo"
+                className="bg-[#3b82f6] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#2563eb] transition-colors duration-200"
+              >
+                Schedule Demo
+              </a>
+              <a
+                href="/contractor-trial"
+                className="border border-[#e5e7eb] text-[#1a1a1a] px-6 py-3 rounded-lg font-medium hover:bg-[#f9fafb] transition-colors duration-200"
+              >
+                Start Free Trial
+              </a>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
   );
 };
 
-// Function to generate proposal data based on user inputs
+// Sample data generator
 export const generateProposalData = (
   contractors: number,
   hoursPerWeek: number,
   hourlyRate: number = 45
 ): DemoData => {
-  const monthlyCost = hoursPerWeek * 4 * hourlyRate;
-  const currentMonthlyCost = monthlyCost + 680 + 320; // Add error correction and delay costs
-  const savings = currentMonthlyCost - 484; // 484 is InvoicePatch total cost (299 + 135 + 50)
-  const annualSavings = savings * 12;
-  const roiPercentage = Math.round((annualSavings / (299 * 12)) * 100);
+  const monthlyCost = hoursPerWeek * hourlyRate * 4.33; // Average weeks per month
+  const errorRate = Math.min(15, Math.max(5, Math.floor(contractors / 2))); // Scale with complexity
   
+  // With InvoicePatch: 30 seconds per 20 invoices = 1.5 seconds per invoice
+  // Assume 4 invoices per contractor per month on average
+  const newHoursPerWeek = (contractors * 4 * 1.5) / 3600 / 4.33; // Convert to hours per week
+  const newMonthlyCost = newHoursPerWeek * hourlyRate * 4.33;
+  const invoicePatchCost = 299; // Monthly subscription
+  const totalNewCost = newMonthlyCost + invoicePatchCost;
+  
+  const savings = Math.max(0, monthlyCost - totalNewCost);
+  const roiPercentage = monthlyCost > 0 ? Math.round((savings / invoicePatchCost) * 100) : 0;
+  const annualSavings = savings * 12;
+
   return {
     contractors,
     hoursPerWeek,
-    monthlyCost,
-    errorRate: 15, // Typical manual error rate
-    savings,
-    currentMonthlyCost,
+    monthlyCost: Math.round(monthlyCost),
+    errorRate,
+    savings: Math.round(savings),
+    currentMonthlyCost: Math.round(monthlyCost),
     roiPercentage,
-    annualSavings
+    annualSavings: Math.round(annualSavings)
   };
 };
 
-// Sample data for demonstration
-export const sampleDemoData: DemoData = {
-  contractors: 25,
-  hoursPerWeek: 8,
-  monthlyCost: 1440,
-  errorRate: 15,
-  savings: 1956,
-  currentMonthlyCost: 2440,
-  roiPercentage: 656,
-  annualSavings: 23472
-};
+// Sample demo data
+export const sampleDemoData: DemoData = generateProposalData(25, 8, 45);
 
 export default InstantProposalGenerator; 

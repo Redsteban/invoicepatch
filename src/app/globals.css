@@ -106,54 +106,45 @@
 
 /* Ethan Marcotte 3D Component System */
 @layer components {
-  /* 3D Buttons */
+  /* Consistent Buttons */
   .atom-button--primary {
     @apply inline-flex items-center justify-center font-medium;
     @apply focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background-color: #3b82f6;
     color: white;
-    border: 1px solid #065f46;
+    border: 1px solid #3b82f6;
     border-radius: 0.5rem;
     padding: 0.5rem 1.5rem;
     min-height: 44px;
-    box-shadow: var(--shadow-soft);
-    transition: all var(--duration-normal) var(--ease-out-quart);
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    transition: all 200ms ease-out;
     position: relative;
   }
   
   .atom-button--primary:hover {
-    transform: translateY(-3px) rotateX(8deg);
-    box-shadow: var(--shadow-3d);
-    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+    background-color: #2563eb;
+    border-color: #2563eb;
   }
   
   .atom-button--primary:active {
-    transform: translateY(0px);
+    transform: scale(0.98);
     transition-duration: 100ms;
   }
   
   .atom-button--secondary {
     @apply inline-flex items-center justify-center font-medium;
     @apply focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
-    border: 1px solid #065f46;
+    background-color: white;
+    color: #1a1a1a;
+    border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
     padding: 0.5rem 1.5rem;
     min-height: 44px;
-    box-shadow: var(--shadow-subtle);
-    transition: all var(--duration-normal) var(--ease-out-quart);
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
+    transition: all 200ms ease-out;
   }
   
   .atom-button--secondary:hover {
-    transform: translateY(-2px) rotateX(5deg);
-    background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-    border-color: #065f46;
-    box-shadow: var(--shadow-soft);
+    background-color: #f9fafb;
+    border-color: #d1d5db;
   }
   
   /* 3D Cards with sophisticated depth */

@@ -440,25 +440,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0, rotateX: 0 }}
             transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
           >
-            Process All Contractor Payments in Minutes, Not Hours or Days{' '}
-            <motion.span 
-              className="text-emerald-600 relative inline-block"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              whileHover={{
-                rotateY: 5,
-                transition: { duration: 0.3 }
-              }}
-            >
-              Invoice Reconciliation
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 rounded"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 1.2, duration: 1, ease: "easeOut" }}
-              />
-            </motion.span>
+            Process All Contractor Payments in Minutes, Not Hours or Days
           </motion.h1>
           
           <motion.p 
