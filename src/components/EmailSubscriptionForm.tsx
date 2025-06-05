@@ -197,7 +197,7 @@ export default function EmailSubscriptionForm({
             Never Miss Another Late Invoice
           </h2>
           <p className="text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto">
-            Join 500+ Canadian contractors who&apos;ve automated their invoicing and never miss a paycheck.
+            Get early access to professional invoice management automation.
           </p>
         </div>
 

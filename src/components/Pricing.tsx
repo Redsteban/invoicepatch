@@ -176,13 +176,13 @@ function PaymentModal({ isOpen, onClose, plan }: {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-auto max-h-[90vh] overflow-hidden mobile-scroll">
         <div className="sticky top-0 bg-white border-b px-4 sm:px-6 py-4 flex justify-between items-center z-10">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800 pr-2 break-words">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 pr-2 break-words">
             Contact Sales - {plan.name}
           </h2>
           <button
             onClick={handleClose}
             disabled={isLoading}
-            className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 transition-colors rounded-lg touch-target"
+            className="p-2 text-slate-400 hover:text-slate-600 disabled:opacity-50 transition-colors rounded-lg touch-target"
             aria-label="Close modal"
           >
             <XMarkIcon className="h-6 w-6" />
@@ -203,8 +203,8 @@ function PaymentModal({ isOpen, onClose, plan }: {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address *
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                Email Address
               </label>
               <input
                 type="email"
@@ -216,115 +216,105 @@ function PaymentModal({ isOpen, onClose, plan }: {
                     message: 'Invalid email address'
                   }
                 })}
-                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
-                placeholder="your.email@company.com"
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-base"
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600 break-words">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-2">
-                Company Name *
+              <label htmlFor="company_name" className="block text-sm font-medium text-slate-700 mb-2">
+                Company Name
               </label>
               <input
                 type="text"
                 id="company_name"
                 {...register('company_name', { required: 'Company name is required' })}
-                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
-                placeholder="Your Company Inc."
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-base"
                 disabled={isLoading}
               />
               {errors.company_name && (
-                <p className="mt-1 text-sm text-red-600 break-words">{errors.company_name.message}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.company_name.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="contractor_count" className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Contractors *
+              <label htmlFor="contractor_count" className="block text-sm font-medium text-slate-700 mb-2">
+                Number of Contractors
               </label>
               <select
                 id="contractor_count"
                 {...register('contractor_count', { required: 'Please select contractor count' })}
-                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-base"
                 disabled={isLoading}
               >
-                <option value="">Select range...</option>
-                <option value="1-10">1-10 contractors</option>
-                <option value="11-25">11-25 contractors</option>
-                <option value="26-50">26-50 contractors</option>
-                <option value="51-100">51-100 contractors</option>
-                <option value="100+">100+ contractors</option>
+                <option value="">Select...</option>
+                <option value="1-5">1-5 contractors</option>
+                <option value="6-15">6-15 contractors</option>
+                <option value="16-30">16-30 contractors</option>
+                <option value="31-50">31-50 contractors</option>
+                <option value="50+">50+ contractors</option>
               </select>
               {errors.contractor_count && (
-                <p className="mt-1 text-sm text-red-600 break-words">{errors.contractor_count.message}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.contractor_count.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="current_invoicing_method" className="block text-sm font-medium text-gray-700 mb-2">
-                Current Invoicing Method *
+              <label htmlFor="current_invoicing_method" className="block text-sm font-medium text-slate-700 mb-2">
+                Current Invoicing Method
               </label>
               <select
                 id="current_invoicing_method"
                 {...register('current_invoicing_method', { required: 'Please select current method' })}
-                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 touch-target"
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-base"
                 disabled={isLoading}
               >
-                <option value="">Select method...</option>
-                <option value="email">Email PDFs</option>
-                <option value="paper">Paper invoices</option>
-                <option value="erp_manual">Manual ERP entry</option>
-                <option value="spreadsheet">Excel/Spreadsheets</option>
+                <option value="">Select...</option>
+                <option value="manual">Manual paper invoices</option>
+                <option value="email">Email invoices</option>
+                <option value="quickbooks">QuickBooks</option>
+                <option value="sage">Sage</option>
+                <option value="xero">Xero</option>
                 <option value="other">Other system</option>
               </select>
               {errors.current_invoicing_method && (
-                <p className="mt-1 text-sm text-red-600 break-words">{errors.current_invoicing_method.message}</p>
+                <p className="mt-1 text-sm text-red-600">{errors.current_invoicing_method.message}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="biggest_pain_point" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="biggest_pain_point" className="block text-sm font-medium text-slate-700 mb-2">
                 Biggest Pain Point (Optional)
               </label>
               <textarea
                 id="biggest_pain_point"
                 {...register('biggest_pain_point')}
                 rows={3}
-                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 resize-none touch-target"
-                placeholder="What's your biggest challenge with invoice processing?"
+                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500 text-base resize-none"
+                placeholder="Tell us about your current invoicing challenges..."
                 disabled={isLoading}
               />
             </div>
 
-            <div className="border-t pt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="flex flex-col gap-3 pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {isLoading ? 'Submitting...' : 'Get Custom Quote'}
+              </button>
+              
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="w-full sm:flex-1 px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
+                className="w-full py-3 px-4 border border-slate-300 rounded-md text-base font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 transition-colors duration-200"
               >
                 Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full sm:flex-1 px-6 py-3 text-base font-medium text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Submitting...
-                  </span>
-                ) : (
-                  'Contact Sales'
-                )}
               </button>
             </div>
           </form>
@@ -335,38 +325,8 @@ function PaymentModal({ isOpen, onClose, plan }: {
 }
 
 export default function Pricing() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ hours: 23, minutes: 14, seconds: 32 });
-  const [spotsRemaining, setSpotsRemaining] = useState(67);
-  const [recentJoins] = useState(127);
   const [selectedTier, setSelectedTier] = useState<typeof tiers[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Countdown timer effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
-        if (prevTime.seconds > 0) {
-          return { ...prevTime, seconds: prevTime.seconds - 1 };
-        } else if (prevTime.minutes > 0) {
-          return { ...prevTime, minutes: prevTime.minutes - 1, seconds: 59 };
-        } else if (prevTime.hours > 0) {
-          return { ...prevTime, hours: prevTime.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prevTime;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Simulate decreasing spots
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSpotsRemaining(prev => Math.max(45, prev - Math.floor(Math.random() * 2)));
-    }, 30000); // Every 30 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   const handleContactSales = (tier: typeof tiers[0]) => {
     setSelectedTier(tier);
@@ -379,165 +339,143 @@ export default function Pricing() {
   };
 
   return (
-    <>
-      <PaymentModal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        plan={selectedTier} 
-      />
-      
-      <section id="pricing" className="block w-full bg-white py-12 sm:py-16 lg:py-20 mobile-container visible">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl text-center">
-            <h2 className="text-base font-semibold leading-7 text-emerald-600">Pricing</h2>
-            <p className="mt-2 text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900 lg:text-4xl break-words">
-              Choose Your Integration Plan
-            </p>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-7 sm:leading-8 text-gray-600 break-words">
-              Transparent pricing based on your business size and integration needs. 
-              All plans include Canadian tax compliance and mobile contractor apps.
-            </p>
-          </div>
-
-          {/* ROI Calculator Teaser */}
-          <div className="block w-full mt-8 sm:mt-12 rounded-xl bg-emerald-50 border border-emerald-200 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <h3 className="text-lg sm:text-xl font-semibold text-emerald-900 mb-4">
-                💡 Calculate Your ROI
-              </h3>
-              <p className="text-sm sm:text-base text-emerald-800 mb-4 break-words">
-                Most businesses save 15+ hours per week and reduce billing errors by 90%. 
-                See your potential savings with our ROI calculator.
-              </p>
-              <button className="mobile-button rounded-md bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-500 touch-target">
-                Calculate My Savings
-              </button>
-            </div>
-          </div>
-
-          {/* Pricing Cards - Mobile First Stacking */}
-          <div className="block w-full isolate mx-auto mt-12 sm:mt-16 lg:mt-20 grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12 max-w-6xl">
-            {tiers.map((tier, index) => (
-              <div
-                key={tier.id}
-                className={`block w-full rounded-xl sm:rounded-2xl p-6 sm:p-8 ring-1 relative transition-all duration-200 hover:shadow-lg ${
-                  tier.mostPopular
-                    ? 'bg-emerald-600 ring-emerald-600 scale-100 sm:scale-105'
-                    : 'bg-white ring-gray-200 hover:ring-gray-300'
-                }`}
-              >
-                {tier.mostPopular && (
-                  <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="rounded-full bg-emerald-600 px-3 py-1 sm:px-4 sm:py-2 text-sm font-semibold text-white ring-4 ring-white whitespace-nowrap">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                
-                <div className="flex items-center justify-between gap-x-4 mb-4">
-                  <h3
-                    id={tier.id}
-                    className={`text-xl sm:text-2xl font-bold leading-8 break-words ${
-                      tier.mostPopular ? 'text-white' : 'text-gray-900'
-                    }`}
-                  >
-                    {tier.name}
-                  </h3>
-                </div>
-                
-                <p className={`mb-6 text-base sm:text-lg leading-7 break-words ${
-                  tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
-                }`}>
-                  {tier.description}
-                </p>
-                
-                <p className={`mb-2 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight ${
-                  tier.mostPopular ? 'text-white' : 'text-gray-900'
-                }`}>
-                  Custom Pricing
-                </p>
-                
-                <p className={`mb-6 text-sm sm:text-base break-words ${
-                  tier.mostPopular ? 'text-emerald-100' : 'text-gray-500'
-                }`}>
-                  {tier.note}
-                </p>
-                
-                <button
-                  onClick={() => handleContactSales(tier)}
-                  className={`w-full inline-flex items-center justify-center px-6 py-4 text-base font-semibold rounded-lg shadow-sm transition-colors duration-200 touch-target focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    tier.mostPopular
-                      ? 'bg-white text-emerald-600 hover:bg-gray-100 focus:ring-white'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
+    <div className="bg-white py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Choose the plan that fits your business needs
+          </p>
+        </div>
+        <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 xl:gap-x-12">
+          {tiers.map((tier) => (
+            <div
+              key={tier.id}
+              className={`rounded-lg p-8 xl:p-10 ${
+                tier.mostPopular
+                  ? 'bg-slate-900 text-white ring-2 ring-slate-900'
+                  : 'bg-white text-slate-900 ring-1 ring-slate-200'
+              } shadow-lg`}
+            >
+              <div className="flex items-center justify-between gap-x-4">
+                <h3
+                  id={tier.id}
+                  className={`text-lg font-semibold leading-8 ${
+                    tier.mostPopular ? 'text-white' : 'text-slate-900'
                   }`}
                 >
-                  {tier.cta}
-                </button>
-                
-                <ul role="list" className={`mt-8 space-y-4 text-sm sm:text-base leading-7 break-words ${
-                  tier.mostPopular ? 'text-emerald-100' : 'text-gray-600'
-                }`}>
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex gap-x-3 items-start">
-                      <CheckIcon
-                        className={`h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 mt-0.5 ${
-                          tier.mostPopular ? 'text-white' : 'text-emerald-600'
-                        }`}
-                        aria-hidden="true"
-                      />
-                      <span className="break-words leading-relaxed">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                  {tier.name}
+                </h3>
+                {tier.mostPopular ? (
+                  <p className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold leading-5 text-slate-900">
+                    Most popular
+                  </p>
+                ) : null}
               </div>
-            ))}
-          </div>
+              <p className={`mt-4 text-sm leading-6 ${tier.mostPopular ? 'text-slate-300' : 'text-slate-600'}`}>
+                {tier.description}
+              </p>
+              <p className="mt-6 flex items-baseline gap-x-1">
+                <span className={`text-4xl font-bold tracking-tight ${tier.mostPopular ? 'text-white' : 'text-slate-900'}`}>
+                  Custom
+                </span>
+                <span className={`text-sm font-semibold leading-6 ${tier.mostPopular ? 'text-slate-300' : 'text-slate-600'}`}>
+                  pricing
+                </span>
+              </p>
+              <button
+                onClick={() => handleContactSales(tier)}
+                aria-describedby={tier.id}
+                className={`mt-8 block w-full rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-200 ${
+                  tier.mostPopular
+                    ? 'bg-white text-slate-900 hover:bg-slate-100 focus-visible:outline-white shadow-sm'
+                    : 'bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-slate-900 shadow-sm hover:shadow-md'
+                }`}
+              >
+                {tier.cta}
+              </button>
+              <ul
+                role="list"
+                className={`mt-8 space-y-3 text-sm leading-6 ${
+                  tier.mostPopular ? 'text-slate-300' : 'text-slate-600'
+                }`}
+              >
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex gap-x-3">
+                    <CheckIcon
+                      className={`h-6 w-5 flex-none ${
+                        tier.mostPopular ? 'text-white' : 'text-slate-600'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              {tier.note && (
+                <p className={`mt-6 text-xs ${tier.mostPopular ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {tier.note}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
 
-          {/* FAQ Section */}
-          <div className="mt-12 sm:mt-16 lg:mt-20">
-            <h3 className="text-xl sm:text-2xl font-bold text-center text-gray-900 mb-6 sm:mb-8">
-              Pricing Questions
+        {/* FAQ Section */}
+        <div className="mt-16 border-t border-slate-200 pt-16">
+          <div className="mx-auto max-w-4xl">
+            <h3 className="text-2xl font-bold text-slate-900 text-center mb-12">
+              Frequently Asked Questions
             </h3>
-            <dl className="space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+            <div className="space-y-8">
               {faqs.map((faq) => (
-                <div key={faq.id} className="rounded-lg bg-gray-50 p-4 sm:p-6">
-                  <dt className="text-sm sm:text-base font-semibold leading-7 text-gray-900 break-words">
+                <div key={faq.id} className="border-b border-slate-200 pb-8">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-3">
                     {faq.question}
-                  </dt>
-                  <dd className="mt-2 text-sm sm:text-base leading-7 text-gray-600 break-words">
+                  </h4>
+                  <p className="text-slate-600 leading-relaxed">
                     {faq.answer}
-                  </dd>
+                  </p>
                 </div>
               ))}
-            </dl>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-12 sm:mt-16 text-center">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6 break-words">
-              Ready to Get Started?
-            </h3>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto break-words leading-relaxed">
-              Schedule a demo to see how integration will work with your specific business system
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 max-w-2xl mx-auto">
-              <Link
-                href="/invoice-builder"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-emerald-600 border border-transparent rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 touch-target"
-              >
-                See Demo
-              </Link>
-              <button 
-                onClick={() => handleContactSales(tiers[1])}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target"
-              >
-                Contact Sales
-                <span className="ml-2" aria-hidden="true">→</span>
-              </button>
             </div>
           </div>
         </div>
-      </section>
-    </>
+
+        {/* Final CTA */}
+        <div className="mt-16 text-center">
+          <div className="bg-slate-50 rounded-lg p-8 max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold text-slate-900 mb-4">
+              Ready to Transform Your Invoice Process?
+            </h3>
+            <p className="text-slate-600 mb-6">
+              Schedule a personalized demo and see how InvoicePatch can save you hours every week.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/manager-demo"
+                className="bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                Book Demo
+              </Link>
+              <Link
+                href="/roi-calculator"
+                className="text-slate-700 hover:text-slate-900 font-medium border border-slate-300 px-8 py-3 rounded-lg hover:border-slate-400 transition-all duration-200"
+              >
+                Calculate ROI
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        plan={selectedTier}
+      />
+    </div>
   );
 } 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ClockIcon, 
   CurrencyDollarIcon, 
@@ -13,7 +13,9 @@ import {
   ArrowRightIcon,
   DocumentTextIcon,
   PlayCircleIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  FireIcon,
+  DevicePhoneMobileIcon
 } from '@heroicons/react/24/outline';
 
 interface EmailForm {
@@ -27,17 +29,355 @@ interface TimeLeft {
   seconds: number;
 }
 
-const simpleVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut"
-    }
-  }
+// Ethan Marcotte Atomic Components with sophisticated 3D
+const CTAButton = ({ 
+  href, 
+  variant = 'primary', 
+  icon: Icon, 
+  children, 
+  className = "",
+  ...props 
+}: {
+  href: string;
+  variant?: 'primary' | 'secondary';
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <Link
+    href={href}
+    className={`
+      atom-button--${variant} micro-lift micro-glow
+      inline-flex items-center justify-center group
+      ${className}
+    `}
+    {...props}
+  >
+    {Icon && (
+      <motion.div
+        whileHover={{ 
+          scale: 1.1, 
+          rotateZ: 5,
+          transition: { duration: 0.2 }
+        }}
+      >
+        <Icon className="h-6 w-6 mr-2 transition-transform duration-300" />
+      </motion.div>
+    )}
+    <span className="relative">
+      {children}
+      <motion.div
+        className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 rounded"
+        initial={false}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2 }}
+      />
+    </span>
+  </Link>
+);
+
+const StatCard = ({ 
+  value, 
+  label, 
+  delay = 0 
+}: { 
+  value: string; 
+  label: string; 
+  delay?: number; 
+}) => (
+  <motion.div 
+    className="text-center group cursor-default"
+    initial={{ opacity: 0, y: 30, rotateX: -15, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+    transition={{ 
+      delay, 
+      duration: 0.8, 
+      ease: [0.25, 1, 0.5, 1]
+    }}
+    whileHover={{ 
+      scale: 1.08,
+      rotateY: 5,
+      rotateX: 5,
+      transition: { duration: 0.3 }
+    }}
+  >
+    <motion.div 
+      className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 group-hover:text-slate-700 transition-colors duration-300"
+      whileHover={{
+        scale: 1.1,
+        transition: { duration: 0.2 }
+      }}
+    >
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay + 0.4, duration: 0.6 }}
+      >
+        {value}
+      </motion.span>
+    </motion.div>
+    <div className="text-lg text-slate-600 group-hover:text-slate-700 transition-colors duration-300">
+      {label}
+    </div>
+  </motion.div>
+);
+
+const ProblemSolutionCard = ({ 
+  type, 
+  icon: Icon, 
+  title, 
+  items, 
+  delay = 0 
+}: {
+  type: 'problem' | 'solution';
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  items: string[];
+  delay?: number;
+}) => {
+  const isProblem = type === 'problem';
+  
+  return (
+    <motion.div
+      className={`
+        atom-card p-8 group relative overflow-hidden
+        ${isProblem ? 'bg-slate-50' : 'bg-white border-2 border-slate-900'}
+      `}
+      initial={{ opacity: 0, x: isProblem ? -50 : 50, rotateY: isProblem ? -10 : 10 }}
+      whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ 
+        delay, 
+        duration: 0.8, 
+        ease: [0.25, 1, 0.5, 1]
+      }}
+      whileHover={{ 
+        y: -8,
+        rotateX: 6,
+        rotateY: isProblem ? 3 : -3,
+        scale: 1.02,
+        transition: { duration: 0.3 }
+      }}
+    >
+      {/* Enhanced background pattern */}
+      <motion.div 
+        className={`
+          absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500
+          ${isProblem ? 'bg-amber-100' : 'bg-teal-100'}
+        `}
+        animate={{
+          scale: [1, 1.05, 1],
+          rotate: [0, 1, 0]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      
+      <h3 className={`
+        text-2xl font-bold mb-6 flex items-center justify-center relative z-10
+        ${isProblem ? 'text-slate-900' : 'text-slate-900'}
+      `}>
+        <motion.div
+          whileHover={{ 
+            scale: 1.2, 
+            rotateZ: isProblem ? -5 : 5,
+            transition: { duration: 0.3 }
+          }}
+        >
+          <Icon className={`
+            h-8 w-8 mr-3 transition-transform duration-300
+            ${isProblem ? 'text-slate-600' : 'text-slate-900'}
+          `} />
+        </motion.div>
+        {title}
+      </h3>
+      
+      <ul className="space-y-4 text-left relative z-10">
+        {items.map((item, index) => (
+          <motion.li 
+            key={index}
+            className="flex items-start"
+            initial={{ opacity: 0, x: -20, rotateX: -5 }}
+            whileInView={{ opacity: 1, x: 0, rotateX: 0 }}
+            viewport={{ once: true }}
+            transition={{ 
+              delay: delay + (index * 0.15), 
+              duration: 0.5,
+              ease: "easeOut"
+            }}
+            whileHover={{
+              x: 6,
+              transition: { duration: 0.2 }
+            }}
+          >
+            <motion.span 
+              className={`
+                text-xl mr-4 mt-1 transition-transform duration-300
+                ${isProblem ? 'text-slate-500' : 'text-slate-900'}
+              `}
+              whileHover={{ 
+                scale: 1.3, 
+                rotateZ: isProblem ? 0 : 180,
+                transition: { duration: 0.3 }
+              }}
+            >
+              {isProblem ? '•' : '✓'}
+            </motion.span>
+            <span className={`
+              text-lg transition-colors duration-300
+              ${isProblem ? 'text-slate-700' : 'text-slate-700'}
+            `}>
+              {item}
+            </span>
+          </motion.li>
+        ))}
+      </ul>
+      
+      {/* Enhanced hover accent with gradient */}
+      <motion.div
+        className={`
+          absolute bottom-0 left-0 right-0 h-2 
+          ${isProblem 
+            ? 'bg-gradient-to-r from-amber-400 to-amber-600' 
+            : 'bg-gradient-to-r from-teal-400 to-violet-500'
+          }
+        `}
+        initial={{ scaleX: 0 }}
+        whileHover={{ scaleX: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      />
+    </motion.div>
+  );
 };
+
+const SocialProofSection = () => (
+  <motion.div
+    className="text-center mb-16"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8 }}
+  >
+    <p className="text-slate-600 mb-6">Professional invoice management made simple</p>
+    
+    {/* Security & Features badges instead of fake social proof */}
+    <div className="flex justify-center items-center space-x-8 mb-8">
+      <div className="flex items-center space-x-2">
+        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <span className="text-sm font-medium text-slate-600">CRA Compliant</span>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <span className="text-sm font-medium text-slate-600">Secure & Private</span>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span className="text-sm font-medium text-slate-600">Fast Setup</span>
+      </div>
+    </div>
+  </motion.div>
+);
+
+const FinalCTASection = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8 }}
+  >
+    <motion.div 
+      className="atom-card p-8 max-w-2xl mx-auto bg-gradient-to-br from-white to-slate-50 relative overflow-hidden"
+      whileHover={{
+        rotateX: 4,
+        rotateY: -2,
+        scale: 1.02,
+        transition: { duration: 0.3 }
+      }}
+    >
+      {/* Enhanced decorative background elements */}
+      <motion.div
+        className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-amber-200 to-teal-200 rounded-full opacity-20"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          rotate: [0, 180, 360],
+          x: [0, 10, 0],
+          y: [0, -10, 0]
+        }}
+        transition={{ 
+          duration: 25, 
+          repeat: Infinity, 
+          ease: "linear" 
+        }}
+      />
+      
+      <motion.div
+        className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-violet-200 to-amber-200 rounded-full opacity-15"
+        animate={{ 
+          scale: [1, 1.3, 1],
+          rotate: [360, 180, 0],
+          x: [0, -8, 0],
+          y: [0, 8, 0]
+        }}
+        transition={{ 
+          duration: 20, 
+          repeat: Infinity, 
+          ease: "linear" 
+        }}
+      />
+      
+      <h3 className="text-2xl font-bold text-slate-900 mb-4 relative z-10">
+        See How You Can Save 8 Hours This Week
+      </h3>
+      <p className="text-slate-600 mb-6 relative z-10">
+        Upload your contractor invoices. See the magic happen in real-time.
+      </p>
+      
+      <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
+          <CTAButton
+            href="/manager-demo"
+            variant="primary"
+            className="group-hover:shadow-lg"
+          >
+            Start Free Demo
+          </CTAButton>
+        </motion.div>
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
+          <CTAButton
+            href="/roi-calculator"
+            variant="secondary"
+            className="group-hover:border-slate-400"
+          >
+            Calculate Your Savings
+          </CTAButton>
+        </motion.div>
+      </div>
+    </motion.div>
+  </motion.div>
+);
 
 export default function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,202 +430,137 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative bg-white overflow-hidden mobile-container">
-      {/* Simplified Background decoration */}
-      <div className="absolute inset-x-0 -top-20 sm:-top-40 -z-10 transform-gpu overflow-hidden blur-3xl">
-        <div
-          className="relative left-[calc(50%-5.5rem)] sm:left-[calc(50%-11rem)] aspect-[1155/678] w-[18rem] sm:w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-emerald-400 to-emerald-600 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
-        />
-      </div>
-      
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24">
-        <div className="mx-auto max-w-6xl text-center">
-          {/* Problem Badge */}
-          <motion.div 
-            className="mb-6 sm:mb-8 md:mb-10 flex justify-center px-2"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="relative rounded-full bg-red-50 px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base leading-6 text-red-700 ring-1 ring-red-600/20 hover:scale-105 transition-transform duration-200 text-center max-w-full break-words">
-              <ExclamationTriangleIcon className="inline h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
-              <span className="font-medium">
-                <span className="hidden sm:inline">Oilfield contractors lose $500-1000 per missed invoice deadline</span>
-                <span className="sm:hidden">Contractors lose $500+ per missed deadline</span>
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Main Headline */}
+    <div className="relative overflow-hidden bg-white">
+      {/* Main Hero Section */}
+      <section className="organism-hero">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h1 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight break-words hyphens-auto"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight text-slate-900"
+            initial={{ opacity: 0, y: 50, rotateX: -15 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
           >
-            <span className="text-blue-600 block break-words">
-              Stop Playing Invoice Detective
-            </span>
-            <span className="block break-words text-gray-900"> 
-              Every Friday Afternoon
-            </span>
+            Stop Wasting 8 Hours Every Week on{' '}
+            <motion.span 
+              className="text-emerald-600 relative inline-block"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              whileHover={{
+                rotateY: 5,
+                transition: { duration: 0.3 }
+              }}
+            >
+              Invoice Reconciliation
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 rounded"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 1.2, duration: 1, ease: "easeOut" }}
+              />
+            </motion.span>
           </motion.h1>
-
-          {/* Subtitle */}
+          
           <motion.p 
-            className="mt-6 sm:mt-8 text-lg sm:text-xl md:text-2xl lg:text-3xl leading-relaxed text-gray-600 max-w-4xl mx-auto break-words"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed text-slate-700"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
           >
-            Upload your project data once. Contractors submit pre-matched invoices. 
-            Approve everything in minutes, not hours.
+            Upload 20 contractor invoices. Get reconciled data in 3 minutes. 
+            Save $1,200/month starting today.
           </motion.p>
-
-          {/* CTA Section */}
+          
           <motion.div 
-            className="mt-8 sm:mt-10 md:mt-12 flex flex-col gap-4 sm:gap-6"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.3 }}
+            className="flex flex-col md:flex-row gap-4 justify-center max-w-4xl mx-auto mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
           >
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto">
-              <Link
-                href="/invoice-setup"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-emerald-600 border border-transparent rounded-lg shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 touch-target group"
-              >
-                <span className="flex flex-col items-center sm:flex-row sm:items-center">
-                  <span className="flex items-center">
-                    Start Free Trial
-                    <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                  </span>
-                  <span className="text-sm text-emerald-100 mt-1 sm:mt-0 sm:ml-2 font-normal">
-                    Set up your invoice in 2 minutes
-                  </span>
-                </span>
-              </Link>
+            <CTAButton
+              href="/manager-demo"
+              variant="primary"
+              icon={DocumentTextIcon}
+            >
+              Free Manager Demo
+            </CTAButton>
+            <CTAButton
+              href="/contractor-trial"
+              variant="secondary"
+              icon={DevicePhoneMobileIcon}
+            >
+              Contractor Trial
+            </CTAButton>
+          </motion.div>
+
+          {/* Enhanced Quick Stats with 3D depth */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <StatCard value="94.7%" label="Auto-match accuracy" delay={1.0} />
+            <StatCard value="3 min" label="Processing time" delay={1.1} />
+            <StatCard value="$29K+" label="Monthly value delivered" delay={1.2} />
+          </div>
+        </div>
+      </section>
+
+      {/* Problem Statement */}
+      <section className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.h2 
+              className="text-3xl md:text-4xl font-bold text-slate-900 mb-8"
+              whileHover={{
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+            >
+              Managers: You're Spending Too Much Time Being the Invoice Police
+            </motion.h2>
+            
+            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+              <ProblemSolutionCard
+                type="problem"
+                icon={ExclamationTriangleIcon}
+                title="Your Current Reality"
+                items={[
+                  "8+ hours every week matching invoices to work orders",
+                  "Contractors submit wrong rates, missing codes",
+                  "Manual data entry into QuickBooks/Sage",
+                  "Chasing contractors for missing information",
+                  "Budget overruns from reconciliation delays"
+                ]}
+                delay={0.2}
+              />
               
-              <Link
-                href="/contractor-dashboard"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-white bg-blue-600 border border-transparent rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target group"
-              >
-                <span className="flex flex-col items-center sm:flex-row sm:items-center">
-                  <span className="flex items-center">
-                    Contractor Interface
-                    <DocumentTextIcon className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  </span>
-                  <span className="text-sm text-blue-100 mt-1 sm:mt-0 sm:ml-2 font-normal">
-                    Mobile entry, time tracking, invoicing
-                  </span>
-                </span>
-              </Link>
+              <ProblemSolutionCard
+                type="solution"
+                icon={CheckCircleIcon}
+                title="With InvoicePatch"
+                items={[
+                  "30 seconds to reconcile 20+ invoices",
+                  "Auto-matched work orders and rates",
+                  "Direct export to your accounting system",
+                  "Complete visibility into all contractor charges",
+                  "Real-time budget tracking and alerts"
+                ]}
+                delay={0.4}
+              />
             </div>
-            
-            <div className="flex justify-center">
-              <button className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-4 text-base font-semibold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 touch-target">
-                <PlayCircleIcon className="mr-2 h-5 w-5 flex-shrink-0" />
-                Watch 2-min demo
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Stats Grid - Mobile Optimized */}
-          <motion.div 
-            className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3 max-w-4xl mx-auto"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.4 }}
-          >
-            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-emerald-600 break-words">8+ hours</dd>
-              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Average time saved per week</dt>
-            </div>
-            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-blue-600">95%</dd>
-              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Billing error reduction</dt>
-            </div>
-            <div className="flex flex-col items-center gap-y-3 text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <dd className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-emerald-600">3x</dd>
-              <dt className="text-sm sm:text-base leading-relaxed text-gray-600 break-words">Faster payment processing</dt>
-            </div>
-          </motion.div>
-
-          {/* Countdown Timer - Mobile Responsive */}
-          <motion.div 
-            className="mt-12 sm:mt-16 md:mt-20 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-6 sm:p-8 max-w-3xl mx-auto"
-            variants={simpleVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.5 }}
-          >
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-orange-900 mb-4 text-center break-words">
-              🔥 Limited Early Access
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.days}</div>
-                <div className="text-xs sm:text-sm text-orange-700 font-medium">Days</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.hours}</div>
-                <div className="text-xs sm:text-sm text-orange-700 font-medium">Hours</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.minutes}</div>
-                <div className="text-xs sm:text-sm text-orange-700 font-medium">Minutes</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-600">{timeLeft.seconds}</div>
-                <div className="text-xs sm:text-sm text-orange-700 font-medium">Seconds</div>
-              </div>
-            </div>
-            
-            {/* Email Signup Form */}
-            {!isSubmitted ? (
-              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <div className="flex-1">
-                  <input
-                    type="email"
-                    {...register('email', { 
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Invalid email address'
-                      }
-                    })}
-                    placeholder="Enter your email for early access"
-                    className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 touch-target"
-                    disabled={isSubmitting}
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600 break-words">{errors.email.message}</p>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto px-6 py-3 text-base font-semibold text-white bg-orange-600 border border-transparent rounded-lg shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 touch-target"
-                >
-                  {isSubmitting ? 'Securing...' : 'Secure My Spot'}
-                </button>
-              </form>
-            ) : (
-              <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-                <CheckCircleIcon className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <p className="text-green-800 font-medium">Thank you! We'll notify you when early access opens.</p>
-              </div>
-            )}
           </motion.div>
         </div>
-      </div>
+      </section>
+
+      {/* Social Proof & CTA Section */}
+      <section className="bg-slate-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SocialProofSection />
+          <FinalCTASection />
+        </div>
+      </section>
     </div>
   );
 } 

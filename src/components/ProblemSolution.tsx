@@ -85,7 +85,7 @@ export default function ProblemSolution() {
             One Source of Truth: Your ERP → Their Mobile App
           </h3>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-10 leading-relaxed break-words">
-            InvoicePatch connects your SAP, JDE, or Oracle system directly to contractor apps. 
+            InvoicePatch connects your FieldCap, FireSpark, or Wellview system directly to contractor apps. 
             Same AFE codes, same well names, same rates - zero reconciliation needed.
           </p>
           

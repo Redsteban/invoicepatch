@@ -94,8 +94,8 @@ export default function AnimatedCounter({ stats, className = '' }: AnimatedCount
           <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
             Real Results for Canadian Contractors
           </h2>
-          <p className="text-slate-600 text-lg">
-            Join thousands who've transformed their invoicing
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Transform your invoice management with professional automation
           </p>
         </motion.div>
 

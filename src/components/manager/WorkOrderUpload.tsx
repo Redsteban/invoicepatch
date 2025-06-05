@@ -109,7 +109,7 @@ const WorkOrderUpload = () => {
           <div>
             <h3 className="text-lg font-semibold text-blue-900 mb-2">Manager Work Order Upload</h3>
             <p className="text-blue-800 mb-4">
-              Upload your project data from ERP systems (SAP, JDE, Oracle) via CSV. This data will be automatically 
+              Upload your project data from field management systems (FieldCap, FireSpark, Wellview) via CSV. This data will be automatically 
               synced to contractor mobile apps for accurate invoice creation.
             </p>
             <div className="bg-blue-100 rounded-lg p-4">
@@ -148,7 +148,7 @@ const WorkOrderUpload = () => {
             Drop your work order CSV files here
           </h4>
           <p className="text-gray-600 mb-4">
-            Or click to browse for files. Supports CSV exports from SAP, JDE, Oracle, and other ERP systems.
+            Or click to browse for files. Supports CSV exports from FieldCap, FireSpark, Wellview, and other field management systems.
           </p>
           <input
             type="file"
@@ -221,21 +221,21 @@ const WorkOrderUpload = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-            <h4 className="font-semibold text-emerald-900 mb-2">SAP Integration</h4>
+            <h4 className="font-semibold text-emerald-900 mb-2">FieldCap Integration</h4>
             <p className="text-sm text-emerald-800">
-              Direct sync with SAP modules including CO (Controlling) and PS (Project Systems)
+              Direct sync with FieldCap field management and project tracking modules
             </p>
           </div>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">JD Edwards</h4>
+            <h4 className="font-semibold text-blue-900 mb-2">FireSpark</h4>
             <p className="text-sm text-blue-800">
-              Real-time work order sync from JDE Project Management and Job Cost modules
+              Real-time work order sync from FireSpark operations and job cost modules
             </p>
           </div>
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h4 className="font-semibold text-purple-900 mb-2">Oracle ERP</h4>
+            <h4 className="font-semibold text-purple-900 mb-2">Wellview</h4>
             <p className="text-sm text-purple-800">
-              Automated data flow from Oracle Project Portfolio Management
+              Automated data flow from Wellview production and project management
             </p>
           </div>
         </div>

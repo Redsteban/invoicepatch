@@ -5,12 +5,8 @@ import { useRef } from 'react';
 import { 
   ShieldCheckIcon,
   LockClosedIcon,
-  CheckBadgeIcon,
-  GlobeAltIcon,
-  StarIcon,
   ClockIcon,
-  PhoneIcon,
-  CheckIcon
+  PhoneIcon
 } from '@heroicons/react/24/outline';
 
 interface TrustSignal {
@@ -21,16 +17,8 @@ interface TrustSignal {
   color: string;
 }
 
-interface CompanyLogo {
-  id: string;
-  name: string;
-  logo?: string;
-  industry: string;
-}
-
 interface TrustSignalsProps {
   trustSignals?: TrustSignal[];
-  companyLogos?: CompanyLogo[];
   className?: string;
 }
 
@@ -67,33 +55,6 @@ function SecurityBadge({ title, subtitle, icon: Icon, color }: {
   );
 }
 
-function CompanyCard({ company, index }: { company: CompanyLogo; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="bg-white rounded-lg p-4 text-center border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 group"
-    >
-      <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-50 transition-colors duration-300">
-        {company.logo ? (
-          <img src={company.logo} alt={company.name} className="w-10 h-10 object-contain" />
-        ) : (
-          <span className="text-2xl font-bold text-slate-400">
-            {company.name.charAt(0)}
-          </span>
-        )}
-      </div>
-      <h4 className="font-semibold text-sm text-slate-800 mb-1">{company.name}</h4>
-      <p className="text-xs text-slate-500">{company.industry}</p>
-    </motion.div>
-  );
-}
-
 export default function TrustSignals({ className = '' }: TrustSignalsProps) {
   return (
     <div className={`bg-gray-50 ${className}`}>
@@ -101,10 +62,10 @@ export default function TrustSignals({ className = '' }: TrustSignalsProps) {
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-4">
-            Trusted by Canadian Contractors Across the Country
+            Professional Invoice Management
           </h2>
           <p className="text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto px-4">
-            Join hundreds of contractors who've transformed their invoicing process and never miss another paycheck.
+            Built with security, compliance, and reliability in mind.
           </p>
         </div>
 
@@ -144,151 +105,56 @@ export default function TrustSignals({ className = '' }: TrustSignalsProps) {
               </div>
               <div className="text-center sm:text-left">
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-2">
-                  100% Money-Back Guarantee
+                  30-Day Money-Back Guarantee
                 </h3>
                 <p className="text-sm sm:text-lg text-slate-600">
-                  If InvoicePatch doesn&apos;t save you at least $200 in the first 30 days, we&apos;ll refund every penny
-                  <span className="font-bold text-emerald-600"> + give you $100 for your time</span>.
+                  Try InvoicePatch risk-free for 30 days. If it doesn&apos;t meet your needs, 
+                  we&apos;ll refund your payment completely.
                 </p>
               </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
-              <p className="text-xs sm:text-sm text-slate-600 italic">
-                &quot;I was skeptical, but InvoicePatch saved me $847 in my first month by catching late submissions 
-                and automating my mileage tracking. The guarantee made it a no-brainer.&quot;
-              </p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-2 font-semibold">
-                - Sarah M., Edmonton Electrical Contractor
-              </p>
             </div>
           </div>
         </div>
 
-        {/* Statistics - Mobile Grid */}
+        {/* Feature Benefits - Real and Honest */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 mb-12 sm:mb-16 lg:mb-20">
           <div className="text-center">
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-600 mb-2">500+</div>
-            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">Active Contractors</div>
-            <div className="text-xs sm:text-sm text-slate-500 mt-1">Across all provinces</div>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-600 mb-2">$2.1M+</div>
-            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">Recovered Revenue</div>
-            <div className="text-xs sm:text-sm text-slate-500 mt-1">From late submissions</div>
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-600 mb-2">5 min</div>
+            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">Setup Time</div>
+            <div className="text-xs sm:text-sm text-slate-500 mt-1">Quick integration</div>
           </div>
           
           <div className="text-center">
             <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-600 mb-2">99.7%</div>
-            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">On-Time Rate</div>
-            <div className="text-xs sm:text-sm text-slate-500 mt-1">Invoice submissions</div>
+            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">Accuracy Rate</div>
+            <div className="text-xs sm:text-sm text-slate-500 mt-1">AI-powered processing</div>
+          </div>
+          
+          <div className="text-center">
+            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-blue-600 mb-2">24/7</div>
+            <div className="text-sm sm:text-base lg:text-lg text-slate-600 font-semibold">Support Available</div>
+            <div className="text-xs sm:text-sm text-slate-500 mt-1">Canadian team</div>
           </div>
         </div>
 
-        {/* Quick Testimonials - Mobile Optimized */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16 lg:mb-20">
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
-            <div className="flex space-x-1 mb-3">
-              {[1,2,3,4,5].map(i => (
-                <StarIcon key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
-              ))}
-            </div>
-            <p className="text-xs sm:text-sm text-slate-700 mb-3 italic">
-              &quot;Cut my invoice time from 4 hours to 15 minutes. Already recovered $1,200 in missed mileage claims!&quot;
-            </p>
-            <div className="text-xs sm:text-sm text-slate-500 font-semibold">
-              Mike R. - Toronto Plumber
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
-            <div className="flex space-x-1 mb-3">
-              {[1,2,3,4,5].map(i => (
-                <StarIcon key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
-              ))}
-            </div>
-            <p className="text-xs sm:text-sm text-slate-700 mb-3 italic">
-              &quot;My contractors love it. No more chasing late invoices. Cash flow improved 200%.&quot;
-            </p>
-            <div className="text-xs sm:text-sm text-slate-500 font-semibold">
-              Lisa C. - Calgary Construction Manager
-            </div>
-          </div>
-        </div>
-
-        {/* Final CTA - Mobile Optimized */}
+        {/* Simple call to action without fake social proof */}
         <div className="text-center">
-          <div className="bg-blue-50 rounded-2xl p-6 sm:p-8 lg:p-12 border border-blue-200">
-            <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-4">
-              Ready to Never Miss Another Paycheck?
-            </h3>
-            <p className="text-sm sm:text-lg text-slate-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
-              Join the smart contractors who&apos;ve automated their invoicing and recovered thousands in lost revenue.
-            </p>
-            
-            {/* Mobile-Optimized CTA Button */}
-            <button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-lg lg:text-xl font-bold py-4 px-6 sm:px-8 lg:px-12 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 min-h-[44px] mx-auto">
-              Get 90% Off - Secure Your Spot Now
+          <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4">
+            Ready to Streamline Your Invoice Process?
+          </h3>
+          <p className="text-sm sm:text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
+            See how InvoicePatch can help you automate invoice reconciliation and save time.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Try Free Demo
             </button>
-            
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 mt-4 sm:mt-6 text-xs sm:text-sm text-slate-500">
-              <div className="flex items-center space-x-2">
-                <CheckIcon className="h-4 w-4 text-emerald-600" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckIcon className="h-4 w-4 text-emerald-600" />
-                <span>14-day trial</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckIcon className="h-4 w-4 text-emerald-600" />
-                <span>Cancel anytime</span>
-              </div>
-            </div>
+            <button className="bg-white text-blue-600 border border-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+              Learn More
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-}
-
-// Default trust signals
-const defaultTrustSignals: TrustSignal[] = [
-  {
-    id: 'ssl',
-    title: 'SSL Encrypted',
-    description: 'Bank-level security',
-    icon: LockClosedIcon,
-    color: 'bg-blue-600'
-  },
-  {
-    id: 'pipeda',
-    title: 'PIPEDA Compliant', 
-    description: 'Privacy protected',
-    icon: ShieldCheckIcon,
-    color: 'bg-blue-600'
-  },
-  {
-    id: 'cra',
-    title: 'CRA Approved',
-    description: 'Tax compliant', 
-    icon: CheckBadgeIcon,
-    color: 'bg-blue-600'
-  },
-  {
-    id: 'canadian',
-    title: 'Canadian Hosted',
-    description: 'Local data storage',
-    icon: GlobeAltIcon,
-    color: 'bg-blue-600'
-  }
-];
-
-// Default company logos (placeholder data)
-const defaultCompanyLogos: CompanyLogo[] = [
-  { id: '1', name: 'TechCorp', industry: 'Technology' },
-  { id: '2', name: 'BuildCo', industry: 'Construction' },
-  { id: '3', name: 'ElectriTech', industry: 'Electrical' },
-  { id: '4', name: 'PlumbPro', industry: 'Plumbing' }
-]; 
+} 

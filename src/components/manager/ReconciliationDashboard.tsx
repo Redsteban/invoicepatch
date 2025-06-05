@@ -1,5 +1,6 @@
 'use client';
 
+
 import { motion } from 'framer-motion';
 import {
   ChartBarIcon,
@@ -97,7 +98,7 @@ const ReconciliationDashboard = () => {
       id: '4',
       type: 'export',
       title: 'Data Exported',
-      description: 'Weekly reconciliation report exported to SAP',
+      description: 'Weekly reconciliation report exported to FieldCap',
       timestamp: '2 hours ago',
       status: 'completed'
     }

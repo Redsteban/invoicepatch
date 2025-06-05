@@ -6,7 +6,7 @@ import AnimatedBranding from '@/components/AnimatedBranding';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import ProblemSolution from '@/components/ProblemSolution';
-import Testimonials from '@/components/Testimonials';
+import FeatureShowcase from '@/components/Testimonials';
 import Pricing from '@/components/Pricing';
 import FAQ from '@/components/FAQ';
 import Footer from '@/components/Footer';
@@ -55,7 +55,7 @@ export default function Home() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.1 }}
       >
-        <Testimonials />
+        <FeatureShowcase />
       </motion.div>
       
       <motion.div 

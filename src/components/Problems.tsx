@@ -59,7 +59,7 @@ const managerProblems = [
   },
   {
     icon: ComputerDesktopIcon,
-    title: 'Manual data entry into SAP, JDE, and field management systems',
+    title: 'Manual data entry into FieldCap, FireSpark, and field management systems',
     description: 'Copy-pasting invoice details from service contractors into multiple systems increases errors and wastes valuable time during critical operations.',
     impact: '5-8 minutes per invoice',
   },

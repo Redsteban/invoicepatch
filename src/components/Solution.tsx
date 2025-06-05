@@ -221,9 +221,8 @@ export default function Solution() {
           <p className="mt-2 text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
             InvoicePatch Transforms Your Workflow
           </p>
-          <p className="mt-6 text-lg leading-8 text-slate-600">
-            Watch how InvoicePatch eliminates every pain point with intelligent automation 
-            and seamless Canadian tax compliance.
+          <p className="text-lg text-slate-600 leading-8 mb-8">
+            Transform your invoice management process with professional-grade automation.
           </p>
         </div>
 
@@ -373,7 +372,7 @@ export default function Solution() {
               Ready to Transform Your Invoicing Process?
             </h3>
             <p className="text-slate-600 mb-6 text-lg">
-              Join 500+ contractors and managers who save 12+ hours weekly with InvoicePatch.
+              See how automated invoice processing can streamline your workflow.
             </p>
             <div className="flex flex-wrap justify-center items-center space-x-8 text-slate-600 text-sm mb-6">
               <div className="flex items-center space-x-2">
