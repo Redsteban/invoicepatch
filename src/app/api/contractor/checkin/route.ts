@@ -23,78 +23,114 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate totals
-    let dailyTotal = 0;
     let taxableAmount = 0;
     let nonTaxableAmount = 0;
 
     if (worked) {
       // Day rate (taxable)
-      taxableAmount += dayRate;
+      taxableAmount += dayRate || 0;
       
       // Truck rate (taxable if applicable)
       if (truckUsed) {
-        taxableAmount += truckRate;
+        taxableAmount += truckRate || 0;
       }
       
       // Travel reimbursement (non-taxable) - $0.68 per km standard rate
-      const travelReimbursement = travelKms * 0.68;
+      const travelReimbursement = (travelKms || 0) * 0.68;
       nonTaxableAmount += travelReimbursement;
       
       // Subsistence (non-taxable)
-      nonTaxableAmount += subsistence;
-      
-      // Calculate GST (5% on taxable amount)
-      const gstAmount = taxableAmount * 0.05;
-      
-      dailyTotal = taxableAmount + gstAmount + nonTaxableAmount;
+      nonTaxableAmount += subsistence || 0;
     }
 
-    // Create check-in record
-    const { data: checkIn, error: checkInError } = await supabaseAdmin
-      .from('contractor_checkins')
-      .insert({
-        trial_invoice_id: trialInvoiceId,
-        checkin_date: date,
-        worked_today: worked,
-        day_rate: worked ? dayRate : 0,
-        truck_used: worked ? truckUsed : false,
-        truck_rate: worked && truckUsed ? truckRate : 0,
-        travel_kms: worked ? travelKms : 0,
-        travel_reimbursement: worked ? travelKms * 0.68 : 0,
-        subsistence: worked ? subsistence : 0,
-        taxable_amount: taxableAmount,
-        gst_amount: taxableAmount * 0.05,
-        non_taxable_amount: nonTaxableAmount,
-        daily_total: dailyTotal,
-        status: 'completed',
-        created_at: new Date().toISOString()
-      })
-      .select()
+    // Calculate GST (5% on taxable amount)
+    const gstAmount = taxableAmount * 0.05;
+    const dailyTotal = taxableAmount + gstAmount + nonTaxableAmount;
+
+    // Check if entry already exists for this date
+    const { data: existingEntry } = await supabaseAdmin
+      .from('daily_entries')
+      .select('id')
+      .eq('trial_invoice_id', trialInvoiceId)
+      .eq('entry_date', date)
       .single();
 
-    if (checkInError) {
-      console.error('Error creating check-in:', checkInError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to save check-in' },
-        { status: 500 }
-      );
+    let result;
+    if (existingEntry) {
+      // Update existing entry
+      const { data, error } = await supabaseAdmin
+        .from('daily_entries')
+        .update({
+          worked: worked,
+          day_rate_used: worked ? dayRate : 0,
+          truck_rate_used: worked && truckUsed ? truckRate : 0,
+          travel_kms_actual: worked ? travelKms : 0,
+          subsistence_actual: worked ? subsistence : 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingEntry.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating daily entry:', error);
+        return NextResponse.json(
+          { success: false, error: 'Failed to update daily entry' },
+          { status: 500 }
+        );
+      }
+      result = data;
+    } else {
+      // Create new entry
+      const { data, error } = await supabaseAdmin
+        .from('daily_entries')
+        .insert({
+          trial_invoice_id: trialInvoiceId,
+          entry_date: date,
+          worked: worked,
+          day_rate_used: worked ? dayRate : 0,
+          truck_rate_used: worked && truckUsed ? truckRate : 0,
+          travel_kms_actual: worked ? travelKms : 0,
+          subsistence_actual: worked ? subsistence : 0,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating daily entry:', error);
+        return NextResponse.json(
+          { success: false, error: 'Failed to create daily entry' },
+          { status: 500 }
+        );
+      }
+      result = data;
     }
 
-    // Update invoice total by fetching all check-ins for this trial
-    const { data: allCheckIns, error: fetchError } = await supabaseAdmin
-      .from('contractor_checkins')
-      .select('daily_total')
+    // Update trial invoice totals
+    const { data: allEntries, error: fetchError } = await supabaseAdmin
+      .from('daily_entries')
+      .select('*')
       .eq('trial_invoice_id', trialInvoiceId)
-      .eq('worked_today', true);
+      .eq('worked', true);
 
-    if (!fetchError && allCheckIns) {
-      const totalAmount = allCheckIns.reduce((sum, checkIn) => sum + (checkIn.daily_total || 0), 0);
+    if (!fetchError && allEntries) {
+      const totalEarned = allEntries.reduce((sum, entry) => {
+        const dayAmount = entry.day_rate_used || 0;
+        const truckAmount = entry.truck_rate_used || 0;
+        const travelAmount = (entry.travel_kms_actual || 0) * 0.68;
+        const subsistenceAmount = entry.subsistence_actual || 0;
+        
+        const entryTaxable = dayAmount + truckAmount;
+        const entryGst = entryTaxable * 0.05;
+        
+        return sum + entryTaxable + entryGst + travelAmount + subsistenceAmount;
+      }, 0);
       
-      // Update the related invoice
+      // Update the trial invoice with current totals
       await supabaseAdmin
-        .from('invoices')
+        .from('trial_invoices')
         .update({ 
-          amount: totalAmount,
           updated_at: new Date().toISOString()
         })
         .eq('id', trialInvoiceId);
@@ -102,12 +138,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      checkIn: checkIn,
+      entry: result,
       summary: {
         dailyTotal: dailyTotal,
         taxableAmount: taxableAmount,
         nonTaxableAmount: nonTaxableAmount,
-        gstAmount: taxableAmount * 0.05
+        gstAmount: gstAmount
       }
     });
 
