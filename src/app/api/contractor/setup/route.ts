@@ -3,7 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone } = await request.json();
+    const body = await request.json();
+    const { name, email, phone } = body;
 
     // Validate required fields
     if (!name || !email) {
@@ -13,89 +14,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create contractor profile
-    const { data: contractor, error: contractorError } = await supabaseAdmin
-      .from('contractors')
-      .insert({
-        name,
-        email,
-        phone,
-        status: 'demo',
-        daily_rate: 450,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    // Calculate 5-day trial period
+    const startDate = new Date();
+    const endDate = new Date();
+    endDate.setDate(startDate.getDate() + 5);
 
-    if (contractorError) {
-      console.error('Error creating contractor:', contractorError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to create contractor profile' },
-        { status: 500 }
-      );
-    }
-
-    // Create demo work order
-    const { data: workOrder, error: workOrderError } = await supabase
-      .from('work_orders')
-      .insert({
-        contractor_id: contractor.id,
-        project_name: 'Calgary Downtown Development',
-        location: 'Calgary Downtown',
-        daily_rate: 450,
-        start_date: new Date().toISOString().split('T')[0],
-        end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 weeks from now
+    // Create trial invoice with 5-day period
+    const { data: invoice, error } = await supabaseAdmin
+      .from('trial_invoices')
+      .insert([{
+        ticket_number: `TRIAL-${Date.now()}`,
+        location: 'Calgary Downtown Site',
+        company: 'Demo Construction Ltd',
+        day_rate: 450.00,
+        truck_rate: 150.00,
+        travel_kms: 45.0,
+        subsistence: 75.00,
+        work_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        invoice_frequency: 'trial',
+        contractor_name: name,
+        contractor_email: email,
+        contractor_phone: phone || null,
         status: 'active',
-        created_at: new Date().toISOString(),
-      })
+        trial_day: 1
+      }])
       .select()
       .single();
 
-    if (workOrderError) {
-      console.error('Error creating work order:', workOrderError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to create work order' },
-        { status: 500 }
-      );
+    if (error) {
+      console.error('Database error:', error);
+      throw error;
     }
 
-    // Create initial demo invoice
-    const { data: invoice, error: invoiceError } = await supabase
-      .from('invoices')
-      .insert({
-        contractor_id: contractor.id,
-        work_order_id: workOrder.id,
-        invoice_number: `INV-${Date.now()}`,
-        amount: 450,
-        days_worked: 1,
-        description: 'Day 1 - Site preparation and setup',
-        status: 'draft',
-        due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    // Create initial daily entry for today
+    const today = new Date().toISOString().split('T')[0];
+    await supabaseAdmin
+      .from('daily_entries')
+      .insert([{
+        trial_invoice_id: invoice.id,
+        entry_date: today,
+        worked: false, // Will be updated when user logs work
+        day_rate_used: 450.00,
+        truck_rate_used: 150.00,
+        travel_kms_actual: 45.0,
+        subsistence_actual: 75.00
+      }]);
 
-    if (invoiceError) {
-      console.error('Error creating invoice:', invoiceError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to create demo invoice' },
-        { status: 500 }
-      );
-    }
+    console.log('Trial created successfully:', invoice.id);
 
-    // Return success with invoice ID for redirection
-    return NextResponse.json({
-      success: true,
-      contractorId: contractor.id,
+    return NextResponse.json({ 
+      success: true, 
       invoiceId: invoice.id,
-      workOrderId: workOrder.id,
+      message: 'Trial setup complete! Start logging your work.',
+      trialDays: 5
     });
 
   } catch (error) {
-    console.error('Contractor setup error:', error);
+    console.error('Setup error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Failed to setup trial' },
       { status: 500 }
     );
   }
