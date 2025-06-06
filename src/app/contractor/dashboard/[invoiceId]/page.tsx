@@ -20,15 +20,26 @@ const ContractorDashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [todayWorked, setTodayWorked] = useState<boolean | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
+    console.log('Dashboard component mounted with ID:', params.invoiceId);
     loadDashboardData();
   }, [params.invoiceId]);
 
   const loadDashboardData = async () => {
     try {
+      console.log('Loading dashboard data for:', params.invoiceId);
+      
       const response = await fetch(`/api/contractor/dashboard?trialInvoiceId=${params.invoiceId}`);
+      console.log('Dashboard API response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const result = await response.json();
+      console.log('Dashboard API result:', result);
       
       if (result.success) {
         setData(result);
@@ -37,9 +48,12 @@ const ContractorDashboard = () => {
         const today = new Date().toISOString().split('T')[0];
         const todayEntry = result.entries.find((e: any) => e.entry_date === today);
         setTodayWorked(todayEntry?.worked || null);
+      } else {
+        setError(result.error || 'Failed to load dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load dashboard:', error);
+      setError(`Failed to load dashboard: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -47,6 +61,8 @@ const ContractorDashboard = () => {
 
   const logWork = async (worked: boolean) => {
     try {
+      console.log('Logging work:', { worked, trialId: params.invoiceId });
+      
       const response = await fetch('/api/contractor/checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,13 +78,24 @@ const ContractorDashboard = () => {
         })
       });
 
+      console.log('Checkin API response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
+      console.log('Checkin API result:', result);
+      
       if (result.success) {
         setTodayWorked(worked);
         loadDashboardData(); // Refresh data
+      } else {
+        setError(result.error || 'Failed to log work');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to log work:', error);
+      setError(`Failed to log work: ${error.message}`);
     }
   };
 
@@ -83,10 +110,26 @@ const ContractorDashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={loadDashboardData}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-600">Failed to load dashboard data</p>
+        <p className="text-gray-600">No dashboard data available</p>
       </div>
     );
   }
@@ -99,7 +142,7 @@ const ContractorDashboard = () => {
           <div className="flex items-center justify-between">
             <h1 className="font-medium text-gray-900">InvoicePatch Trial</h1>
             <span className="text-sm text-gray-500">
-              Day {data.summary.currentDay}/5 • {data.summary.trialDaysRemaining} days left
+              Day {data.summary?.currentDay || 1}/5 • {data.summary?.trialDaysRemaining || 0} days left
             </span>
           </div>
         </div>
@@ -112,16 +155,16 @@ const ContractorDashboard = () => {
             <div>
               <p className="text-sm text-gray-600">Trial Progress</p>
               <p className="text-2xl font-semibold text-gray-900">
-                ${data.summary.totalEarned.toFixed(2)}
+                ${(data.summary?.totalEarned || 0).toFixed(2)}
               </p>
               <p className="text-sm text-gray-500">
-                Projected 5-day total: ${data.summary.projectedTotal.toFixed(2)}
+                Projected 5-day total: ${(data.summary?.projectedTotal || 0).toFixed(2)}
               </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Days worked</p>
               <p className="text-2xl font-semibold text-gray-900">
-                {data.summary.daysWorked}/5
+                {data.summary?.daysWorked || 0}/5
               </p>
             </div>
           </div>
@@ -130,11 +173,11 @@ const ContractorDashboard = () => {
           <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
             <div 
               className="bg-blue-500 h-3 rounded-full transition-all" 
-              style={{ width: `${(data.summary.currentDay / 5) * 100}%` }}
+              style={{ width: `${((data.summary?.currentDay || 1) / 5) * 100}%` }}
             ></div>
           </div>
           <p className="text-xs text-gray-500">
-            {data.summary.trialDaysRemaining} days remaining in trial
+            {data.summary?.trialDaysRemaining || 0} days remaining in trial
           </p>
         </div>
 
@@ -173,115 +216,23 @@ const ContractorDashboard = () => {
           </div>
         )}
 
-        {/* 5-Day Summary */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-4">Trial Insights</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Average daily earnings</span>
-                <span className="font-medium">
-                  ${data.summary.daysWorked > 0 ? (data.summary.totalEarned / data.summary.daysWorked).toFixed(2) : '0.00'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Work completion rate</span>
-                <span className="font-medium">
-                  {((data.summary.daysWorked / data.summary.currentDay) * 100).toFixed(0)}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Days until invoice</span>
-                <span className="font-medium">{6 - data.summary.currentDay} days</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="font-medium text-gray-900 mb-4">Invoice Preview</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Day rate total</span>
-                <span>${(data.summary.daysWorked * 450).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Truck allowance</span>
-                <span>${(data.summary.daysWorked * 150).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Travel (45km/day)</span>
-                <span>${(data.summary.daysWorked * 45 * 0.68).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subsistence</span>
-                <span>${(data.summary.daysWorked * 75).toFixed(2)}</span>
-              </div>
-              <div className="border-t pt-2">
-                <div className="flex justify-between font-medium">
-                  <span>GST (5%)</span>
-                  <span>${(data.summary.daysWorked * 600 * 0.05).toFixed(2)}</span>
-                </div>
-              </div>
-              <div className="border-t pt-2">
-                <div className="flex justify-between font-semibold text-blue-600">
-                  <span>Total</span>
-                  <span>${data.summary.totalEarned.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Work History */}
+        {/* Simple stats for now */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="font-medium text-gray-900 mb-4">5-Day Work History</h3>
-          <div className="space-y-3">
-            {Array.from({ length: 5 }, (_, i) => {
-              const date = new Date();
-              date.setDate(date.getDate() - (4 - i));
-              const dateStr = date.toISOString().split('T')[0];
-              const entry = data.entries.find(e => e.entry_date === dateStr);
-              const isToday = dateStr === new Date().toISOString().split('T')[0];
-              const isPast = date < new Date(new Date().toDateString());
-              
-              return (
-                <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${
-                  isToday ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
-                }`}>
-                  <div>
-                    <span className="font-medium">
-                      Day {i + 1} - {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                    </span>
-                    {isToday && <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded">TODAY</span>}
-                  </div>
-                  <div className="text-right">
-                    {entry?.worked ? (
-                      <span className="text-green-600 font-medium">$673.50</span>
-                    ) : entry?.worked === false ? (
-                      <span className="text-gray-500">Day off</span>
-                    ) : isPast ? (
-                      <span className="text-gray-400">Not logged</span>
-                    ) : (
-                      <span className="text-gray-400">Pending</span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+          <h3 className="font-medium text-gray-900 mb-4">Trial Summary</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Total Earned</p>
+              <p className="text-xl font-semibold text-gray-900">
+                ${(data.summary?.totalEarned || 0).toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Days Worked</p>
+              <p className="text-xl font-semibold text-gray-900">
+                {data.summary?.daysWorked || 0}
+              </p>
+            </div>
           </div>
-        </div>
-
-        {/* CTA for full version */}
-        <div className="mt-8 text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Ready for the full InvoicePatch experience?
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Automate your invoicing completely and never miss a payment again.
-          </p>
-          <button className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">
-            Start Full Version - $39/month
-          </button>
         </div>
       </div>
     </div>

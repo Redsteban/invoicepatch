@@ -1,85 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest) {
-  try {
-    console.log('=== DAILY CHECKIN API CALLED ===')
-    
-    const body = await request.json()
-    console.log('Checkin request body:', body)
-    
-    const { 
-      trialInvoiceId, 
-      date, 
-      worked, 
-      dayRate, 
-      truckUsed, 
-      truckRate, 
-      travelKms, 
-      subsistence, 
-      notes 
-    } = body
-
-    // Validate required fields
-    if (!trialInvoiceId || !date || worked === undefined) {
-      console.log('Validation failed: missing required fields')
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    // For now, return mock success
-    console.log('Daily checkin saved successfully')
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Daily entry saved successfully',
-      data: {
-        date,
-        worked,
-        earnings: worked ? 673.50 : 0
-      }
-    })
-
-  } catch (error) {
-    console.error('=== CHECKIN API ERROR ===', error)
-    return NextResponse.json(
-      { success: false, error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
-      { status: 500 }
-    )
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const trialInvoiceId = searchParams.get('trialInvoiceId')
-    const date = searchParams.get('date')
 
-    console.log('=== GET CHECKIN API CALLED ===')
-    console.log('Query params:', { trialInvoiceId, date })
+    console.log('=== DASHBOARD API CALLED ===')
+    console.log('Query params:', { trialInvoiceId })
 
-    // Return mock data for now
-    return NextResponse.json({ 
-      success: true, 
-      entry: {
-        id: 'mock-entry-id',
-        trial_invoice_id: trialInvoiceId,
-        entry_date: date,
-        worked: false,
-        day_rate_used: null,
-        truck_used: false,
-        truck_rate_used: null,
-        travel_kms_actual: null,
-        subsistence_actual: null,
-        notes: null
+    if (!trialInvoiceId) {
+      console.log('Validation failed: missing trialInvoiceId')
+      return NextResponse.json(
+        { success: false, error: 'trialInvoiceId is required' },
+        { status: 400 }
+      )
+    }
+
+    // Mock data with the structure the dashboard component expects
+    const mockData = {
+      success: true,
+      invoice: {
+        id: trialInvoiceId,
+        sequence_number: 'INV-001',
+        contractor_name: 'Test Contractor',
+        start_date: '2024-01-15',
+        end_date: '2024-01-19'
+      },
+      entries: [
+        {
+          id: 'entry-1',
+          entry_date: '2024-01-15',
+          worked: true,
+          day_rate_used: 450,
+          truck_used: true,
+          truck_rate_used: 150,
+          travel_kms_actual: 45,
+          subsistence_actual: 75,
+          total_earnings: 673.50
+        },
+        {
+          id: 'entry-2', 
+          entry_date: '2024-01-16',
+          worked: true,
+          day_rate_used: 450,
+          truck_used: true,
+          truck_rate_used: 150,
+          travel_kms_actual: 45,
+          subsistence_actual: 75,
+          total_earnings: 673.50
+        }
+      ],
+      summary: {
+        totalEarned: 1347.00,
+        daysWorked: 2,
+        currentDay: 3,
+        trialDaysRemaining: 2,
+        projectedTotal: 3367.50
       }
-    })
+    }
+
+    console.log('Dashboard API returning mock data:', mockData)
+    
+    return NextResponse.json(mockData)
 
   } catch (error) {
-    console.error('=== GET CHECKIN API ERROR ===', error)
+    console.error('=== DASHBOARD API ERROR ===', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to get daily entry' },
+      { success: false, error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
       { status: 500 }
     )
   }
