@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create check-in record
-    const { data: checkIn, error: checkInError } = await supabase
+    const { data: checkIn, error: checkInError } = await supabaseAdmin
       .from('contractor_checkins')
       .insert({
         trial_invoice_id: trialInvoiceId,
@@ -86,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update invoice total by fetching all check-ins for this trial
-    const { data: allCheckIns, error: fetchError } = await supabase
+    const { data: allCheckIns, error: fetchError } = await supabaseAdmin
       .from('contractor_checkins')
       .select('daily_total')
       .eq('trial_invoice_id', trialInvoiceId)
@@ -96,7 +91,7 @@ export async function POST(request: NextRequest) {
       const totalAmount = allCheckIns.reduce((sum, checkIn) => sum + (checkIn.daily_total || 0), 0);
       
       // Update the related invoice
-      await supabase
+      await supabaseAdmin
         .from('invoices')
         .update({ 
           amount: totalAmount,
@@ -123,4 +118,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
