@@ -43,10 +43,28 @@ const ManagerTrialLanding = () => {
   const handleUpload = async (uploadFiles) => {
     setIsUploading(true);
     
-    // Simulate upload and processing
-    setTimeout(() => {
-      router.push('/manager-demo?step=processing');
-    }, 1500);
+    const formData = new FormData();
+    uploadFiles.forEach(file => formData.append('files', file));
+    
+    try {
+      const response = await fetch('/api/manager/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setTimeout(() => {
+          router.push('/manager/reconciliation');
+        }, 3000); // Show processing animation
+      } else {
+        console.error('Upload failed:', data.error);
+        setIsUploading(false);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setIsUploading(false);
+    }
   };
 
   const handleSampleData = () => {
