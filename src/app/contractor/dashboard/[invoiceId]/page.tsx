@@ -1,85 +1,74 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 
-interface Invoice {
-  id: string;
-  invoice_number: string;
-  amount: number;
-  days_worked: number;
-  description: string;
-  status: string;
-  due_date: string;
-  created_at: string;
-  contractor: {
-    name: string;
-    email: string;
-    daily_rate: number;
-  };
-  work_order: {
-    project_name: string;
-    location: string;
-    start_date: string;
-    end_date: string;
+interface DashboardData {
+  invoice: any;
+  entries: any[];
+  summary: {
+    totalEarned: number;
+    daysWorked: number;
+    currentDay: number;
+    trialDaysRemaining: number;
+    projectedTotal: number;
   };
 }
 
 const ContractorDashboard = () => {
-  const [invoice, setInvoice] = useState<Invoice | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
   const params = useParams();
-  const router = useRouter();
-  const invoiceId = params?.invoiceId as string;
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [todayWorked, setTodayWorked] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (invoiceId) {
-      fetchInvoice();
-    }
-  }, [invoiceId]);
+    loadDashboardData();
+  }, [params.invoiceId]);
 
-  const fetchInvoice = async () => {
+  const loadDashboardData = async () => {
     try {
-      const response = await fetch(`/api/contractor/invoice/${invoiceId}`);
-      const data = await response.json();
+      const response = await fetch(`/api/contractor/dashboard?trialInvoiceId=${params.invoiceId}`);
+      const result = await response.json();
       
-      if (data.success) {
-        setInvoice(data.invoice);
-      } else {
-        setError(data.error || 'Failed to load invoice');
+      if (result.success) {
+        setData(result);
+        
+        // Check if today's work is logged
+        const today = new Date().toISOString().split('T')[0];
+        const todayEntry = result.entries.find((e: any) => e.entry_date === today);
+        setTodayWorked(todayEntry?.worked || null);
       }
-    } catch (err) {
-      console.error('Error fetching invoice:', err);
-      setError('Failed to load invoice data');
+    } catch (error) {
+      console.error('Failed to load dashboard:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const submitInvoice = async () => {
-    if (!invoice) return;
-    
-    setSubmitting(true);
+  const logWork = async (worked: boolean) => {
     try {
-      const response = await fetch(`/api/contractor/invoice/${invoiceId}/submit`, {
+      const response = await fetch('/api/contractor/checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trialInvoiceId: params.invoiceId,
+          date: new Date().toISOString().split('T')[0],
+          worked,
+          dayRate: worked ? 450 : 0,
+          truckUsed: worked,
+          truckRate: worked ? 150 : 0,
+          travelKms: worked ? 45 : 0,
+          subsistence: worked ? 75 : 0
+        })
       });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setInvoice(prev => prev ? { ...prev, status: 'submitted' } : null);
-      } else {
-        setError(data.error || 'Failed to submit invoice');
+
+      const result = await response.json();
+      if (result.success) {
+        setTodayWorked(worked);
+        loadDashboardData(); // Refresh data
       }
-    } catch (err) {
-      console.error('Error submitting invoice:', err);
-      setError('Failed to submit invoice');
-    } finally {
-      setSubmitting(false);
+    } catch (error) {
+      console.error('Failed to log work:', error);
     }
   };
 
@@ -87,173 +76,212 @@ const ContractorDashboard = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#3b82f6] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#6b7280]">Loading your dashboard...</p>
+          <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (!data) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h1 className="text-xl font-semibold text-[#1a1a1a] mb-2">Something went wrong</h1>
-          <p className="text-[#6b7280] mb-6">{error}</p>
-          <button 
-            onClick={() => router.push('/automated-trial-setup')}
-            className="bg-[#3b82f6] text-white px-6 py-2 rounded-lg hover:bg-[#2563eb] transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
+        <p className="text-gray-600">Failed to load dashboard data</p>
       </div>
     );
   }
-
-  if (!invoice) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-[#6b7280]">Invoice not found</p>
-        </div>
-      </div>
-    );
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'draft': return 'bg-[#fefce8] text-[#f59e0b] border-[#fde68a]';
-      case 'submitted': return 'bg-[#f0f9ff] text-[#3b82f6] border-[#bfdbfe]';
-      case 'approved': return 'bg-[#f0fdf4] text-[#22c55e] border-[#bbf7d0]';
-      case 'paid': return 'bg-[#f0fdf4] text-[#16a34a] border-[#bbf7d0]';
-      default: return 'bg-[#f9fafb] text-[#6b7280] border-[#e5e7eb]';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-[#e5e7eb]">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-[#1a1a1a]">
-                Welcome, {invoice.contractor.name}
-              </h1>
-              <p className="text-[#6b7280]">
-                {invoice.work_order.project_name}
-              </p>
-            </div>
-            <div className={`px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor(invoice.status)}`}>
-              {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-            </div>
+            <h1 className="font-medium text-gray-900">InvoicePatch Trial</h1>
+            <span className="text-sm text-gray-500">
+              Day {data.summary.currentDay}/5 • {data.summary.trialDaysRemaining} days left
+            </span>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Current Invoice Card */}
-        <div className="bg-white border border-[#e5e7eb] rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-[#1a1a1a]">Current Invoice</h2>
-            <span className="text-sm text-[#6b7280]">{invoice.invoice_number}</span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Amount</label>
-                <div className="text-2xl font-bold text-[#1a1a1a]">${invoice.amount}</div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Days Worked</label>
-                <div className="text-lg text-[#1a1a1a]">{invoice.days_worked} day{invoice.days_worked !== 1 ? 's' : ''}</div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Daily Rate</label>
-                <div className="text-lg text-[#1a1a1a]">${invoice.contractor.daily_rate}</div>
-              </div>
+        {/* 5-Day Progress */}
+        <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm text-gray-600">Trial Progress</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                ${data.summary.totalEarned.toFixed(2)}
+              </p>
+              <p className="text-sm text-gray-500">
+                Projected 5-day total: ${data.summary.projectedTotal.toFixed(2)}
+              </p>
             </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Due Date</label>
-                <div className="text-lg text-[#1a1a1a]">
-                  {new Date(invoice.due_date).toLocaleDateString()}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Created</label>
-                <div className="text-lg text-[#1a1a1a]">
-                  {new Date(invoice.created_at).toLocaleDateString()}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6b7280]">Location</label>
-                <div className="text-lg text-[#1a1a1a]">{invoice.work_order.location}</div>
-              </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Days worked</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                {data.summary.daysWorked}/5
+              </p>
             </div>
           </div>
-
-          <div className="mb-6">
-            <label className="text-sm font-medium text-[#6b7280]">Work Description</label>
-            <div className="mt-1 text-[#1a1a1a]">{invoice.description}</div>
-          </div>
-
-          {invoice.status === 'draft' && (
-            <div className="flex gap-4">
-              <button 
-                onClick={submitInvoice}
-                disabled={submitting}
-                className="bg-[#3b82f6] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#2563eb] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? 'Submitting...' : 'Submit Invoice'}
-              </button>
-              <button className="border border-[#e5e7eb] text-[#1a1a1a] px-6 py-2 rounded-lg font-medium hover:bg-[#f9fafb] transition-colors">
-                Edit Details
-              </button>
-            </div>
-          )}
           
-          {invoice.status === 'submitted' && (
-            <div className="bg-[#f0f9ff] border border-[#3b82f6]/20 rounded-lg p-4">
-              <p className="text-[#3b82f6] font-medium">
-                ✓ Invoice submitted successfully! 
-              </p>
-              <p className="text-[#6b7280] text-sm mt-1">
-                You'll receive payment within 30 days of approval.
-              </p>
-            </div>
-          )}
+          {/* Progress bar */}
+          <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+            <div 
+              className="bg-blue-500 h-3 rounded-full transition-all" 
+              style={{ width: `${(data.summary.currentDay / 5) * 100}%` }}
+            ></div>
+          </div>
+          <p className="text-xs text-gray-500">
+            {data.summary.trialDaysRemaining} days remaining in trial
+          </p>
         </div>
 
-        {/* Project Details */}
-        <div className="bg-[#f9fafb] rounded-lg p-6">
-          <h3 className="font-medium text-[#1a1a1a] mb-4">Project Information</h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <span className="text-sm text-[#6b7280]">Project:</span>
-              <div className="font-medium text-[#1a1a1a]">{invoice.work_order.project_name}</div>
+        {/* Today's Work */}
+        {todayWorked === null && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">
+              Did you work today?
+            </h2>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => logWork(true)}
+                className="flex-1 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+              >
+                Yes, I worked today
+              </button>
+              <button 
+                onClick={() => logWork(false)}
+                className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                No work today
+              </button>
             </div>
-            <div>
-              <span className="text-sm text-[#6b7280]">Location:</span>
-              <div className="font-medium text-[#1a1a1a]">{invoice.work_order.location}</div>
-            </div>
-            <div>
-              <span className="text-sm text-[#6b7280]">Start Date:</span>
-              <div className="font-medium text-[#1a1a1a]">
-                {new Date(invoice.work_order.start_date).toLocaleDateString()}
+          </div>
+        )}
+
+        {todayWorked === true && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p className="text-green-800">✓ Today's work logged: $673.50 earned</p>
+          </div>
+        )}
+
+        {todayWorked === false && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+            <p className="text-gray-600">Day off logged for today</p>
+          </div>
+        )}
+
+        {/* 5-Day Summary */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 className="font-medium text-gray-900 mb-4">Trial Insights</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Average daily earnings</span>
+                <span className="font-medium">
+                  ${data.summary.daysWorked > 0 ? (data.summary.totalEarned / data.summary.daysWorked).toFixed(2) : '0.00'}
+                </span>
               </div>
-            </div>
-            <div>
-              <span className="text-sm text-[#6b7280]">End Date:</span>
-              <div className="font-medium text-[#1a1a1a]">
-                {new Date(invoice.work_order.end_date).toLocaleDateString()}
+              <div className="flex justify-between">
+                <span className="text-gray-600">Work completion rate</span>
+                <span className="font-medium">
+                  {((data.summary.daysWorked / data.summary.currentDay) * 100).toFixed(0)}%
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Days until invoice</span>
+                <span className="font-medium">{6 - data.summary.currentDay} days</span>
               </div>
             </div>
           </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 className="font-medium text-gray-900 mb-4">Invoice Preview</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Day rate total</span>
+                <span>${(data.summary.daysWorked * 450).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Truck allowance</span>
+                <span>${(data.summary.daysWorked * 150).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Travel (45km/day)</span>
+                <span>${(data.summary.daysWorked * 45 * 0.68).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Subsistence</span>
+                <span>${(data.summary.daysWorked * 75).toFixed(2)}</span>
+              </div>
+              <div className="border-t pt-2">
+                <div className="flex justify-between font-medium">
+                  <span>GST (5%)</span>
+                  <span>${(data.summary.daysWorked * 600 * 0.05).toFixed(2)}</span>
+                </div>
+              </div>
+              <div className="border-t pt-2">
+                <div className="flex justify-between font-semibold text-blue-600">
+                  <span>Total</span>
+                  <span>${data.summary.totalEarned.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Work History */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="font-medium text-gray-900 mb-4">5-Day Work History</h3>
+          <div className="space-y-3">
+            {Array.from({ length: 5 }, (_, i) => {
+              const date = new Date();
+              date.setDate(date.getDate() - (4 - i));
+              const dateStr = date.toISOString().split('T')[0];
+              const entry = data.entries.find(e => e.entry_date === dateStr);
+              const isToday = dateStr === new Date().toISOString().split('T')[0];
+              const isPast = date < new Date(new Date().toDateString());
+              
+              return (
+                <div key={i} className={`flex items-center justify-between p-3 rounded-lg ${
+                  isToday ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'
+                }`}>
+                  <div>
+                    <span className="font-medium">
+                      Day {i + 1} - {date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                    </span>
+                    {isToday && <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded">TODAY</span>}
+                  </div>
+                  <div className="text-right">
+                    {entry?.worked ? (
+                      <span className="text-green-600 font-medium">$673.50</span>
+                    ) : entry?.worked === false ? (
+                      <span className="text-gray-500">Day off</span>
+                    ) : isPast ? (
+                      <span className="text-gray-400">Not logged</span>
+                    ) : (
+                      <span className="text-gray-400">Pending</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CTA for full version */}
+        <div className="mt-8 text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Ready for the full InvoicePatch experience?
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Automate your invoicing completely and never miss a payment again.
+          </p>
+          <button className="px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors">
+            Start Full Version - $39/month
+          </button>
         </div>
       </div>
     </div>
