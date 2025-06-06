@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
+import { supabaseAdmin } from '@/lib/supabase';
 export async function POST(
   request: NextRequest,
   { params }: { params: { invoiceId: string } }
@@ -21,7 +15,7 @@ export async function POST(
     }
 
     // Update invoice status to submitted
-    const { data: invoice, error } = await supabase
+    const { data: invoice, error } = await supabaseAdmin
       .from('invoices')
       .update({ 
         status: 'submitted',

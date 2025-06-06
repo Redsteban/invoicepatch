@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create manager session
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await supabaseAdmin
       .from('manager_sessions')
       .insert({
         session_id: `MGR-${Date.now()}`,
@@ -62,7 +57,7 @@ export async function POST(request: NextRequest) {
     await Promise.all(invoicePromises);
 
     // Update session status
-    await supabase
+    await supabaseAdmin
       .from('manager_sessions')
       .update({ 
         status: 'completed',
