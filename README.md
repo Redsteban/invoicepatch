@@ -205,3 +205,4 @@ For questions or issues:
 
 **InvoicePatch MVP** - Proving delivery capability through functional software. 
 *Built with modern tech stack, Canadian compliance, and user-first design.*
+# Deploy trigger Fri Jun  6 10:52:05 MST 2025
