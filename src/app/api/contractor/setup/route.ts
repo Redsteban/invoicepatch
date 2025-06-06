@@ -3,6 +3,13 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== SETUP API STARTED ===');
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      nodeEnv: process.env.NODE_ENV
+    });
+
     const body = await request.json();
     const { 
       name, 
@@ -34,34 +41,41 @@ export async function POST(request: NextRequest) {
     const endDate = new Date();
     endDate.setDate(startDate.getDate() + 5);
 
+    console.log('Dates calculated:', { startDate: startDate.toISOString(), endDate: endDate.toISOString() });
+
+    // Prepare data for insertion
+    const insertData = {
+      contractor_name: name,
+      contractor_email: email,
+      contractor_phone: phone || null,
+      sequence_number: invoiceSequence || `TRIAL-${Date.now()}`,
+      start_date: startDate.toISOString().split('T')[0],
+      end_date: endDate.toISOString().split('T')[0],
+      trial_day: 1,
+      day_rate: parseFloat(dayRate) || 450.00,
+      truck_rate: parseFloat(truckRate) || 150.00,
+      travel_kms: parseInt(travelKms) || 45,
+      rate_per_km: parseFloat(ratePerKm) || 0.68,
+      subsistence: parseFloat(subsistence) || 75.00,
+      location: location || 'Project Site',
+      company: company || 'Construction Company',
+      total_earned: 0,
+      days_worked: 0
+    };
+
+    console.log('Data prepared for insertion:', insertData);
+
     // Create trial invoice with user's details using correct schema
     const { data: invoice, error } = await supabaseAdmin
       .from('trial_invoices')
-      .insert([{
-        contractor_name: name,
-        contractor_email: email,
-        contractor_phone: phone || null,
-        sequence_number: invoiceSequence || `TRIAL-${Date.now()}`,
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
-        trial_day: 1,
-        day_rate: parseFloat(dayRate) || 450.00,
-        truck_rate: parseFloat(truckRate) || 150.00,
-        travel_kms: parseInt(travelKms) || 45,
-        rate_per_km: parseFloat(ratePerKm) || 0.68,
-        subsistence: parseFloat(subsistence) || 75.00,
-        location: location || 'Project Site',
-        company: company || 'Construction Company',
-        total_earned: 0,
-        days_worked: 0
-      }])
+      .insert([insertData])
       .select()
       .single();
 
     if (error) {
       console.error('Database error creating trial invoice:', error);
       return NextResponse.json(
-        { success: false, error: `Database error: ${error.message}` },
+        { success: false, error: `Database error: ${error.message}`, details: error },
         { status: 500 }
       );
     }
@@ -77,8 +91,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Setup error:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json(
-      { success: false, error: `Failed to setup trial: ${error.message}` },
+      { success: false, error: `Failed to setup trial: ${error.message}`, details: error.stack },
       { status: 500 }
     );
   }
