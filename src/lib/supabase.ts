@@ -3,8 +3,8 @@ import type { Database, PreOrderCustomer, EmailSubscriber, AnalyticsEventInsert 
 
 // Supabase URL and Keys with fallbacks for build time
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key'
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUwMzU0MDAsImV4cCI6MTk2MDYxMTQwMH0.B-GxrZ2qFoJ-mPLO3F5B1WPzV4aQY_9Gq5WcOZOqGQw'
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY0NTAzNTQwMCwiZXhwIjoxOTYwNjExNDAwfQ._4o5BZWlkQ5vZgA6wZNDbJ7bGQO8eGmSyI_1g5iIQP8'
 
 // Check if we're in a build environment
 const isBuildTime = process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV
@@ -21,18 +21,22 @@ if (!isBuildTime) {
 }
 
 // Client-side Supabase client (for browser/frontend)
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
+export const supabase = createClient<Database>(
+  supabaseUrl.includes('placeholder') ? 'https://placeholder.supabase.co' : supabaseUrl, 
+  supabaseAnonKey === 'placeholder_key' ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUwMzU0MDAsImV4cCI6MTk2MDYxMTQwMH0.B-GxrZ2qFoJ-mPLO3F5B1WPzV4aQY_9Gq5WcOZOqGQw' : supabaseAnonKey, 
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
   }
-})
+)
 
 // Server-side admin client (for API routes)
 export const supabaseAdmin = createClient<Database>(
-  supabaseUrl, 
-  supabaseServiceKey || supabaseAnonKey,
+  supabaseUrl.includes('placeholder') ? 'https://placeholder.supabase.co' : supabaseUrl,
+  supabaseServiceKey === 'placeholder_key' ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY0NTAzNTQwMCwiZXhwIjoxOTYwNjExNDAwfQ._4o5BZWlkQ5vZgA6wZNDbJ7bGQO8eGmSyI_1g5iIQP8' : supabaseServiceKey,
   {
     auth: {
       autoRefreshToken: false,
