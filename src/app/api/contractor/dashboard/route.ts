@@ -8,26 +8,24 @@ export async function GET(request: NextRequest) {
 
     if (!trialInvoiceId) {
       return NextResponse.json(
-        { success: false, error: 'Trial invoice ID is required' },
+        { success: false, error: 'Trial invoice ID required' },
         { status: 400 }
       )
     }
 
-    // Fetch trial invoice details
+    // Get trial invoice details
     const { data: invoice, error: invoiceError } = await supabaseAdmin
       .from('trial_invoices')
       .select('*')
       .eq('id', trialInvoiceId)
       .single()
 
-    if (invoiceError || !invoice) {
-      return NextResponse.json(
-        { success: false, error: 'Trial invoice not found' },
-        { status: 404 }
-      )
+    if (invoiceError) {
+      console.error('Invoice error:', invoiceError)
+      throw invoiceError
     }
 
-    // Fetch all daily entries for this trial
+    // Get all daily entries for this trial
     const { data: entries, error: entriesError } = await supabaseAdmin
       .from('daily_entries')
       .select('*')
@@ -35,51 +33,52 @@ export async function GET(request: NextRequest) {
       .order('entry_date', { ascending: true })
 
     if (entriesError) {
-      console.error('Error fetching entries:', entriesError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch daily entries' },
-        { status: 500 }
-      )
+      console.error('Entries error:', entriesError)
+      throw entriesError
     }
 
-    // Calculate summary metrics
-    const workedEntries = (entries || []).filter(entry => entry.worked === true)
-    const daysWorked = workedEntries.length
-    
-    // Calculate total earnings (day rate + truck + travel + subsistence + GST)
-    const baseEarningsPerDay = 450 + 150 + (45 * 0.68) + 75 // $675.60 per day
-    const taxablePerDay = 450 + 150 // $600 taxable
-    const gstPerDay = taxablePerDay * 0.05 // $30 GST
-    const totalPerDay = baseEarningsPerDay + gstPerDay // $705.60 total with GST
-
-    const totalEarned = daysWorked * totalPerDay
-    const projectedTotal = 5 * totalPerDay // Full 5-day projection
-
-    // Calculate current day and remaining days
+    // Calculate 5-day trial summary
     const startDate = new Date(invoice.start_date)
-    const today = new Date()
-    const diffTime = today.getTime() - startDate.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    const currentDay = Math.max(1, Math.min(diffDays + 1, 5))
-    const trialDaysRemaining = Math.max(0, 5 - currentDay + 1)
+    const currentDate = new Date()
+    const currentDay = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    const trialDaysRemaining = Math.max(0, 5 - currentDay)
 
-    const summary = {
-      totalEarned: Math.round(totalEarned * 100) / 100,
-      daysWorked,
-      currentDay,
-      trialDaysRemaining,
-      projectedTotal: Math.round(projectedTotal * 100) / 100
-    }
+    // Calculate earnings
+    const totalEarned = entries.reduce((sum, entry) => {
+      if (!entry.worked) return sum
+      
+      const dayAmount = entry.day_rate_used || 0
+      const truckAmount = entry.truck_rate_used || 0
+      const travelAmount = (entry.travel_kms_actual || 0) * 0.68 // CRA mileage rate
+      const subsistenceAmount = entry.subsistence_actual || 0
+      
+      const taxableAmount = dayAmount + truckAmount
+      const gst = taxableAmount * 0.05
+      
+      return sum + taxableAmount + gst + travelAmount + subsistenceAmount
+    }, 0)
 
-    return NextResponse.json({
+    const daysWorked = entries.filter(entry => entry.worked).length
+    
+    // Project total for 5 days based on current rate
+    const avgDailyEarning = daysWorked > 0 ? totalEarned / daysWorked : 673.50
+    const projectedTotal = avgDailyEarning * 5
+
+    return NextResponse.json({ 
       success: true,
       invoice,
-      entries: entries || [],
-      summary
+      entries,
+      summary: {
+        totalEarned,
+        daysWorked,
+        currentDay: Math.min(currentDay, 5),
+        trialDaysRemaining,
+        projectedTotal
+      }
     })
 
   } catch (error) {
-    console.error('Dashboard API error:', error)
+    console.error('Dashboard error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to load dashboard data' },
       { status: 500 }
