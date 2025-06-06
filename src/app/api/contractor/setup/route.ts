@@ -12,13 +12,17 @@ export async function POST(request: NextRequest) {
       dayRate,
       truckRate,
       travelKms,
+      ratePerKm,
       subsistence,
       location,
       company
     } = body;
 
+    console.log('Setup request body:', body);
+
     // Validate required fields
     if (!name || !email) {
+      console.log('Validation failed: missing name or email');
       return NextResponse.json(
         { success: false, error: 'Name and email are required' },
         { status: 400 }
@@ -30,50 +34,39 @@ export async function POST(request: NextRequest) {
     const endDate = new Date();
     endDate.setDate(startDate.getDate() + 5);
 
-    // Create trial invoice with user's details
+    // Create trial invoice with user's details using correct schema
     const { data: invoice, error } = await supabaseAdmin
       .from('trial_invoices')
       .insert([{
-        ticket_number: invoiceSequence || `TRIAL-${Date.now()}`,
-        location: location || 'Project Site',
-        company: company || 'Construction Company',
-        day_rate: dayRate || 450.00,
-        truck_rate: truckRate || 150.00,
-        travel_kms: travelKms || 45.0,
-        subsistence: subsistence || 75.00,
-        work_days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        start_date: startDate.toISOString().split('T')[0],
-        end_date: endDate.toISOString().split('T')[0],
-        invoice_frequency: 'trial',
         contractor_name: name,
         contractor_email: email,
         contractor_phone: phone || null,
-        status: 'active',
-        trial_day: 1
+        sequence_number: invoiceSequence || `TRIAL-${Date.now()}`,
+        start_date: startDate.toISOString().split('T')[0],
+        end_date: endDate.toISOString().split('T')[0],
+        trial_day: 1,
+        day_rate: parseFloat(dayRate) || 450.00,
+        truck_rate: parseFloat(truckRate) || 150.00,
+        travel_kms: parseInt(travelKms) || 45,
+        rate_per_km: parseFloat(ratePerKm) || 0.68,
+        subsistence: parseFloat(subsistence) || 75.00,
+        location: location || 'Project Site',
+        company: company || 'Construction Company',
+        total_earned: 0,
+        days_worked: 0
       }])
       .select()
       .single();
 
     if (error) {
-      console.error('Database error:', error);
-      throw error;
+      console.error('Database error creating trial invoice:', error);
+      return NextResponse.json(
+        { success: false, error: `Database error: ${error.message}` },
+        { status: 500 }
+      );
     }
 
-    // Create initial daily entry for today with user's rates
-    const today = new Date().toISOString().split('T')[0];
-    await supabaseAdmin
-      .from('daily_entries')
-      .insert([{
-        trial_invoice_id: invoice.id,
-        entry_date: today,
-        worked: false, // Will be updated when user logs work
-        day_rate_used: dayRate || 450.00,
-        truck_rate_used: truckRate || 150.00,
-        travel_kms_actual: travelKms || 45.0,
-        subsistence_actual: subsistence || 75.00
-      }]);
-
-    console.log('Trial created successfully:', invoice.id);
+    console.log('Trial invoice created successfully:', invoice.id);
 
     return NextResponse.json({ 
       success: true, 
@@ -82,10 +75,10 @@ export async function POST(request: NextRequest) {
       trialDays: 5
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Setup error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to setup trial' },
+      { success: false, error: `Failed to setup trial: ${error.message}` },
       { status: 500 }
     );
   }
