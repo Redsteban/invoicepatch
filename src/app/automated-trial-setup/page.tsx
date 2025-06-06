@@ -7,17 +7,36 @@ const AutomatedTrialSetup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Redirect to dashboard or success page
-    router.push('/dashboard');
+    try {
+      const response = await fetch('/api/contractor/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Redirect to contractor dashboard with the created invoice
+        router.push(`/contractor/dashboard/${data.invoiceId}`);
+      } else {
+        setError(data.error || 'Setup failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('Setup error:', err);
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -28,7 +47,7 @@ const AutomatedTrialSetup = () => {
             Almost Ready!
           </h1>
           <p className="text-[#6b7280]">
-            We'll simulate a real work order for you
+            We'll create a real demo project for you
           </p>
         </div>
         
@@ -51,10 +70,16 @@ const AutomatedTrialSetup = () => {
           </div>
         </div>
         
+        {error && (
+          <div className="mb-4 p-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg">
+            <p className="text-sm text-[#dc2626]">{error}</p>
+          </div>
+        )}
+        
         <form className="space-y-4" onSubmit={handleSubmit}>
           <input 
             type="text" 
-            placeholder="Your name"
+            placeholder="Your full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -68,13 +93,20 @@ const AutomatedTrialSetup = () => {
             required
             className="w-full px-4 py-3 border border-[#e5e7eb] rounded-lg focus:outline-none focus:border-[#3b82f6] transition-colors"
           />
+          <input 
+            type="tel" 
+            placeholder="Phone number (optional)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-3 border border-[#e5e7eb] rounded-lg focus:outline-none focus:border-[#3b82f6] transition-colors"
+          />
           
           <button 
             type="submit"
             disabled={isSubmitting}
             className="w-full py-3 bg-[#3b82f6] text-white rounded-lg font-medium hover:bg-[#2563eb] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Setting up...' : 'Start Trial'}
+            {isSubmitting ? 'Creating your demo...' : 'Start Trial'}
           </button>
           
           <p className="text-center text-sm text-[#9ca3af]">
