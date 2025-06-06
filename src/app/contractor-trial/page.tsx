@@ -1,198 +1,128 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function ContractorTrial() {
-  const [selectedOption, setSelectedOption] = useState<'quick' | 'full' | null>(null);
+const ContractorTrialPage = () => {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  // Quick Start Setup Screen
-  if (selectedOption === 'quick') {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="max-w-md mx-auto px-4 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-2xl font-semibold text-[#1a1a1a] mb-2">
-              Quick Start Setup
-            </h1>
-            <p className="text-[#6b7280]">
-              Create your first invoice in 2 minutes
-            </p>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Your Name
-              </label>
-              <input 
-                type="text" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="Enter your full name"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Company Name
-              </label>
-              <input 
-                type="text" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="Your business name"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Daily Rate
-              </label>
-              <input 
-                type="number" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="850"
-              />
-            </div>
-          </div>
-          
-          <div className="mt-16">
-            <Link
-              href="/invoice-setup"
-              className="w-full block bg-[#3b82f6] text-white text-center py-4 rounded-lg font-medium hover:bg-[#2563eb] transition-colors"
-            >
-              Create First Invoice
-            </Link>
-            
-            <button 
-              onClick={() => setSelectedOption(null)}
-              className="w-full text-[#6b7280] text-center py-4 mt-2 hover:text-[#1a1a1a] transition-colors"
-            >
-              Back
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
 
-  // Full Experience Setup Screen
-  if (selectedOption === 'full') {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="max-w-md mx-auto px-4 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-2xl font-semibold text-[#1a1a1a] mb-2">
-              Full Experience Setup
-            </h1>
-            <p className="text-[#6b7280]">
-              See automated daily check-ins in action
-            </p>
-          </div>
-          
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Your Name
-              </label>
-              <input 
-                type="text" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="Enter your full name"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Email
-              </label>
-              <input 
-                type="email" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="your@email.com"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-[#1a1a1a]">
-                Phone Number
-              </label>
-              <input 
-                type="tel" 
-                className="w-full px-0 py-3 border-0 border-b border-[#e5e7eb] focus:border-[#3b82f6] focus:ring-0 bg-transparent text-[#1a1a1a] placeholder-[#9ca3af]"
-                placeholder="(403) 555-0123"
-              />
-            </div>
-            
-            <div className="p-4 bg-[#f9fafb] rounded-lg">
-              <p className="text-sm text-[#6b7280]">
-                We'll send you a daily 6 PM text asking about your work. 
-                You can reply directly to create invoices.
-              </p>
-            </div>
-          </div>
-          
-          <div className="mt-16">
-            <Link
-              href="/automated-trial-setup"
-              className="w-full block bg-[#3b82f6] text-white text-center py-4 rounded-lg font-medium hover:bg-[#2563eb] transition-colors"
-            >
-              Start Automated Trial
-            </Link>
-            
-            <button 
-              onClick={() => setSelectedOption(null)}
-              className="w-full text-[#6b7280] text-center py-4 mt-2 hover:text-[#1a1a1a] transition-colors"
-            >
-              Back
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    try {
+      const response = await fetch('/api/contractor/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-  // Initial Selection Screen
+      const data = await response.json();
+
+      if (data.success) {
+        // Store trial ID in localStorage for easy access
+        localStorage.setItem('trialInvoiceId', data.invoiceId);
+        router.push(`/contractor/dashboard/${data.invoiceId}`);
+      } else {
+        setError(data.error || 'Failed to start trial');
+      }
+    } catch (err) {
+      console.error('Trial setup error:', err);
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-md mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-2xl font-semibold text-[#1a1a1a] mb-2">
-            Start Your Trial
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Start Your 5-Day Trial
           </h1>
-          <p className="text-[#6b7280]">
-            Choose how you'd like to experience InvoicePatch
+          <p className="text-gray-600">
+            Experience automated invoice tracking for 5 days
           </p>
         </div>
         
-        <div className="space-y-4">
-          <button 
-            onClick={() => setSelectedOption('quick')}
-            className="w-full p-6 border border-[#e5e7eb] rounded-lg text-left hover:border-[#3b82f6] transition-colors group"
-          >
-            <h3 className="font-medium text-[#1a1a1a] mb-1">Quick Start</h3>
-            <p className="text-sm text-[#6b7280]">Manual invoice creation • 2 min setup</p>
-          </button>
+        {/* Demo Project Details */}
+        <div className="bg-gray-50 rounded-lg p-6 mb-8">
+          <h3 className="font-medium text-gray-900 mb-3">Demo Project Details</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Daily Rate</span>
+              <span className="font-medium">$450</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Truck Rate</span>
+              <span className="font-medium">$150</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Location</span>
+              <span className="font-medium">Calgary Downtown</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Trial Duration</span>
+              <span className="font-medium">5 days</span>
+            </div>
+          </div>
+        </div>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input 
+            type="text" 
+            placeholder="Your name"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            required
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+          />
+          <input 
+            type="email" 
+            placeholder="Email for notifications"
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            required
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+          />
+          <input 
+            type="tel" 
+            placeholder="Phone number"
+            value={formData.phone}
+            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
+          />
           
           <button 
-            onClick={() => setSelectedOption('full')}
-            className="w-full p-6 border-2 border-[#3b82f6] rounded-lg text-left bg-[#f9fafb] group"
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium text-[#1a1a1a] mb-1">Full Experience</h3>
-                <p className="text-sm text-[#6b7280]">Automated daily check-ins • See the magic</p>
-              </div>
-              <span className="text-xs bg-[#3b82f6] text-white px-2 py-1 rounded">RECOMMENDED</span>
-            </div>
+            {isSubmitting ? 'Setting up trial...' : 'Start 5-Day Trial'}
           </button>
-        </div>
-        
-        <div className="mt-16 text-center">
-          <p className="text-sm text-[#9ca3af]">
-            Both options are completely free
+          
+          <p className="text-center text-sm text-gray-500">
+            You'll get daily check-ins at 6 PM for 5 days
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
-} 
+};
+
+export default ContractorTrialPage; 
