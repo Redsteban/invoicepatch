@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { OTPSecurity } from '../../../../lib/otp-security';
-import { createSecureApi } from '../../../../lib/secure-api';
+import { OTPSecurity } from '@/lib/otp-security';
+import { createSecureApi } from '@/lib/secure-api';
 
 export const dynamic = 'force-dynamic'
 
