@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import { WorkEntryAccordion } from '@/components/ui/Accordion';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardData {
   success: boolean;
@@ -421,7 +419,6 @@ const ContractorDashboard = () => {
   }
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
@@ -904,7 +901,6 @@ const ContractorDashboard = () => {
         </div>
       </div>
     </div>
-    </ProtectedRoute>
   );
 };
 
