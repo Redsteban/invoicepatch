@@ -90,17 +90,27 @@ const ContractorDashboard = () => {
     const authAge = currentTime - authTimestamp;
     const maxAuthAge = 60 * 60 * 1000; // 1 hour
     
+    console.log('🔒 SECURITY CHECK:', {
+      hasRecentAuth: !!hasRecentAuth,
+      authTimestamp,
+      currentTime,
+      authAge: authAge / 1000 / 60, // minutes
+      maxAgeMinutes: maxAuthAge / 1000 / 60,
+      isValid: hasRecentAuth && authAge <= maxAuthAge && !isNaN(authTimestamp)
+    });
+    
     // Force authentication if:
     // 1. No recent auth flag OR
     // 2. Auth is older than 1 hour OR
     // 3. No valid timestamp
     if (!hasRecentAuth || authAge > maxAuthAge || isNaN(authTimestamp)) {
-      console.log('🔒 SECURITY: Authentication required');
+      console.log('🔒 SECURITY: Authentication required - showing modal');
       setShowAuthModal(true);
       return;
     }
     
     console.log('✅ SECURITY: Authentication verified, loading dashboard');
+    setShowAuthModal(false); // Explicitly hide modal when authenticated
     loadDashboardData();
   }, [params.invoiceId]);
 

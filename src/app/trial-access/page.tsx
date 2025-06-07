@@ -90,7 +90,8 @@ const TrialAccessPage = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to trial dashboard
+        // Set authentication flag and redirect to trial dashboard
+        sessionStorage.setItem('recentAuthFlow', Date.now().toString());
         router.push(`/contractor/dashboard/${data.trialId}`);
       } else {
         setError(data.error || 'Invalid verification code');
