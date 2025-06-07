@@ -475,20 +475,22 @@ export default function Hero() {
             </CTAButton>
           </motion.div>
 
-          {/* Trial Access Link */}
+          {/* Enhanced Trial Access Link - Direct to Login */}
           <motion.div 
             className="text-center mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.6 }}
           >
-            <p className="text-slate-600 mb-2">Already have a trial?</p>
+            <p className="text-slate-600 mb-2">🔑 Already have an account?</p>
             <Link 
-              href="/trial-access"
-              className="text-blue-600 hover:text-blue-700 font-medium underline"
+              href="/login"
+              className="text-blue-600 hover:text-blue-700 font-medium underline flex items-center justify-center gap-2"
             >
-              Access Your Existing Trial →
+              <span>🔐 Sign In + OTP Verification</span>
+              <ArrowRightIcon className="h-4 w-4" />
             </Link>
+            <p className="text-xs text-slate-500 mt-1">Password + OTP required for security</p>
           </motion.div>
 
           {/* Enhanced Quick Stats with 3D depth */}
