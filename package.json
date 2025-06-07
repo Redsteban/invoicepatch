@@ -21,6 +21,7 @@
     "dotenv": "^16.5.0",
     "framer-motion": "^12.15.0",
     "html2pdf.js": "^0.10.3",
+    "isomorphic-dompurify": "^2.25.0",
     "jspdf": "^3.0.1",
     "next": "14.2.29",
     "nodemailer": "^7.0.3",
@@ -28,7 +29,8 @@
     "react-dom": "^18",
     "react-hook-form": "^7.57.0",
     "stripe": "^18.2.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
