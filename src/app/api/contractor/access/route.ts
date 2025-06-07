@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createRuntimeSupabaseClient } from '@/lib/supabase-client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  const supabase = createRuntimeSupabaseClient();
+  
   try {
     console.log('=== TRIAL ACCESS API STARTED ===');
     
