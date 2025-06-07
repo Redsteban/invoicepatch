@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from '@/lib/supabase-client';
 import { createSecureApi } from '@/lib/secure-api';
 
 export const dynamic = 'force-dynamic'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 async function handleGetUserTrials(request: NextRequest) {
   try {
+    // Get Supabase client at runtime
+    const supabase = getSupabaseClient();
+    
     // Get user from auth header
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {

@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OTPSecurity } from '@/lib/otp-security';
 import { createSecureApi } from '@/lib/secure-api';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { getSupabaseClient } from '@/lib/supabase-client';
 
 async function handleVerifyOTP(request: NextRequest) {
   try {
@@ -47,6 +43,7 @@ async function handleVerifyOTP(request: NextRequest) {
     }
 
     // OTP verified successfully - now find the trial
+    const supabase = getSupabaseClient();
     const { data: trial, error: trialError } = await supabase
       .from('trial_invoices')
       .select('id, contractor_name, company, status, start_date, end_date')

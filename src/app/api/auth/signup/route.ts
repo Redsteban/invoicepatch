@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const dynamic = 'force-dynamic'
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL environment variable is required');
+  }
+  
+  if (!supabaseKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +28,9 @@ export async function POST(request: NextRequest) {
         error: 'Email and password are required'
       }, { status: 400 });
     }
+
+    // Get Supabase client at runtime
+    const supabase = getSupabaseClient();
 
     // Create user account
     const { data, error } = await supabase.auth.admin.createUser({
@@ -48,7 +64,7 @@ export async function POST(request: NextRequest) {
     console.error('Signup API error:', error);
     return NextResponse.json({
       success: false,
-      error: 'Failed to create account'
+      error: error.message || 'Failed to create account'
     }, { status: 500 });
   }
 } 
