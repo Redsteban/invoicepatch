@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { OTPSecurity } from '../../../../lib/otp-security';
 import { createSecureApi } from '../../../../lib/secure-api';
 
+export const dynamic = 'force-dynamic'
+
 async function handleRequestLoginOTP(request: NextRequest) {
   try {
     const body = await request.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { OTPSecurity } from '../../../lib/otp-security';
-import { createSecureApi } from '../../../lib/secure-api';
+import { OTPSecurity } from '@/lib/otp-security';
+import { createSecureApi } from '@/lib/secure-api';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

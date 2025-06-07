@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic' // Ensure this route is rendered dynamically
+
 export async function GET(request: NextRequest) {
   try {
     // 🛡️ SECURITY CHECK: Require authentication header for trial access
