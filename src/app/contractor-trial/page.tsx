@@ -72,82 +72,96 @@ const ContractorTrialPage = () => {
     const periods = [];
     
     if (useManual && formData.useManualSchedule) {
-      // Manual schedule calculation
+      // IMPROVED: Manual schedule calculation with better logic
       if (formData.scheduleType === 'custom' && formData.customCutoffDate && formData.customSubmissionDate) {
-        // Custom specific dates
-        periods.push({
-          period: 1,
-          workStart: startDate,
-          cutoffDate: formData.customCutoffDate,
-          submissionDate: formData.customSubmissionDate,
-          type: 'custom'
-        });
+        // Custom specific dates - calculate subsequent periods
+        const cutoffDate = new Date(formData.customCutoffDate);
+        const submissionDate = new Date(formData.customSubmissionDate);
+        
+        for (let i = 1; i <= 6; i++) { // Show more periods for planning
+          const periodStart = new Date(start);
+          const periodCutoff = new Date(cutoffDate);
+          const periodSubmission = new Date(submissionDate);
+          
+          // Add weeks to each subsequent period
+          const weeksToAdd = (i - 1) * 2; // Bi-weekly
+          periodStart.setDate(periodStart.getDate() + (weeksToAdd * 7));
+          periodCutoff.setDate(periodCutoff.getDate() + (weeksToAdd * 7));
+          periodSubmission.setDate(periodSubmission.getDate() + (weeksToAdd * 7));
+          
+          periods.push({
+            period: i,
+            workStart: periodStart.toISOString().split('T')[0],
+            cutoffDate: periodCutoff.toISOString().split('T')[0],
+            submissionDate: periodSubmission.toISOString().split('T')[0],
+            type: 'custom-recurring'
+          });
+        }
       } else {
-        // Weekly or biweekly with day-of-week selection
+        // IMPROVED: Weekly or biweekly with proper day-of-week calculation
         const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
         const cutoffDayIndex = dayNames.indexOf(formData.cutoffDay.toLowerCase());
         const submissionDayIndex = dayNames.indexOf(formData.submissionDay.toLowerCase());
         
         const periodLength = formData.scheduleType === 'weekly' ? 7 : 14;
         
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 6; i++) { // Show more periods
+          // Calculate period start
           const periodStart = new Date(start);
-          periodStart.setDate(start.getDate() + ((i - 1) * periodLength));
+          if (i > 1) {
+            periodStart.setDate(start.getDate() + ((i - 1) * periodLength));
+          }
           
-          // Find next cutoff day
+          // Find the cutoff date (last day of period)
           const cutoffDate = new Date(periodStart);
-          const daysUntilCutoff = (cutoffDayIndex + 7 - cutoffDate.getDay()) % 7;
-          cutoffDate.setDate(cutoffDate.getDate() + daysUntilCutoff + (periodLength - 7));
+          cutoffDate.setDate(cutoffDate.getDate() + periodLength - 1);
           
-          // Find submission day (usually after cutoff)
+          // Adjust to correct day of week
+          const cutoffDayDiff = (cutoffDayIndex - cutoffDate.getDay() + 7) % 7;
+          cutoffDate.setDate(cutoffDate.getDate() + cutoffDayDiff);
+          
+          // Find submission date (after cutoff)
           const submissionDate = new Date(cutoffDate);
-          const daysUntilSubmission = (submissionDayIndex + 7 - cutoffDate.getDay()) % 7;
-          if (daysUntilSubmission === 0) submissionDate.setDate(submissionDate.getDate() + 7); // Next week if same day
-          else submissionDate.setDate(submissionDate.getDate() + daysUntilSubmission);
+          const submissionDayDiff = (submissionDayIndex - cutoffDate.getDay() + 7) % 7;
+          submissionDate.setDate(submissionDate.getDate() + (submissionDayDiff || 7)); // Next occurrence
           
           periods.push({
             period: i,
             workStart: periodStart.toISOString().split('T')[0],
             cutoffDate: cutoffDate.toISOString().split('T')[0],
             submissionDate: submissionDate.toISOString().split('T')[0],
-            type: formData.scheduleType
+            type: formData.scheduleType,
+            description: `Period ${i}: ${periodStart.toLocaleDateString()} - ${cutoffDate.toLocaleDateString()}`
           });
         }
       }
     } else {
-      // Default automatic calculation
+      // IMPROVED: Default automatic calculation
       const firstCutoff = new Date(start);
-      firstCutoff.setMonth(firstCutoff.getMonth() + 1);
-      firstCutoff.setDate(0); // Last day of current month
+      firstCutoff.setDate(firstCutoff.getDate() + 13); // 14-day period (0-indexed)
       
       const firstSubmission = new Date(firstCutoff);
       firstSubmission.setDate(firstSubmission.getDate() + 1);
       
-      periods.push({
-        period: 1,
-        workStart: startDate,
-        cutoffDate: firstCutoff.toISOString().split('T')[0],
-        submissionDate: firstSubmission.toISOString().split('T')[0],
-        type: 'initial'
-      });
-      
-      // Period 2 and beyond: Regular 14-day periods
-      for (let i = 2; i <= 3; i++) {
-        const periodStart = new Date(firstSubmission);
-        periodStart.setDate(periodStart.getDate() + ((i - 2) * 14));
+      // Generate 6 periods for better planning visibility
+      for (let i = 1; i <= 6; i++) {
+        const periodStart = new Date(start);
+        const periodCutoff = new Date(firstCutoff);
+        const periodSubmission = new Date(firstSubmission);
         
-        const periodCutoff = new Date(periodStart);
-        periodCutoff.setDate(periodCutoff.getDate() + 13);
-        
-        const periodSubmission = new Date(periodCutoff);
-        periodSubmission.setDate(periodSubmission.getDate() + 1);
+        // Add 14 days for each subsequent period
+        const daysToAdd = (i - 1) * 14;
+        periodStart.setDate(periodStart.getDate() + daysToAdd);
+        periodCutoff.setDate(periodCutoff.getDate() + daysToAdd);
+        periodSubmission.setDate(periodSubmission.getDate() + daysToAdd);
         
         periods.push({
           period: i,
           workStart: periodStart.toISOString().split('T')[0],
           cutoffDate: periodCutoff.toISOString().split('T')[0],
           submissionDate: periodSubmission.toISOString().split('T')[0],
-          type: 'regular'
+          type: i === 1 ? 'initial' : 'regular',
+          description: `Period ${i}: ${periodStart.toLocaleDateString()} - ${periodCutoff.toLocaleDateString()}`
         });
       }
     }

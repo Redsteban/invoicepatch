@@ -99,19 +99,23 @@ const ContractorDashboard = () => {
       isValid: hasRecentAuth && authAge <= maxAuthAge && !isNaN(authTimestamp)
     });
     
-    // Force authentication if:
-    // 1. No recent auth flag OR
-    // 2. Auth is older than 1 hour OR
-    // 3. No valid timestamp
-    if (!hasRecentAuth || authAge > maxAuthAge || isNaN(authTimestamp)) {
-      console.log('🔒 SECURITY: Authentication required - showing modal');
-      setShowAuthModal(true);
-      return;
-    }
+    // ALWAYS FORCE AUTHENTICATION - MAXIMUM SECURITY
+    // This ensures the password/OTP section always appears for returning customers
+    console.log('🔒 SECURITY: ALWAYS requiring authentication - showing modal');
+    setShowAuthModal(true);
+    setLoading(false); // Stop loading state that causes "Loading..." screen
+    return;
     
-    console.log('✅ SECURITY: Authentication verified, loading dashboard');
-    setShowAuthModal(false); // Explicitly hide modal when authenticated
-    loadDashboardData();
+    // Original logic - keeping for reference but disabled for maximum security
+    // if (!hasRecentAuth || authAge > maxAuthAge || isNaN(authTimestamp)) {
+    //   console.log('🔒 SECURITY: Authentication required - showing modal');
+    //   setShowAuthModal(true);
+    //   return;
+    // }
+    
+    // console.log('✅ SECURITY: Authentication verified, loading dashboard');
+    // setShowAuthModal(false); // Explicitly hide modal when authenticated
+    // loadDashboardData();
   }, [params.invoiceId]);
 
   const loadDashboardData = async () => {
