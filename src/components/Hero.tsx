@@ -475,6 +475,22 @@ export default function Hero() {
             </CTAButton>
           </motion.div>
 
+          {/* Trial Access Link */}
+          <motion.div 
+            className="text-center mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+          >
+            <p className="text-slate-600 mb-2">Already have a trial?</p>
+            <Link 
+              href="/trial-access"
+              className="text-blue-600 hover:text-blue-700 font-medium underline"
+            >
+              Access Your Existing Trial →
+            </Link>
+          </motion.div>
+
           {/* Enhanced Quick Stats with 3D depth */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <StatCard value="94.7%" label="Auto-match accuracy" delay={1.0} />
