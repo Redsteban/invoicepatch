@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRuntimeSupabaseClient } from '@/lib/supabase-client';
+import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
-  const supabase = createRuntimeSupabaseClient();
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL environment variable is required');
+  }
   
+  if (!supabaseKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+}
+
+export async function POST(request: NextRequest) {
   try {
     console.log('=== TRIAL ACCESS API STARTED ===');
     
@@ -20,6 +33,9 @@ export async function POST(request: NextRequest) {
         error: 'Email is required'
       }, { status: 400 });
     }
+    
+    // Get Supabase client at runtime
+    const supabase = getSupabaseClient();
     
     // Find active trial by email
     const { data: trial, error: trialError } = await supabase
