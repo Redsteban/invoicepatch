@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createSecureApi } from '../../../../lib/secure-api';
+import { createSecureApi } from '@/lib/secure-api';
 
 export const dynamic = 'force-dynamic'
 
