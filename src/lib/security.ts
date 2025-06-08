@@ -295,4 +295,164 @@ export const ValidationSchemas = {
   })
 };
 
+// Security configuration for sessions and tokens
+export const SECURITY_CONFIG = {
+  SESSION_DURATION_HOURS: 24,
+  SESSION_TOKEN_LENGTH: 64,
+  REFRESH_THRESHOLD_HOURS: 2, // Refresh session if expires within 2 hours
+};
+
+/**
+ * Security utilities for session management and token generation
+ */
+export class SecurityUtils {
+  /**
+   * Generate a secure session token
+   */
+  static generateSessionToken(): string {
+    const crypto = require('crypto');
+    return crypto.randomBytes(SECURITY_CONFIG.SESSION_TOKEN_LENGTH / 2).toString('hex');
+  }
+
+  /**
+   * Generate session expiry time
+   */
+  static getSessionExpiry(): Date {
+    return new Date(Date.now() + SECURITY_CONFIG.SESSION_DURATION_HOURS * 60 * 60 * 1000);
+  }
+
+  /**
+   * Check if session needs refresh
+   */
+  static needsRefresh(expiresAt: Date): boolean {
+    const now = new Date();
+    const refreshThreshold = new Date(now.getTime() + SECURITY_CONFIG.REFRESH_THRESHOLD_HOURS * 60 * 60 * 1000);
+    return expiresAt <= refreshThreshold;
+  }
+
+  /**
+   * Generate a secure random OTP
+   */
+  static generateOTP(length: number = 6): string {
+    const crypto = require('crypto');
+    const digits = '0123456789';
+    let result = '';
+    
+    for (let i = 0; i < length; i++) {
+      const randomByte = crypto.randomBytes(1)[0];
+      result += digits[randomByte % digits.length];
+    }
+    
+    return result;
+  }
+
+  /**
+   * Hash OTP for secure storage
+   */
+  static hashOTP(otp: string): string {
+    const crypto = require('crypto');
+    return crypto.createHash('sha256').update(otp).digest('hex');
+  }
+
+  /**
+   * Get OTP expiry time (10 minutes)
+   */
+  static getOTPExpiry(): Date {
+    return new Date(Date.now() + 10 * 60 * 1000);
+  }
+
+  /**
+   * Validate password strength
+   */
+  static validatePasswordStrength(password: string): {
+    isValid: boolean;
+    errors: string[];
+  } {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      errors.push('Password must contain at least one lowercase letter');
+    }
+    
+    if (!/\d/.test(password)) {
+      errors.push('Password must contain at least one number');
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('Password must contain at least one special character');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
+   * Hash password for storage
+   */
+  static async hashPassword(password: string): Promise<string> {
+    const bcrypt = require('bcryptjs');
+    const saltRounds = 12;
+    return await bcrypt.hash(password, saltRounds);
+  }
+
+  /**
+   * Verify password against hash
+   */
+  static async verifyPassword(password: string, hash: string): Promise<boolean> {
+    const bcrypt = require('bcryptjs');
+    return await bcrypt.compare(password, hash);
+  }
+
+  /**
+   * Extract IP address from various sources
+   */
+  static extractIPAddress(request: NextRequest): string {
+    const forwarded = request.headers.get('x-forwarded-for');
+    const realIP = request.headers.get('x-real-ip');
+    const cfConnectingIP = request.headers.get('cf-connecting-ip');
+    
+    if (forwarded) {
+      return forwarded.split(',')[0].trim();
+    }
+    
+    return realIP || cfConnectingIP || 'unknown';
+  }
+
+  /**
+   * Extract user agent safely
+   */
+  static extractUserAgent(request: NextRequest): string {
+    return request.headers.get('user-agent') || 'unknown';
+  }
+
+  /**
+   * Generate CSRF token
+   */
+  static generateCSRFToken(): string {
+    const crypto = require('crypto');
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  /**
+   * Sanitize input to prevent injection attacks
+   */
+  static sanitizeInput(input: string): string {
+    return input
+      .replace(/[<>]/g, '') // Remove angle brackets
+      .replace(/['"]/g, '') // Remove quotes
+      .replace(/[&]/g, '&amp;') // Escape ampersands
+      .trim();
+  }
+}
+
 export default APISecurity; 
