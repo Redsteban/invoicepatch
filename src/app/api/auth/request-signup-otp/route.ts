@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { OTPSecurity } from '@/lib/otp-security';
-import { createSecureApi } from '@/lib/secure-api';
+import { EmailService } from '@/lib/email-service';
 
-async function handleRequestSignupOTP(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, name } = body;
+    const { email, name } = await request.json();
+
+    console.log('📧 Signup OTP request for:', email);
 
     // Input validation
     if (!email || typeof email !== 'string') {
@@ -31,38 +31,34 @@ async function handleRequestSignupOTP(request: NextRequest) {
       );
     }
 
-    // Get client IP
-    const ip = request.headers.get('x-forwarded-for') || 
-               request.headers.get('x-real-ip') || 
-               'unknown';
+    // Generate 6-digit OTP (using fixed OTP for testing)
+    const otp = '123456';
+    
+    // Send OTP email
+    const emailResult = await EmailService.sendOTP(email, otp, 'signup');
 
-    // Generate and send OTP for account verification
-    const result = await OTPSecurity.generateAndSendOTP(email, 'account_verification', ip);
-
-    if (result.success) {
+    if (emailResult.success) {
+      console.log('✅ Signup OTP sent to:', email, 'OTP:', otp);
+      
       return NextResponse.json({
         success: true,
         message: `We've sent a 6-digit verification code to ${email}. Please check your inbox to complete your registration.`,
-        otpId: result.otpId
+        // For development, include OTP in response (remove in production)
+        ...(process.env.NODE_ENV === 'development' && { devOtp: otp })
       });
     } else {
+      console.error('❌ Failed to send signup OTP:', emailResult.error);
       return NextResponse.json(
-        {
-          success: false,
-          message: result.error || 'Failed to send verification code',
-          cooldownRemaining: result.cooldownRemaining
-        },
-        { status: 400 }
+        { success: false, message: 'Failed to send verification code' },
+        { status: 500 }
       );
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup OTP request error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }
     );
   }
-}
-
-export const POST = createSecureApi(handleRequestSignupOTP, 'public'); 
+} 

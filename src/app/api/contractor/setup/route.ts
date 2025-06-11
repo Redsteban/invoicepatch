@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { 
+  calculatePayrollSchedule, 
+  getCurrentPayPeriod, 
+  getUpcomingDeadlines 
+} from '@/lib/payrollCalculation';
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,96 +72,91 @@ export async function POST(request: NextRequest) {
       customStartDate 
     });
 
-    // Calculate pay periods for reference with manual schedule support
-    const calculatePayPeriods = (workStart: Date) => {
-      const periods = [];
+    // Calculate Canadian bi-weekly payroll schedule using our enhanced system
+    let payrollSchedule;
+    let currentPeriod;
+    let upcomingDeadlines;
+    
+    if (useManualSchedule) {
+      // For manual schedules, use the existing logic but also generate Canadian schedule for reference
+      const legacyPeriods = [];
       
-      if (useManualSchedule) {
-        // Manual schedule calculation
-        if (scheduleType === 'custom' && customCutoffDate && customSubmissionDate) {
-          // Custom specific dates
-          periods.push({
-            period: 1,
-            workStart: workStart.toISOString().split('T')[0],
-            cutoffDate: customCutoffDate,
-            submissionDate: customSubmissionDate,
-            type: 'custom',
-            scheduleType: 'custom'
-          });
-        } else if (cutoffDay && submissionDay) {
-          // Weekly or biweekly with day-of-week selection
-          const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-          const cutoffDayIndex = dayNames.indexOf(cutoffDay.toLowerCase());
-          const submissionDayIndex = dayNames.indexOf(submissionDay.toLowerCase());
-          
-          const periodLength = scheduleType === 'weekly' ? 7 : 14;
-          
-          for (let i = 1; i <= 3; i++) {
-            const periodStart = new Date(workStart);
-            periodStart.setDate(workStart.getDate() + ((i - 1) * periodLength));
-            
-            // Find next cutoff day
-            const cutoffDate = new Date(periodStart);
-            const daysUntilCutoff = (cutoffDayIndex + 7 - cutoffDate.getDay()) % 7;
-            cutoffDate.setDate(cutoffDate.getDate() + daysUntilCutoff + (periodLength - 7));
-            
-            // Find submission day (usually after cutoff)
-            const submissionDate = new Date(cutoffDate);
-            const daysUntilSubmission = (submissionDayIndex + 7 - cutoffDate.getDay()) % 7;
-            if (daysUntilSubmission === 0) submissionDate.setDate(submissionDate.getDate() + 7); // Next week if same day
-            else submissionDate.setDate(submissionDate.getDate() + daysUntilSubmission);
-            
-            periods.push({
-              period: i,
-              workStart: periodStart.toISOString().split('T')[0],
-              cutoffDate: cutoffDate.toISOString().split('T')[0],
-              submissionDate: submissionDate.toISOString().split('T')[0],
-              type: scheduleType,
-              scheduleType,
-              cutoffDay,
-              submissionDay
-            });
-          }
-        }
-      } else {
-        // Default automatic calculation
-        const firstCutoff = new Date(workStart);
-        firstCutoff.setDate(firstCutoff.getDate() + 1);
-        const firstSubmission = new Date(firstCutoff);
-        firstSubmission.setDate(firstSubmission.getDate() + 1);
-        
-        periods.push({
+      if (scheduleType === 'custom' && customCutoffDate && customSubmissionDate) {
+        // Custom specific dates
+        legacyPeriods.push({
           period: 1,
-          workStart: workStart.toISOString().split('T')[0],
-          cutoffDate: firstCutoff.toISOString().split('T')[0],
-          submissionDate: firstSubmission.toISOString().split('T')[0],
-          type: 'initial'
+          workStart: startDate.toISOString().split('T')[0],
+          cutoffDate: customCutoffDate,
+          submissionDate: customSubmissionDate,
+          type: 'custom',
+          scheduleType: 'custom'
         });
+      } else if (cutoffDay && submissionDay) {
+        // Weekly or biweekly with day-of-week selection
+        const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const cutoffDayIndex = dayNames.indexOf(cutoffDay.toLowerCase());
+        const submissionDayIndex = dayNames.indexOf(submissionDay.toLowerCase());
         
-        // Subsequent 14-day periods
-        let nextPeriodStart = new Date(firstSubmission);
-        for (let i = 2; i <= 3; i++) {
-          const periodEnd = new Date(nextPeriodStart);
-          periodEnd.setDate(periodEnd.getDate() + 13); // 14 days total
-          const submissionDate = new Date(periodEnd);
-          submissionDate.setDate(submissionDate.getDate() + 1);
+        const periodLength = scheduleType === 'weekly' ? 7 : 14;
+        
+        for (let i = 1; i <= 3; i++) {
+          const periodStart = new Date(startDate);
+          periodStart.setDate(startDate.getDate() + ((i - 1) * periodLength));
           
-          periods.push({
+          // Find next cutoff day
+          const cutoffDate = new Date(periodStart);
+          const daysUntilCutoff = (cutoffDayIndex + 7 - cutoffDate.getDay()) % 7;
+          cutoffDate.setDate(cutoffDate.getDate() + daysUntilCutoff + (periodLength - 7));
+          
+          // Find submission day (usually after cutoff)
+          const submissionDate = new Date(cutoffDate);
+          const daysUntilSubmission = (submissionDayIndex + 7 - cutoffDate.getDay()) % 7;
+          if (daysUntilSubmission === 0) submissionDate.setDate(submissionDate.getDate() + 7); // Next week if same day
+          else submissionDate.setDate(submissionDate.getDate() + daysUntilSubmission);
+          
+          legacyPeriods.push({
             period: i,
-            workStart: nextPeriodStart.toISOString().split('T')[0],
-            cutoffDate: periodEnd.toISOString().split('T')[0],
+            workStart: periodStart.toISOString().split('T')[0],
+            cutoffDate: cutoffDate.toISOString().split('T')[0],
             submissionDate: submissionDate.toISOString().split('T')[0],
-            type: 'regular'
+            type: scheduleType,
+            scheduleType,
+            cutoffDay,
+            submissionDay
           });
-          
-          nextPeriodStart = new Date(submissionDate);
         }
       }
       
-      return periods;
-    };
+      // Also generate Canadian payroll schedule for reference
+      const canadianSchedule = calculatePayrollSchedule(startDate.toISOString().split('T')[0], 26);
+      payrollSchedule = {
+        type: 'manual',
+        legacyPeriods,
+        canadianReference: canadianSchedule
+      };
+      currentPeriod = legacyPeriods[0];
+    } else {
+      // Use enhanced Canadian bi-weekly payroll system
+      const canadianSchedule = calculatePayrollSchedule(startDate.toISOString().split('T')[0], 26);
+      currentPeriod = getCurrentPayPeriod(canadianSchedule);
+      upcomingDeadlines = getUpcomingDeadlines(canadianSchedule, 60);
+      
+      payrollSchedule = {
+        type: 'canadian_biweekly',
+        schedule: canadianSchedule,
+        currentPeriod,
+        upcomingDeadlines
+      };
+      
+      console.log('Canadian payroll schedule generated:', {
+        totalPeriods: canadianSchedule.periods.length,
+        firstPeriodEnd: canadianSchedule.firstPeriodEnd,
+        currentPeriod: currentPeriod?.periodNumber,
+        upcomingDeadlines: upcomingDeadlines?.length
+      });
+    }
 
-    const payPeriods = calculatePayPeriods(startDate);
+    const payPeriods = payrollSchedule.type === 'manual' ? payrollSchedule.legacyPeriods : payrollSchedule.schedule.periods;
     console.log('Pay periods calculated:', payPeriods);
 
     // Prepare data for insertion (with fallback if columns don't exist)

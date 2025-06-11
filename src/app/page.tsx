@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import MobileNavigation from '@/components/MobileNavigation';
 import AnimatedBranding from '@/components/AnimatedBranding';
 import Hero from '@/components/Hero';
@@ -24,6 +25,38 @@ const simpleVariants = {
 };
 
 export default function Home() {
+  // Check for existing session on page load
+  useEffect(() => {
+    const checkSession = async () => {
+      const sessionToken = localStorage.getItem('invoicepatch_session')
+      
+      if (sessionToken) {
+        try {
+          const response = await fetch('/api/auth/validate-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionToken })
+          })
+
+          const data = await response.json()
+
+          if (data.valid) {
+            // User is already authenticated, redirect to dashboard
+            window.location.href = '/contractor/dashboard'
+          } else {
+            // Invalid session, remove token
+            localStorage.removeItem('invoicepatch_session')
+          }
+        } catch (error) {
+          console.error('Session check failed:', error)
+          localStorage.removeItem('invoicepatch_session')
+        }
+      }
+    }
+
+    checkSession()
+  }, [])
+
   return (
     <main className="min-h-screen bg-white overflow-x-hidden w-full">
       <MobileNavigation />

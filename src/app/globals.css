@@ -2,6 +2,149 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Minimalist Design System - Remove visual noise */
+
+/* Remove all unnecessary colors, shadows, and decorations */
+* {
+  @apply shadow-none;
+}
+
+/* Remove default focus rings and add subtle ones */
+*:focus {
+  @apply outline-none ring-0;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  @apply outline-none ring-1 ring-gray-300;
+}
+
+/* Consistent spacing */
+.container {
+  @apply max-w-4xl mx-auto px-4;
+}
+
+/* Minimal buttons */
+.btn-primary {
+  @apply bg-gray-900 text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors font-medium;
+}
+
+.btn-secondary {
+  @apply border border-gray-200 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors font-medium;
+}
+
+.btn-ghost {
+  @apply text-gray-500 hover:text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors;
+}
+
+/* Minimal form elements */
+.input-field {
+  @apply border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-gray-300 focus:border-gray-300;
+}
+
+/* Remove all gradients and colored backgrounds */
+.bg-gradient-to-r,
+.bg-gradient-to-l,
+.bg-gradient-to-b,
+.bg-gradient-to-t,
+[class*="bg-gradient"] {
+  @apply bg-white;
+}
+
+/* Remove colored cards and make them minimal - but preserve button colors */
+.card[class*="bg-blue"],
+.card[class*="bg-green"],
+.card[class*="bg-red"],
+.card[class*="bg-yellow"],
+.card[class*="bg-purple"],
+.card[class*="bg-indigo"],
+.card[class*="bg-pink"],
+.card[class*="bg-emerald"],
+div:not(button)[class*="bg-blue"]:not(.toggle-button),
+div:not(button)[class*="bg-green"]:not(.toggle-button),
+div:not(button)[class*="bg-red"]:not(.toggle-button),
+div:not(button)[class*="bg-yellow"]:not(.toggle-button),
+div:not(button)[class*="bg-purple"]:not(.toggle-button),
+div:not(button)[class*="bg-indigo"]:not(.toggle-button),
+div:not(button)[class*="bg-pink"]:not(.toggle-button),
+div:not(button)[class*="bg-emerald"]:not(.toggle-button) {
+  @apply bg-gray-50;
+}
+
+/* Minimal card style */
+.card {
+  @apply bg-white border border-gray-100 rounded-lg p-4;
+}
+
+/* Typography hierarchy */
+.text-display {
+  @apply text-4xl font-light text-gray-900;
+}
+
+.text-heading {
+  @apply text-xl font-medium text-gray-900;
+}
+
+.text-subheading {
+  @apply text-sm font-medium text-gray-500;
+}
+
+.text-body {
+  @apply text-sm text-gray-700;
+}
+
+.text-caption {
+  @apply text-xs text-gray-500;
+}
+
+/* Minimal header */
+.header-minimal {
+  @apply border-b border-gray-100 bg-white;
+}
+
+/* Progress indicators */
+.progress-bar {
+  @apply w-full bg-gray-100 rounded-full h-1;
+}
+
+.progress-fill {
+  @apply bg-gray-900 h-1 rounded-full transition-all duration-300;
+}
+
+/* Remove all icon backgrounds and decorative elements */
+[class*="icon-bg"],
+[class*="bg-opacity"] {
+  @apply bg-transparent;
+}
+
+/* Minimal toggle/tab style */
+.toggle-container {
+  @apply flex space-x-1 bg-gray-100 p-1 rounded-lg max-w-xs;
+}
+
+.toggle-button {
+  @apply flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+}
+
+.toggle-button.active {
+  @apply bg-white text-gray-900;
+}
+
+.toggle-button.inactive {
+  @apply text-gray-500;
+}
+
+/* Account type toggle - override minimalist restrictions */
+.account-type-toggle button.bg-blue-600 {
+  @apply !bg-blue-600 !text-white;
+}
+
+.account-type-toggle button:not(.bg-blue-600) {
+  @apply !text-gray-700;
+}
+
 /* Ethan Marcotte Design System - Responsive 3D Excellence */
 :root {
   /* Sophisticated Color Palette - No harsh blues/greens/reds */
@@ -391,4 +534,103 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, var(--color-amber-400) 0%, var(--color-teal-400) 100%);
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+/* Fix signup toggle visibility - override minimalist restrictions */
+button.bg-blue-600,
+.bg-blue-600 {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+button.text-gray-700,
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+button:hover.text-gray-900,
+.hover\:text-gray-900:hover {
+  color: #111827 !important;
+}
+
+/* Ensure all buttons have visible text */
+button {
+  color: #374151 !important;
+}
+
+button.bg-blue-600,
+button.bg-black,
+button.bg-gray-900 {
+  color: white !important;
+}
+
+/* More specific signup toggle fixes */
+.account-type-toggle button {
+  color: #374151 !important;
+}
+
+.account-type-toggle button.bg-blue-600 {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.account-type-toggle button:hover {
+  color: #111827 !important;
+}
+
+.account-type-toggle button.bg-blue-600:hover {
+  background-color: #1d4ed8 !important;
+  color: white !important;
+}
+
+/* FINAL FIX - Highest specificity for signup toggle visibility */
+div.account-type-toggle button[class*="bg-blue-600"] {
+  background-color: #2563eb !important;
+  color: white !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+div.account-type-toggle button[class*="text-gray-700"] {
+  color: #374151 !important;
+  background-color: transparent !important;
+}
+
+div.account-type-toggle button[class*="hover:text-gray-900"]:hover {
+  color: #111827 !important;
+}
+
+/* FINAL FIX - Highest specificity for signup toggle visibility */
+div.account-type-toggle button[class*="bg-blue-600"] {
+  background-color: #2563eb !important;
+  color: white !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+div.account-type-toggle button[class*="text-gray-700"] {
+  color: #374151 !important;
+  background-color: transparent !important;
+}
+
+div.account-type-toggle button[class*="hover:text-gray-900"]:hover {
+  color: #111827 !important;
+}
+
+/* COMPREHENSIVE BUTTON TEXT VISIBILITY FIX */
+/* Ensure all colored buttons have proper white text */
+button[class*="bg-blue-"],
+button[class*="bg-green-"],
+button[class*="bg-red-"],
+button[class*="bg-yellow-"],
+button[class*="bg-purple-"],
+button[class*="bg-indigo-"],
+button[class*="bg-emerald-"],
+button[class*="bg-gray-9"],
+button[class*="bg-slate-9"] {
+  color: white !important;
+}
+
+/* Ensure buttons with explicit text-white class are white */
+button[class*="text-white"],
+.text-white {
+  color: white !important;
 }

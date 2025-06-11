@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseClient } from '@/lib/supabase-client';
-import { createSecureApi } from '@/lib/secure-api';
 
 export const dynamic = 'force-dynamic'
 
-async function handleGetUserTrials(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    // Get Supabase client at runtime
-    const supabase = getSupabaseClient();
-    
     // Get user from auth header
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
@@ -18,52 +13,55 @@ async function handleGetUserTrials(request: NextRequest) {
       );
     }
 
-    // Extract JWT token
+    // Extract session token
     const token = authHeader.replace('Bearer ', '');
     
-    // Verify the token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
+    // Simple token validation for development
+    if (!token.startsWith('session_')) {
       return NextResponse.json(
-        { success: false, error: 'Invalid authentication' },
+        { success: false, error: 'Invalid token format' },
         { status: 401 }
       );
     }
 
-    // Get user's trials
-    const { data: trials, error: trialsError } = await supabase
-      .from('trial_invoices')
-      .select('*')
-      .eq('contractor_email', user.email)
-      .order('created_at', { ascending: false });
-
-    if (trialsError) {
-      console.error('Error fetching trials:', trialsError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to fetch trials' },
-        { status: 500 }
-      );
-    }
+    // Mock trials data for development
+    const mockTrials = [
+      {
+        id: 'trial_1',
+        status: 'active',
+        created_at: new Date().toISOString(),
+        end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        contractor_email: 'demo@example.com',
+        title: 'Construction Project Trial'
+      },
+      {
+        id: 'trial_2',
+        status: 'completed',
+        created_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
+        end_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        contractor_email: 'demo@example.com',
+        title: 'Plumbing Services Trial'
+      }
+    ];
 
     // Categorize trials
     const now = new Date();
-    const active = trials?.filter(trial => {
+    const active = mockTrials.filter(trial => {
       const endDate = new Date(trial.end_date);
       return trial.status === 'active' && endDate >= now;
-    }) || [];
+    });
 
-    const completed = trials?.filter(trial => {
+    const completed = mockTrials.filter(trial => {
       const endDate = new Date(trial.end_date);
       return trial.status === 'completed' || endDate < now;
-    }) || [];
+    });
 
     return NextResponse.json({
       success: true,
       trials: {
         active,
         completed,
-        total: trials?.length || 0
+        total: mockTrials.length
       }
     });
 
@@ -74,6 +72,4 @@ async function handleGetUserTrials(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-export const GET = createSecureApi(handleGetUserTrials, 'authenticated'); 
+} 

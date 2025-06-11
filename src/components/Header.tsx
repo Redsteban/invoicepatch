@@ -118,7 +118,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <NavLink href="/manager-demo">Manager Demo</NavLink>
-            <NavLink href="/contractor-trial">Contractor Trial</NavLink>
+                            <NavLink href="/signup?type=contractor">Contractor Trial</NavLink>
             <NavLink href="/roi-calculator">ROI Calculator</NavLink>
             <NavLink href="/instant-proposal">Instant Proposal</NavLink>
             <NavLink href="/pricing">Pricing</NavLink>
@@ -153,7 +153,7 @@ export default function Header() {
                 <NavLink href="/manager-demo" onClick={handleLinkClick} className="block py-2">
                   Manager Demo
                 </NavLink>
-                <NavLink href="/contractor-trial" onClick={handleLinkClick} className="block py-2">
+                <NavLink href="/signup?type=contractor" onClick={handleLinkClick} className="block py-2">
                   Contractor Trial
                 </NavLink>
                 <NavLink href="/roi-calculator" onClick={handleLinkClick} className="block py-2">

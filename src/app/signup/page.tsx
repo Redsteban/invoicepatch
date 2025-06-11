@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { Eye, EyeOff, User, Mail, Building, Phone } from 'lucide-react';
 
 interface OTPStep {
   email: string;
@@ -11,28 +12,52 @@ interface OTPStep {
   attempts: number;
 }
 
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  // Optional contractor fields
+  phone?: string;
+  company?: string;
+  isContractor?: boolean;
+}
+
 const SignupPage = () => {
-  const [step, setStep] = useState<'signup' | 'otp'>('signup');
-  const [formData, setFormData] = useState({
+  const searchParams = useSearchParams();
+  const isContractorFlow = searchParams.get('type') === 'contractor';
+  
+  const [step, setStep] = useState<'signup' | 'otp' | 'success'>('signup');
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: '',
+    company: '',
+    isContractor: isContractorFlow
   });
   const [otpCode, setOtpCode] = useState('');
   const [otpStep, setOtpStep] = useState<OTPStep | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const { signUp, user } = useAuth();
 
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      if (isContractorFlow) {
+        router.push('/contractor-dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [user, router]);
+  }, [user, router, isContractorFlow]);
 
   // Cooldown timer
   useEffect(() => {
@@ -43,10 +68,12 @@ const SignupPage = () => {
   }, [resendCooldown]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     });
+    setError('');
   };
 
   const validatePassword = (password: string): { valid: boolean; message?: string } => {
@@ -68,33 +95,68 @@ const SignupPage = () => {
     return { valid: true };
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  const validateForm = (): boolean => {
+    if (!formData.name.trim()) {
+      setError('Full name is required');
+      return false;
+    }
+    
+    if (!formData.email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      setLoading(false);
-      return;
+      return false;
     }
 
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.valid) {
       setError(passwordValidation.message!);
+      return false;
+    }
+
+    // Contractor-specific validation
+    if (formData.isContractor) {
+      if (!formData.phone?.trim()) {
+        setError('Phone number is required for contractors');
+        return false;
+      }
+      if (!formData.company?.trim()) {
+        setError('Company name is required for contractors');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!validateForm()) {
       setLoading(false);
       return;
     }
 
     try {
-      // First, request OTP for account verification
+      // Request OTP for account verification
       const otpResponse = await fetch('/api/auth/request-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: formData.email,
-          name: formData.name 
+          name: formData.name,
+          type: formData.isContractor ? 'contractor' : 'user'
         })
       });
 
@@ -107,11 +169,13 @@ const SignupPage = () => {
           attempts: 0
         });
         setStep('otp');
+        setSuccess('Verification code sent to your email!');
       } else {
         setError(otpData.message || 'Failed to send verification code');
       }
     } catch (error: any) {
       setError('An unexpected error occurred');
+      console.error('Signup error:', error);
     } finally {
       setLoading(false);
     }
@@ -122,8 +186,20 @@ const SignupPage = () => {
     setLoading(true);
     setError('');
 
+    if (!otpCode || otpCode.length !== 6) {
+      setError('Please enter a 6-digit verification code');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // First verify the OTP
+      console.log('Attempting OTP verification with:', {
+        email: otpStep?.email,
+        code: otpCode,
+        purpose: 'account_verification'
+      });
+      
+      // Verify the OTP
       const verifyResponse = await fetch('/api/auth/verify-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -134,21 +210,37 @@ const SignupPage = () => {
         })
       });
 
+      console.log('Response status:', verifyResponse.status);
+      console.log('Response headers:', verifyResponse.headers);
+      
       const verifyData = await verifyResponse.json();
+      console.log('Response data:', verifyData);
 
       if (verifyData.success) {
-        // OTP verified - now create the account
+        // OTP verified - create the account
         const { error } = await signUp(formData.email, formData.password, {
           full_name: formData.name,
+          phone: formData.phone,
+          company: formData.company,
+          user_type: formData.isContractor ? 'contractor' : 'user',
           email_verified: true
         });
         
         if (error) {
           setError(error.message);
         } else {
-          // Success - set recent auth flag and redirect to dashboard
+          setStep('success');
+          setSuccess('Account created successfully!');
+          
+          // Set recent auth flag and redirect after a short delay
           sessionStorage.setItem('recentAuthFlow', Date.now().toString());
-          router.push('/dashboard');
+          setTimeout(() => {
+            if (formData.isContractor) {
+              router.push('/contractor-dashboard');
+            } else {
+              router.push('/dashboard');
+            }
+          }, 2000);
         }
       } else {
         setError(verifyData.error || 'Invalid verification code');
@@ -168,6 +260,7 @@ const SignupPage = () => {
       }
     } catch (error: any) {
       setError('Verification failed. Please try again.');
+      console.error('OTP verification error:', error);
     } finally {
       setLoading(false);
     }
@@ -185,7 +278,8 @@ const SignupPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: otpStep.email,
-          name: formData.name 
+          name: formData.name,
+          type: formData.isContractor ? 'contractor' : 'user'
         })
       });
 
@@ -197,11 +291,9 @@ const SignupPage = () => {
           otpId: data.otpId
         });
         setResendCooldown(120); // 2 minute cooldown
+        setSuccess('New verification code sent!');
       } else {
         setError(data.message || 'Failed to resend code');
-        if (data.cooldownRemaining) {
-          setResendCooldown(data.cooldownRemaining * 60);
-        }
       }
     } catch (error) {
       setError('Failed to resend verification code');
@@ -210,232 +302,423 @@ const SignupPage = () => {
     }
   };
 
-  // Signup Step
-  if (step === 'signup') {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-md w-full mx-4">
-          <div className="text-center mb-8">
-            <div className="text-6xl mb-4">🚀</div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Create Your Account
-            </h1>
-            <p className="text-gray-600">
-              Join InvoicePatch and streamline your contracting
-            </p>
+  const getPasswordStrength = () => {
+    const checks = [
+      formData.password.length >= 8,
+      /(?=.*[a-z])/.test(formData.password),
+      /(?=.*[A-Z])/.test(formData.password),
+      /(?=.*\d)/.test(formData.password),
+      /(?=.*[@$!%*?&])/.test(formData.password)
+    ];
+    return checks.filter(Boolean).length;
+  };
+
+  const getPasswordStrengthColor = () => {
+    const strength = getPasswordStrength();
+    if (strength < 2) return 'bg-red-500';
+    if (strength < 4) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
+  const getPasswordStrengthText = () => {
+    const strength = getPasswordStrength();
+    if (strength < 2) return 'Weak';
+    if (strength < 4) return 'Medium';
+    return 'Strong';
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            {step === 'signup' && !formData.isContractor && 'Create your account'}
+            {step === 'signup' && formData.isContractor && 'Create contractor account'}
+            {step === 'otp' && 'Verify your email'}
+            {step === 'success' && 'Welcome aboard!'}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            {step === 'signup' && !formData.isContractor && 'Join thousands of satisfied users'}
+            {step === 'signup' && formData.isContractor && 'Start your contractor trial'}
+            {step === 'otp' && `We sent a verification code to ${formData.email}`}
+            {step === 'success' && 'Your account has been created successfully'}
+          </p>
+        </div>
+
+        <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
+          {/* Step Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center">
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                step === 'signup' ? 'bg-blue-600 text-white' : 
+                step === 'otp' || step === 'success' ? 'bg-green-600 text-white' : 'bg-gray-300'
+              }`}>
+                <span className="text-sm font-medium">1</span>
+              </div>
+              <div className={`flex-1 h-1 mx-2 ${
+                step === 'otp' || step === 'success' ? 'bg-green-600' : 'bg-gray-300'
+              }`}></div>
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                step === 'otp' ? 'bg-blue-600 text-white' : 
+                step === 'success' ? 'bg-green-600 text-white' : 'bg-gray-300'
+              }`}>
+                <span className="text-sm font-medium">2</span>
+              </div>
+              <div className={`flex-1 h-1 mx-2 ${
+                step === 'success' ? 'bg-green-600' : 'bg-gray-300'
+              }`}></div>
+              <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                step === 'success' ? 'bg-green-600 text-white' : 'bg-gray-300'
+              }`}>
+                <span className="text-sm font-medium">3</span>
+              </div>
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <span>Details</span>
+              <span>Verify</span>
+              <span>Complete</span>
+            </div>
           </div>
 
+          {/* Error/Success Messages */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
+            <div className="mb-4 p-4 rounded-md bg-red-50 border border-red-200">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-4 rounded-md bg-green-50 border border-green-200">
+              <p className="text-sm text-green-600">{success}</p>
             </div>
           )}
 
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Create a strong password"
-              />
-              <div className="mt-2 text-xs text-gray-500">
-                Must include uppercase, lowercase, number, and special character (@$!%*?&)
+          {/* Account Type Toggle */}
+          {step === 'signup' && (
+            <div className="mb-6">
+              <div className="flex rounded-lg border border-gray-300 p-1 account-type-toggle">
+                <button
+                  type="button"
+                  onClick={() => setFormData({...formData, isContractor: false})}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                    !formData.isContractor 
+                      ? 'bg-blue-600 text-white shadow-sm' 
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  Regular User
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({...formData, isContractor: true})}
+                  className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                    formData.isContractor 
+                      ? 'bg-blue-600 text-white shadow-sm' 
+                      : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  Contractor
+                </button>
               </div>
             </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500"
-                placeholder="Confirm your password"
-              />
+          {/* Signup Form */}
+          {step === 'signup' && (
+            <form className="space-y-6" onSubmit={handleSignup}>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
+                <div className="mt-1 relative">
+                  <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="pl-10 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Enter your full name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <div className="mt-1 relative">
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-10 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              {/* Contractor Fields */}
+              {formData.isContractor && (
+                <>
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                      Phone Number
+                    </label>
+                    <div className="mt-1 relative">
+                      <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone || ''}
+                        onChange={handleChange}
+                        className="pl-10 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="(555) 123-4567"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                      Company Name
+                    </label>
+                    <div className="mt-1 relative">
+                      <Building className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <input
+                        id="company"
+                        name="company"
+                        type="text"
+                        value={formData.company || ''}
+                        onChange={handleChange}
+                        className="pl-10 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                        placeholder="Your company name"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Create a strong password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                
+                {/* Password Strength Indicator */}
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full transition-all ${getPasswordStrengthColor()}`}
+                          style={{ width: `${(getPasswordStrength() / 5) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-gray-600">{getPasswordStrengthText()}</span>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-600">
+                      <p>Password must contain:</p>
+                      <ul className="grid grid-cols-1 gap-1 mt-1">
+                        <li className={formData.password.length >= 8 ? 'text-green-600' : 'text-gray-400'}>
+                          ✓ At least 8 characters
+                        </li>
+                        <li className={/(?=.*[a-z])/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                          ✓ One lowercase letter
+                        </li>
+                        <li className={/(?=.*[A-Z])/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                          ✓ One uppercase letter
+                        </li>
+                        <li className={/(?=.*\d)/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                          ✓ One number
+                        </li>
+                        <li className={/(?=.*[@$!%*?&])/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                          ✓ One special character
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-600">Passwords do not match</p>
+                )}
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Creating Account...' : 'Create Account'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* OTP Verification Form */}
+          {step === 'otp' && (
+            <form className="space-y-6" onSubmit={handleOTPVerification}>
+              <div>
+                <label htmlFor="otpCode" className="block text-sm font-medium text-gray-700">
+                  Verification Code
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="otpCode"
+                    name="otpCode"
+                    type="text"
+                    maxLength={6}
+                    required
+                    value={otpCode}
+                    onChange={(e) => {
+                      setOtpCode(e.target.value.replace(/\D/g, ''));
+                      setError('');
+                    }}
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm text-center text-2xl tracking-widest"
+                    placeholder="000000"
+                  />
+                </div>
+                <p className="mt-2 text-sm text-gray-500">
+                  Enter the 6-digit code sent to your email
+                </p>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading || otpCode.length !== 6}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Verifying...' : 'Verify Email'}
+                </button>
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  disabled={resendCooldown > 0 || loading}
+                  onClick={handleResendOTP}
+                  className="text-sm text-blue-600 hover:text-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resendCooldown > 0 
+                    ? `Resend code in ${resendCooldown}s`
+                    : 'Resend verification code'
+                  }
+                </button>
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('signup');
+                    setOtpStep(null);
+                    setOtpCode('');
+                    setError('');
+                  }}
+                  className="text-sm text-gray-600 hover:text-gray-500"
+                >
+                  ← Back to signup
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Success State */}
+          {step === 'success' && (
+            <div className="text-center space-y-6">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Account Created Successfully!</h3>
+                <p className="mt-2 text-sm text-gray-600">
+                  {formData.isContractor 
+                    ? 'You will be redirected to the contractor dashboard shortly...'
+                    : 'You will be redirected to your dashboard shortly...'
+                  }
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
             </div>
+          )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="mt-8 pt-8 border-t border-gray-200 text-center">
-            <p className="text-gray-600 mb-4">Already have an account?</p>
-            <Link 
-              href="/login" 
-              className="text-blue-500 hover:text-blue-600 font-medium"
-            >
-              Sign In
-            </Link>
-          </div>
-
-          {/* Features */}
-          <div className="mt-8 bg-blue-50 rounded-lg p-4">
-            <h3 className="font-medium text-blue-900 mb-2">🛡️ Secure Registration</h3>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Email verification required</li>
-              <li>• Strong password protection</li>
-              <li>• Encrypted data storage</li>
-              <li>• GDPR compliant</li>
-            </ul>
-          </div>
-
-          {/* Trial option */}
-          <div className="mt-6 bg-gray-50 rounded-lg p-4">
-            <h3 className="font-medium text-gray-900 mb-2">💡 Try Before You Commit</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Want to explore our features first? Start with a free trial.
-            </p>
-            <Link 
-              href="/contractor-trial"
-              className="text-blue-500 hover:text-blue-600 text-sm font-medium"
-            >
-              Start Free Trial →
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // OTP Verification Step
-  return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="max-w-md w-full mx-4">
-        <div className="text-center mb-8">
-          <div className="text-6xl mb-4">📧</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Verify Your Email
-          </h1>
-          <p className="text-gray-600">
-            We've sent a 6-digit verification code to
-          </p>
-          <p className="font-medium text-gray-900">{otpStep?.email}</p>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleOTPVerification} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
-              Enter 6-Digit Verification Code
-            </label>
-            <input
-              type="text"
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="w-full px-4 py-4 text-center text-2xl font-mono border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 tracking-widest"
-              placeholder="000000"
-              maxLength={6}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || otpCode.length !== 6}
-            className="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
-          >
-            {loading ? 'Verifying...' : 'Verify Email & Create Account'}
-          </button>
-        </form>
-
-        {/* Attempts remaining */}
-        {otpStep && otpStep.attempts > 0 && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-red-600">
-              {3 - otpStep.attempts} attempt{3 - otpStep.attempts !== 1 ? 's' : ''} remaining
-            </p>
-          </div>
-        )}
-
-        {/* Resend option */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
-          <button
-            onClick={handleResendOTP}
-            disabled={resendCooldown > 0 || loading}
-            className="text-blue-500 hover:text-blue-600 text-sm font-medium disabled:opacity-50"
-          >
-            {resendCooldown > 0 
-              ? `Resend in ${Math.floor(resendCooldown / 60)}:${(resendCooldown % 60).toString().padStart(2, '0')}`
-              : 'Resend Code'
-            }
-          </button>
-        </div>
-
-        {/* Back to signup */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => {
-              setStep('signup');
-              setOtpStep(null);
-              setOtpCode('');
-              setError('');
-            }}
-            className="text-gray-500 hover:text-gray-700 text-sm"
-          >
-            ← Back to Sign Up
-          </button>
-        </div>
-
-        {/* Tips */}
-        <div className="mt-8 bg-gray-50 rounded-lg p-4">
-          <h3 className="font-medium text-gray-900 mb-2">💡 Tips</h3>
-          <ul className="text-sm text-gray-600 space-y-1">
-            <li>• Check your spam/junk folder if you don't see the email</li>
-            <li>• The code expires in 10 minutes</li>
-            <li>• Make sure to use the email address you just entered</li>
-          </ul>
+          {/* Login Link */}
+          {step === 'signup' && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                  Sign in here
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

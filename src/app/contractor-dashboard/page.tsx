@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import {
   HomeIcon,
   SparklesIcon,
@@ -23,6 +24,22 @@ type TabType = 'overview' | 'automation' | 'timetracking' | 'invoices' | 'analyt
 
 export default function ContractorDashboardPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  
+  // Check onboarding status - in a real app, get userId from auth context
+  // For demo purposes, using a proper UUID format
+  const { isLoading, error, needsOnboarding } = useOnboardingStatus('123e4567-e89b-12d3-a456-426614174000', true);
+  
+  // Show loading while checking onboarding status
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking your setup...</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabs = [
     {
