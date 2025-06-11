@@ -138,25 +138,6 @@ function differenceInDays(date1: Date, date2: Date): number {
 
 // Additional utility functions for practical use
 
-export function getCurrentPayPeriod(schedule: PayrollSchedule): PayPeriod | null {
-  const today = new Date()
-  return schedule.periods.find(period => 
-    today >= period.startDate && today <= period.endDate
-  ) || null
-}
-
-export function getUpcomingDeadlines(
-  schedule: PayrollSchedule, 
-  daysAhead: number = 30
-): PayPeriod[] {
-  const today = new Date()
-  const futureDate = addDays(today, daysAhead)
-  
-  return schedule.periods.filter(period =>
-    period.submissionDeadline >= today && period.submissionDeadline <= futureDate
-  )
-}
-
 export function formatPeriodDates(period: PayPeriod): string {
   const startStr = period.startDate.toLocaleDateString('en-CA')
   const endStr = period.endDate.toLocaleDateString('en-CA')
