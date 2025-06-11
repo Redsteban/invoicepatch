@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +23,8 @@ interface FormData {
   isContractor?: boolean;
 }
 
-const SignupPage = () => {
+// Wrap the component that uses useSearchParams in a Suspense boundary
+function SignupForm() {
   const searchParams = useSearchParams();
   const isContractorFlow = searchParams.get('type') === 'contractor';
   
@@ -725,4 +726,29 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage; 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Loading...</h2>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SignupPage = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Loading signup form...</h2>
+        </div>
+      </div>
+    </div>}>
+      <SignupForm />
+    </Suspense>
+  );
+};
+
+export default SignupPage;

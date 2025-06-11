@@ -14,6 +14,26 @@ export interface PayrollSchedule {
   periods: PayPeriod[]
 }
 
+// Add these exported utility functions for use in components and APIs
+export function getCurrentPayPeriod(schedule: PayrollSchedule): PayPeriod | null {
+  const today = new Date()
+  return schedule.periods.find(period => 
+    today >= period.startDate && today <= period.endDate
+  ) || null
+}
+
+export function getUpcomingDeadlines(
+  schedule: PayrollSchedule, 
+  daysAhead: number = 30
+): PayPeriod[] {
+  const today = new Date()
+  const futureDate = addDays(today, daysAhead)
+  
+  return schedule.periods.filter(period =>
+    period.submissionDeadline >= today && period.submissionDeadline <= futureDate
+  )
+}
+
 export function calculatePayrollSchedule(
   contractStartDate: string,
   numberOfPeriods: number = 26 // One year of bi-weekly periods
