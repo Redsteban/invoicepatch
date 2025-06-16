@@ -48,7 +48,7 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
 }) => {
   const router = useRouter()
   const pathname = usePathname()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [isNavigating, setIsNavigating] = useState(false)
 
@@ -123,7 +123,6 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
     if (item.href === pathname) return
     
     setIsNavigating(true)
-    setSidebarOpen(false)
     
     // Add a small delay for smooth transition
     await new Promise(resolve => setTimeout(resolve, 100))
@@ -143,33 +142,33 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
+      {/* Always Present Sidebar */}
       <div 
         data-tour="sidebar"
         className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out
-          lg:translate-x-0 lg:static lg:inset-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          bg-white shadow-xl border-r border-gray-200 flex-shrink-0 z-40 transition-all duration-300 ease-in-out
+          ${sidebarCollapsed ? 'w-16' : 'w-64'}
         `}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">InvoicePatch</h2>
+        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200">
+          {!sidebarCollapsed && <h2 className="text-xl font-bold text-gray-900">InvoicePatch</h2>}
           <button 
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <Menu className="w-5 h-5" />
           </button>
         </div>
         
-        <nav className="p-6 space-y-2">
+        <nav className={`p-4 space-y-2 ${sidebarCollapsed ? 'px-2' : 'px-6'}`}>
           {sidebarItems.map((item) => (
             <motion.button
               key={item.id}
               data-tour={item.id}
               onClick={() => handleNavigation(item)}
               className={`
-                w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200
+                w-full flex items-center text-left rounded-xl transition-all duration-200 relative
+                ${sidebarCollapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'}
                 ${activeTab === item.id 
                   ? 'bg-black text-white shadow-lg' 
                   : 'text-gray-700 hover:bg-gray-100'
@@ -178,40 +177,56 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={isNavigating}
+              title={sidebarCollapsed ? item.label : undefined}
             >
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="flex-1 font-medium">{item.label}</span>
-              {item.badge && (
-                <motion.span 
-                  className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  {item.badge}
-                </motion.span>
+              <item.icon className={`w-5 h-5 ${sidebarCollapsed ? '' : 'mr-3'} flex-shrink-0`} />
+              {!sidebarCollapsed && (
+                <>
+                  <span className="flex-1 font-medium">{item.label}</span>
+                  {item.badge && (
+                    <motion.span 
+                      className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      {item.badge}
+                    </motion.span>
+                  )}
+                </>
+              )}
+              {sidebarCollapsed && item.badge && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {item.badge > 99 ? '99+' : item.badge}
+                </div>
               )}
             </motion.button>
           ))}
         </nav>
 
         {/* User Profile Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200">
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">JD</span>
+        <div className={`absolute bottom-0 left-0 right-0 border-t border-gray-200 ${sidebarCollapsed ? 'p-2' : 'p-6'}`}>
+          {!sidebarCollapsed && (
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700">JD</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">John Doe</p>
+                <p className="text-xs text-gray-600">Manager</p>
+              </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-600">Manager</p>
-            </div>
-          </div>
+          )}
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className={`
+              w-full flex items-center text-gray-700 hover:bg-gray-100 rounded-lg transition-colors
+              ${sidebarCollapsed ? 'p-3 justify-center' : 'px-4 py-2'}
+            `}
+            title={sidebarCollapsed ? 'Sign Out' : undefined}
           >
-            <LogOut className="w-4 h-4 mr-3" />
-            <span className="text-sm">Sign Out</span>
+            <LogOut className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-3'}`} />
+            {!sidebarCollapsed && <span className="text-sm">Sign Out</span>}
           </button>
         </div>
       </div>
@@ -220,15 +235,8 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 relative z-10">
-          <div className="flex items-center justify-between h-16 px-6">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-              
+          <div className="flex items-center justify-between h-20 px-8">
+            <div className="flex items-center space-x-6">
               {/* Breadcrumbs */}
               <nav className="flex items-center space-x-2 text-sm">
                 <Home className="w-4 h-4 text-gray-400" />
@@ -250,14 +258,14 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
               </nav>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {/* Search */}
               <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search invoices..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent w-64"
+                  className="pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent w-72"
                 />
               </div>
               
@@ -283,7 +291,7 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-gray-50">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
@@ -298,19 +306,6 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
           </AnimatePresence>
         </main>
       </div>
-
-      {/* Sidebar Overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
 
       {/* Guided Tour System */}
       <GuidedTour />
