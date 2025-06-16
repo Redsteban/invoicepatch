@@ -72,7 +72,6 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/manager/dashboard', badge: null },
     { id: 'email-inbox', label: 'Email Inbox', icon: Mail, href: '/manager/email-inbox', badge: 12 },
-    { id: 'pdf-processor', label: 'PDF Processor', icon: Upload, href: '/manager/pdf-processor', badge: null },
     { id: 'billing-integration', label: 'Billing Integration', icon: Database, href: '/manager/billing-integration', badge: null },
     { id: 'invoice-matching', label: 'Invoice Matching', icon: Target, href: '/manager/invoice-matching', badge: 8 },
     { id: 'manual-upload', label: 'Manual Upload', icon: FolderUp, href: '/manager/manual-upload', badge: null },
@@ -95,7 +94,6 @@ const ManagerLayout: React.FC<ManagerLayoutProps> = ({
       const pageName = pathSegments[2]
       const pageConfig = {
         'email-inbox': 'Email Inbox',
-        'pdf-processor': 'PDF Processor',
         'billing-integration': 'Billing Integration',
         'invoice-matching': 'Invoice Matching',
         'manual-upload': 'Manual Upload',

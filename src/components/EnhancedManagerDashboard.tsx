@@ -128,7 +128,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           title="Issues"
           value={outstandingIssues.length.toString()}
           change="-15%"
-          changeType="positive"
+          changeType="negative"
           icon={<AlertTriangle size={24} />}
           onClick={() => window.location.href = '/manager/issue-detection'}
           description="Requires attention"
