@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, User, LogOut, Menu, Home, FileText, GitMerge, BarChart3, Settings,
   Upload, Plus, Download, Clock, CheckCircle, AlertTriangle, DollarSign,
-  TrendingUp, TrendingDown, Calendar, Filter, Search, ChevronRight, Activity
+  TrendingUp, TrendingDown, Calendar, Filter, Search, ChevronRight, Activity, X
 } from 'lucide-react';
 import { sampleInvoices, historicalData } from '../data/sampleData';
 
@@ -15,6 +15,7 @@ const InvoiceManagerDashboard: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount] = useState(3);
 
   // Calculate metrics
   const pendingInvoices = sampleInvoices.filter(inv => inv.status === 'pending' || inv.status === 'processing');
@@ -66,16 +67,20 @@ const InvoiceManagerDashboard: React.FC = () => {
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`bg-white rounded-xl shadow-sm border p-6 ${onClick ? 'cursor-pointer hover:shadow-md' : ''} transition-all duration-200`}
+      className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-8 ${onClick ? 'cursor-pointer hover:shadow-lg hover:border-blue-200' : ''} transition-all duration-200 relative min-h-[180px] flex flex-col justify-between`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+      <div className="flex items-start justify-between mb-6">
+        <div className={`p-4 rounded-xl ${
+          changeType === 'positive' ? 'bg-green-50 text-green-600' :
+          changeType === 'negative' ? 'bg-red-50 text-red-600' :
+          'bg-blue-50 text-blue-600'
+        }`}>
           {icon}
         </div>
         {change && (
-          <div className={`flex items-center space-x-1 text-sm font-medium ${
-            changeType === 'positive' ? 'text-green-600' : 
-            changeType === 'negative' ? 'text-red-600' : 'text-gray-600'
+          <div className={`flex items-center space-x-2 text-sm font-medium px-3 py-1 rounded-full ${
+            changeType === 'positive' ? 'text-green-700 bg-green-50' : 
+            changeType === 'negative' ? 'text-red-700 bg-red-50' : 'text-gray-700 bg-gray-50'
           }`}>
             {changeType === 'positive' ? <TrendingUp size={16} /> : 
              changeType === 'negative' ? <TrendingDown size={16} /> : null}
@@ -83,9 +88,10 @@ const InvoiceManagerDashboard: React.FC = () => {
           </div>
         )}
       </div>
-      <div>
-        <h3 className="text-sm font-medium text-gray-600 mb-1">{title}</h3>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
+      
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">{title}</h3>
+        <p className="text-4xl font-bold text-gray-900">{value}</p>
       </div>
     </motion.div>
   );
@@ -129,9 +135,11 @@ const InvoiceManagerDashboard: React.FC = () => {
                 className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Bell size={20} className="text-gray-600" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  3
-                </span>
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
               </motion.button>
 
               <AnimatePresence>
@@ -273,26 +281,38 @@ const InvoiceManagerDashboard: React.FC = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="flex flex-wrap gap-4">
+          <div className="bg-white rounded-2xl shadow-sm border p-10 mb-8">
+            <div className="space-y-2 mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900">Quick Actions</h2>
+              <p className="text-gray-600">Streamline your workflow with these common tasks</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <motion.button
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center space-x-3 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveNav('process')}
+                className="flex items-center justify-center space-x-3 px-8 py-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Plus size={20} />
                 <span>Process New Batch</span>
               </motion.button>
+              
               <motion.button
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center space-x-3 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveNav('process')}
+                className="flex items-center justify-center space-x-3 px-8 py-4 bg-gray-50 text-gray-700 rounded-xl font-medium hover:bg-gray-100 border border-gray-200 hover:border-gray-300 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Upload size={20} />
                 <span>Upload Invoices</span>
               </motion.button>
+              
               <motion.button
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center space-x-3 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setActiveNav('reports')}
+                className="flex items-center justify-center space-x-3 px-8 py-4 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Download size={20} />
                 <span>Generate Report</span>
@@ -302,33 +322,57 @@ const InvoiceManagerDashboard: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <div className="bg-white rounded-2xl shadow-sm border">
+              <div className="p-8 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-semibold text-gray-900">Recent Activity</h2>
+                    <p className="text-gray-600">Latest updates and notifications</p>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-blue-50 transition-all"
+                  >
+                    <span>View all</span>
+                    <ChevronRight size={16} />
+                  </motion.button>
+                </div>
               </div>
-              <div className="divide-y divide-gray-100">
+              
+              <div className="divide-y divide-gray-50">
                 {recentActivities.map((activity, index) => (
                   <motion.div
                     key={activity.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="p-8 hover:bg-gray-25 cursor-pointer transition-all duration-200 group"
                   >
-                    <div className="flex items-start space-x-3">
-                      <div className={`p-2 rounded-full ${
+                    <div className="flex items-start space-x-6">
+                      <div className={`p-3 rounded-xl flex-shrink-0 ${
                         activity.status === 'success' ? 'bg-green-100 text-green-600' :
                         activity.status === 'warning' ? 'bg-yellow-100 text-yellow-600' :
                         'bg-blue-100 text-blue-600'
                       }`}>
-                        <Activity size={16} />
+                        <Activity size={18} />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{activity.title}</p>
-                        <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                        <span className="text-xs text-gray-500 mt-2 block">{activity.timestamp}</span>
+                      
+                      <div className="flex-1 min-w-0 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-lg">
+                              {activity.title}
+                            </p>
+                            <p className="text-gray-600 leading-relaxed">
+                              {activity.description}
+                            </p>
+                          </div>
+                          <ChevronRight size={18} className="text-gray-400 group-hover:text-blue-500 transition-colors flex-shrink-0 ml-4" />
+                        </div>
+                        <div className="flex items-center justify-between pt-2">
+                          <span className="text-sm text-gray-500">{activity.timestamp}</span>
+                        </div>
                       </div>
-                      <ChevronRight size={16} className="text-gray-400" />
                     </div>
                   </motion.div>
                 ))}
@@ -336,11 +380,11 @@ const InvoiceManagerDashboard: React.FC = () => {
             </div>
 
             {/* Reconciliation Trends */}
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">Reconciliation Trends</h2>
+            <div className="bg-white rounded-2xl shadow-sm border">
+              <div className="p-8 border-b border-gray-100">
+                <h2 className="text-2xl font-semibold text-gray-900">Reconciliation Trends</h2>
               </div>
-              <div className="p-6">
+              <div className="p-8">
                 <div className="space-y-4">
                   {historicalData.slice(-6).map((month, index) => (
                     <div key={month.month} className="flex items-center justify-between">
