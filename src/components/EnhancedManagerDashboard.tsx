@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, User, Upload, Plus, Download, Clock, CheckCircle, AlertTriangle, 
@@ -11,6 +12,7 @@ import { sampleInvoices, historicalData } from '../data/sampleData';
 
 const EnhancedManagerDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   // Calculate metrics from sample data
   const pendingInvoices = sampleInvoices.filter(inv => inv.status === 'pending' || inv.status === 'processing');
@@ -111,7 +113,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           change="+12%"
           changeType="positive"
           icon={<Clock size={24} />}
-          onClick={() => window.location.href = '/manager/process'}
+          onClick={() => router.push('/manager/process')}
           description="Awaiting processing"
           badge={pendingInvoices.length}
         />
@@ -121,7 +123,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           change="+8%"
           changeType="positive"
           icon={<CheckCircle size={24} />}
-          onClick={() => window.location.href = '/manager/reconciliation'}
+          onClick={() => router.push('/manager/reconciliation')}
           description="Successfully processed"
         />
         <DashboardCard
@@ -130,7 +132,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           change="-15%"
           changeType="negative"
           icon={<AlertTriangle size={24} />}
-          onClick={() => window.location.href = '/manager/issue-detection'}
+          onClick={() => router.push('/manager/issue-detection')}
           description="Requires attention"
           badge={outstandingIssues.length}
         />
@@ -140,7 +142,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           change="+18%"
           changeType="positive"
           icon={<DollarSign size={24} />}
-          onClick={() => window.location.href = '/manager/reporting'}
+          onClick={() => router.push('/manager/reporting')}
           description="Total processed value"
         />
       </div>
@@ -152,7 +154,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = '/manager/process'}
+            onClick={() => router.push('/manager/process')}
             className="flex items-center justify-center space-x-3 px-6 py-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200"
           >
             <Plus size={20} />
@@ -162,7 +164,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = '/manager/manual-upload'}
+            onClick={() => router.push('/manager/manual-upload')}
             className="flex items-center justify-center space-x-3 px-6 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all duration-200"
           >
             <Upload size={20} />
@@ -172,7 +174,7 @@ const EnhancedManagerDashboard: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = '/manager/reporting'}
+            onClick={() => router.push('/manager/reporting')}
             className="flex items-center justify-center space-x-3 px-6 py-4 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-all duration-200"
           >
             <Download size={20} />
@@ -190,7 +192,7 @@ const EnhancedManagerDashboard: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center space-x-1"
-                onClick={() => window.location.href = '/manager/notifications'}
+                onClick={() => router.push('/manager/notifications')}
               >
                 <span>View all</span>
                 <ChevronRight size={16} />
