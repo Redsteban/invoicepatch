@@ -24,7 +24,8 @@ export const generateContractorInvoices = (count: number = 30) => {
       status: confidence > 85 ? 'matched' : 'flagged',
       confidence,
       issues: confidence <= 85 ? ['Rate mismatch', 'Missing work order', 'Date discrepancy'][Math.floor(Math.random() * 3)] : null,
-      workOrderMatch: isMatched ? `WO-${String(Math.floor(Math.random() * 1000) + 1).padStart(4, '0')}` : null
+      workOrderMatch: isMatched ? `WO-${String(Math.floor(Math.random() * 1000) + 1).padStart(4, '0')}` : null,
+      processed: false
     })
   }
   
