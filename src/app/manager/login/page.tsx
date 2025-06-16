@@ -49,6 +49,8 @@ export default function ManagerLogin() {
       if (newOtp.join('') === DEMO_OTP) {
         setIsLoading(true)
         setTimeout(() => {
+          // Set authentication session
+          sessionStorage.setItem('manager_authenticated', 'true')
           router.push('/manager/dashboard')
         }, 1000)
       }

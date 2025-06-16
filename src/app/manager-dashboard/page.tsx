@@ -1,5 +1,5 @@
-import ManagerDashboard from '@/components/ManagerDashboard'
+import InvoiceManagerDashboard from '@/components/InvoiceManagerDashboard';
 
 export default function ManagerDashboardPage() {
-  return <ManagerDashboard />
+  return <InvoiceManagerDashboard />;
 } 

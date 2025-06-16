@@ -256,8 +256,6 @@ const ActivityFeed = ({ activities }: { activities: any[] }) => {
 
 export default function ManagerDashboard() {
   const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState('dashboard')
   const data = useMemo(() => generateDashboardData(), [])
 
   const formatDate = (dateString: string) => {
@@ -436,24 +434,24 @@ export default function ManagerDashboard() {
           <div className="mb-8 p-6 bg-gray-900 rounded-xl text-white">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-gray-300 text-sm">Next Deadline</p>
+                <p className="text-gray-100 text-sm">Next Deadline</p>
                 <p className="text-2xl font-bold">{formatDate(data.nextCutoff)}</p>
-                <p className="text-gray-400 text-sm">{daysUntilCutoff} days remaining</p>
+                <p className="text-gray-200 text-sm">{daysUntilCutoff} days remaining</p>
               </div>
               <div>
-                <p className="text-gray-300 text-sm">Total Saved</p>
+                <p className="text-gray-100 text-sm">Total Saved</p>
                 <p className="text-2xl font-bold">{data.stats.totalSaved}</p>
-                <p className="text-gray-400 text-sm">This month</p>
+                <p className="text-gray-200 text-sm">This month</p>
               </div>
               <div>
-                <p className="text-gray-300 text-sm">Efficiency Rate</p>
+                <p className="text-gray-100 text-sm">Efficiency Rate</p>
                 <p className="text-2xl font-bold">{data.stats.efficiency}</p>
-                <p className="text-gray-400 text-sm">Auto-reconciliation</p>
+                <p className="text-gray-200 text-sm">Auto-reconciliation</p>
               </div>
               <div>
-                <p className="text-gray-300 text-sm">Avg Processing</p>
+                <p className="text-gray-100 text-sm">Avg Processing</p>
                 <p className="text-2xl font-bold">{data.stats.avgProcessingTime}</p>
-                <p className="text-gray-400 text-sm">Per invoice batch</p>
+                <p className="text-gray-200 text-sm">Per invoice batch</p>
               </div>
             </div>
           </div>

@@ -1,5 +1,10 @@
-import ManagerDashboard from '@/components/ManagerDashboard'
+import ManagerLayout from '@/components/ManagerLayout'
+import EnhancedManagerDashboard from '@/components/EnhancedManagerDashboard'
 
 export default function ManagerDashboardPage() {
-  return <ManagerDashboard />
+  return (
+    <ManagerLayout>
+      <EnhancedManagerDashboard />
+    </ManagerLayout>
+  )
 } 
