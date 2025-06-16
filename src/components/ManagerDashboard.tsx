@@ -102,11 +102,11 @@ const DashboardCard = ({
   trend?: { value: string, direction: 'up' | 'down' }
 }) => {
   const colorClasses = {
-    blue: 'bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-700',
+    blue: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700',
     green: 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700',
     red: 'bg-red-50 border-red-200 hover:bg-red-100 text-red-700',
     yellow: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-yellow-700',
-    purple: 'bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-700'
+    purple: 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
   }
 
   return (
@@ -198,7 +198,7 @@ const SimpleChart = ({ data }: { data: any[] }) => {
               style={{ width: `${(item.reconciled / maxValue) * 100}%` }}
             />
             <div 
-              className="bg-yellow-500 transition-all duration-500"
+              className="bg-gray-400 transition-all duration-500"
               style={{ width: `${(item.pending / maxValue) * 100}%` }}
             />
           </div>
@@ -396,7 +396,7 @@ export default function ManagerDashboard() {
                 <input
                   type="text"
                   placeholder="Search invoices..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                 />
               </div>
               
@@ -433,27 +433,27 @@ export default function ManagerDashboard() {
         {/* Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-6">
           {/* Quick Stats Bar */}
-          <div className="mb-8 p-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl text-white">
+          <div className="mb-8 p-6 bg-gray-900 rounded-xl text-white">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-blue-100 text-sm">Next Deadline</p>
+                <p className="text-gray-300 text-sm">Next Deadline</p>
                 <p className="text-2xl font-bold">{formatDate(data.nextCutoff)}</p>
-                <p className="text-blue-200 text-sm">{daysUntilCutoff} days remaining</p>
+                <p className="text-gray-400 text-sm">{daysUntilCutoff} days remaining</p>
               </div>
               <div>
-                <p className="text-blue-100 text-sm">Total Saved</p>
+                <p className="text-gray-300 text-sm">Total Saved</p>
                 <p className="text-2xl font-bold">{data.stats.totalSaved}</p>
-                <p className="text-blue-200 text-sm">This month</p>
+                <p className="text-gray-400 text-sm">This month</p>
               </div>
               <div>
-                <p className="text-blue-100 text-sm">Efficiency Rate</p>
+                <p className="text-gray-300 text-sm">Efficiency Rate</p>
                 <p className="text-2xl font-bold">{data.stats.efficiency}</p>
-                <p className="text-blue-200 text-sm">Auto-reconciliation</p>
+                <p className="text-gray-400 text-sm">Auto-reconciliation</p>
               </div>
               <div>
-                <p className="text-blue-100 text-sm">Avg Processing</p>
+                <p className="text-gray-300 text-sm">Avg Processing</p>
                 <p className="text-2xl font-bold">{data.stats.avgProcessingTime}</p>
-                <p className="text-blue-200 text-sm">Per invoice batch</p>
+                <p className="text-gray-400 text-sm">Per invoice batch</p>
               </div>
             </div>
           </div>
@@ -537,25 +537,25 @@ export default function ManagerDashboard() {
                 <Filter className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
               </div>
               <SimpleChart data={data.chartData} />
-              <div className="flex items-center justify-center space-x-6 mt-4 text-sm">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Reconciled</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                  <span className="text-gray-600">Pending</span>
-                </div>
-              </div>
+                             <div className="flex items-center justify-center space-x-6 mt-4 text-sm">
+                 <div className="flex items-center">
+                   <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                   <span className="text-gray-600">Reconciled</span>
+                 </div>
+                 <div className="flex items-center">
+                   <div className="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                   <span className="text-gray-600">Pending</span>
+                 </div>
+               </div>
             </div>
 
             {/* Recent Activity */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  View All
-                </button>
+                                 <button className="text-gray-600 hover:text-black text-sm font-medium">
+                   View All
+                 </button>
               </div>
               <ActivityFeed activities={data.recentActivity} />
             </div>
