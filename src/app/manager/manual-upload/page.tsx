@@ -1,5 +1,10 @@
+import ManagerLayout from '@/components/ManagerLayout'
 import ManualUploadInterface from '../../../components/ManualUploadInterface'
 
 export default function ManualUploadPage() {
-  return <ManualUploadInterface />
+  return (
+    <ManagerLayout>
+      <ManualUploadInterface />
+    </ManagerLayout>
+  )
 } 

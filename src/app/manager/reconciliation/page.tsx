@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ManagerLayout from '@/components/ManagerLayout';
 
 interface DemoInvoice {
   id: string;
@@ -149,9 +150,10 @@ const ManagerReconciliation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-white border-b border-[#e5e7eb]">
+    <ManagerLayout>
+      <div className="min-h-screen bg-white">
+        {/* Header */}
+        <div className="bg-white border-b border-[#e5e7eb]">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -400,7 +402,8 @@ const ManagerReconciliation = () => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ManagerLayout>
   );
 };
 
