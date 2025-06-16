@@ -1,5 +1,6 @@
 'use client';
 
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DocumentArrowDownIcon, ClockIcon, CalculatorIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
@@ -394,7 +395,7 @@ const InstantProposalGenerator: React.FC<InstantProposalGeneratorProps> = ({ dem
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/manager-demo"
+                href="/manager/login"
                 className="bg-[#3b82f6] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#2563eb] transition-colors duration-200"
               >
                 Schedule Demo

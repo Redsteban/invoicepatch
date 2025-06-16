@@ -355,7 +355,7 @@ const FinalCTASection = () => (
           transition={{ duration: 0.2 }}
         >
           <CTAButton
-            href="/manager-demo"
+            href="/manager/login"
             variant="primary"
             className="group-hover:shadow-lg"
           >
@@ -460,7 +460,7 @@ export default function Hero() {
             transition={{ delay: 0.8, duration: 0.8 }}
           >
             <CTAButton
-              href="/manager-demo"
+              href="/manager/login"
               variant="primary"
               icon={DocumentTextIcon}
             >

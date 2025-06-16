@@ -275,7 +275,7 @@ const ROIAnalyticsDashboard: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/manager-demo"
+              href="/manager/login"
               className="bg-[#3b82f6] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#2563eb] transition-colors duration-200"
             >
               Schedule Demo

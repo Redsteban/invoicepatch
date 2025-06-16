@@ -117,7 +117,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <NavLink href="/manager-demo">Manager Demo</NavLink>
+            <NavLink href="/manager/login">Manager Trial</NavLink>
                             <NavLink href="/signup?type=contractor">Contractor Trial</NavLink>
             <NavLink href="/roi-calculator">ROI Calculator</NavLink>
             <NavLink href="/instant-proposal">Instant Proposal</NavLink>
@@ -127,7 +127,7 @@ export default function Header() {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <NavLink href="/contractor-trial">Log In</NavLink>
-            <CTAButton href="/manager-demo">
+            <CTAButton href="/manager/login">
               Start Free Trial
             </CTAButton>
           </div>
@@ -150,8 +150,8 @@ export default function Header() {
               transition={{ duration: 0.2 }}
             >
               <div className="flex flex-col space-y-4">
-                <NavLink href="/manager-demo" onClick={handleLinkClick} className="block py-2">
-                  Manager Demo
+                <NavLink href="/manager/login" onClick={handleLinkClick} className="block py-2">
+                  Manager Trial
                 </NavLink>
                 <NavLink href="/signup?type=contractor" onClick={handleLinkClick} className="block py-2">
                   Contractor Trial
@@ -168,7 +168,7 @@ export default function Header() {
                 
                 <div className="pt-4 border-t border-[#e5e7eb]">
                   <CTAButton
-                    href="/manager-demo"
+                    href="/manager/login"
                     onClick={handleLinkClick}
                     className="block text-center w-full"
                   >
