@@ -67,6 +67,11 @@ const ContractorSidebar = () => {
 
   const toolsNavItems: SidebarItem[] = [
     {
+      label: 'Ticket Info',
+      href: '/contractor/dashboard?tab=ticket-info',
+      icon: <FileText className="w-5 h-5" />
+    },
+    {
       label: 'Photo Upload',
       href: '/contractor/photos',
       icon: <Camera className="w-5 h-5" />

@@ -1,17 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ContractorDashboardOverview from '@/components/contractor/ContractorDashboardOverview';
 import TimeTrackingWidget from '@/components/contractor/TimeTrackingWidget';
 import InvoiceStatusWidget from '@/components/contractor/InvoiceStatusWidget';
+import TicketInformationForm from '@/components/contractor/TicketInformationForm';
 
-type ActiveView = 'overview' | 'time-tracking' | 'invoices' | 'history' | 'expenses' | 'payments' | 'settings';
+type ActiveView = 'overview' | 'time-tracking' | 'ticket-info' | 'invoices' | 'history' | 'expenses' | 'payments' | 'settings';
 
 export default function ContractorDashboardPage() {
+  const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const { role } = useRole();
+
+  // Handle URL parameters
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['overview', 'time-tracking', 'ticket-info', 'invoices', 'history', 'expenses', 'payments', 'settings'].includes(tab)) {
+      setActiveView(tab as ActiveView);
+    }
+  }, [searchParams]);
 
   const renderContent = () => {
     switch (activeView) {
@@ -19,6 +30,8 @@ export default function ContractorDashboardPage() {
         return <ContractorDashboardOverview />;
       case 'time-tracking':
         return <TimeTrackingWidget />;
+      case 'ticket-info':
+        return <TicketInformationForm />;
       case 'invoices':
         return <InvoiceStatusWidget />;
       case 'history':
@@ -55,6 +68,12 @@ export default function ContractorDashboardPage() {
                 {/* Quick Actions */}
                 <div className="hidden md:flex items-center space-x-3">
                   <button 
+                    onClick={() => setActiveView('ticket-info')}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                  >
+                    Fill Ticket
+                  </button>
+                  <button 
                     onClick={() => setActiveView('time-tracking')}
                     className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
                   >
@@ -76,6 +95,7 @@ export default function ContractorDashboardPage() {
                 {[
                   { id: 'overview', label: 'Overview', description: 'Dashboard summary' },
                   { id: 'time-tracking', label: 'Time Tracking', description: 'Work timer & GPS' },
+                  { id: 'ticket-info', label: 'Ticket Info', description: 'Daily rates & expenses' },
                   { id: 'invoices', label: 'Invoices', description: 'Current & past invoices' },
                   { id: 'history', label: 'Work History', description: 'Past work entries' },
                   { id: 'expenses', label: 'Expenses', description: 'Track expenses' },
