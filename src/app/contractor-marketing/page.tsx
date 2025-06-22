@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { 
-  HardHat, 
+  Zap, 
   ArrowRight, 
   CheckCircle, 
   Clock, 
@@ -14,7 +14,7 @@ import {
   Sparkles,
   Shield,
   TrendingUp,
-  Zap,
+  Wrench,
   Star,
   Quote,
   Menu,
@@ -23,7 +23,9 @@ import {
   Receipt,
   Smartphone,
   Wifi,
-  Battery
+  Battery,
+  Fuel,
+  HardHat
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -57,57 +59,57 @@ export default function ContractorMarketing() {
   const painPoints = [
     {
       icon: Clock,
-      problem: "Lost Hours & Missed Payments",
-      solution: "GPS-Verified Time Tracking",
-      description: "Never lose billable hours again with automatic GPS verification and real-time tracking that ensures every minute is captured and paid"
+      problem: "Lost Service Hours & Missed Payments",
+      solution: "GPS-Verified Field Time Tracking",
+      description: "Never lose billable service hours again with automatic GPS verification at remote well sites and real-time tracking for all drilling, completion, and production work"
     },
     {
       icon: FileText,
-      problem: "Complex Invoice Creation",
-      solution: "One-Tap Invoice Generation",
-      description: "Generate professional invoices instantly with all your hours, expenses, and photos automatically included"
+      problem: "Complex Service Invoice Creation",
+      solution: "One-Tap Service Invoice Generation",
+      description: "Generate professional service invoices instantly with all your field hours, equipment usage, and site expenses automatically included"
     },
     {
       icon: Receipt,
-      problem: "Expense Receipt Chaos",
-      solution: "Smart Receipt Management",
-      description: "Snap photos of receipts and let AI automatically categorize and organize them for seamless expense tracking"
+      problem: "Equipment & Fuel Receipt Chaos",
+      solution: "Smart Equipment & Expense Management",
+      description: "Snap photos of fuel receipts, equipment rentals, and field expenses - AI automatically categorizes for seamless oilfield expense tracking"
     },
     {
       icon: DollarSign,
-      problem: "Slow Payment Processing",
-      solution: "Faster Payment Pipeline",
-      description: "Get paid 3 days faster with streamlined approval workflows and automated payment notifications"
+      problem: "Slow Operator Payment Processing",
+      solution: "Faster Operator Payment Pipeline",
+      description: "Get paid 5 days faster with streamlined operator approval workflows and automated payment notifications from major oil companies"
     }
   ];
 
   const testimonials = [
     {
       name: "Jake Morrison",
-      title: "Independent Contractor",
-      company: "Morrison Electrical",
-      quote: "I was losing 2-3 hours every week on paperwork. Now everything is automated and I get paid faster. Made an extra $8K last quarter just from better time tracking.",
+      title: "Drilling Services Contractor",
+      company: "Morrison Oilfield Services",
+      quote: "I was losing 2-3 hours every week on service tickets and invoicing. Now everything is automated and operators pay me faster. Made an extra $12K last quarter just from better time tracking on drilling jobs.",
       rating: 5,
-      metrics: "Extra $8K earned",
+      metrics: "Extra $12K earned",
       location: "Calgary, AB"
     },
     {
       name: "Maria Santos",
-      title: "Framing Contractor",
-      company: "Santos Construction",
-      quote: "The GPS tracking saved my reputation when a client questioned my hours. Having proof of exactly when and where I worked was a game-changer.",
+      title: "Production Services Contractor",
+      company: "Santos Well Services",
+      quote: "The GPS tracking saved my reputation when an operator questioned my service hours at a remote well site. Having proof of exactly when and where I worked was a game-changer for my credibility.",
       rating: 5,
       metrics: "100% payment accuracy",
       location: "Edmonton, AB"
     },
     {
       name: "David Chen",
-      title: "Heavy Equipment Operator",
-      company: "Chen Excavation",
-      quote: "Invoice creation used to take me hours every week. Now it's literally one button and everything is professional and accurate. My clients love it.",
+      title: "Completion Services Contractor",
+      company: "Chen Frac Services",
+      quote: "Service invoice creation used to take me hours every week with all the equipment and fuel costs. Now it's literally one button and everything is professional and accurate. Operators love the detail.",
       rating: 5,
       metrics: "5 hours saved weekly",
-      location: "Vancouver, BC"
+      location: "Grande Prairie, AB"
     }
   ];
 
@@ -116,82 +118,82 @@ export default function ContractorMarketing() {
       name: "Solo Contractor",
       price: "$29",
       period: "per month",
-      description: "Perfect for independent contractors",
+      description: "Perfect for independent oilfield contractors",
       features: [
-        "Unlimited time tracking",
-        "GPS verification",
-        "Photo documentation",
-        "Basic invoice generation",
-        "Expense tracking",
+        "Unlimited service time tracking",
+        "GPS verification at well sites",
+        "Site photo documentation",
+        "Basic service invoice generation",
+        "Equipment & fuel expense tracking",
         "Mobile app access",
         "Email support"
       ],
       cta: "Start Free Trial",
       popular: false,
-      savings: "vs $200/mo in lost time"
+      savings: "vs $300/mo in lost service time"
     },
     {
       name: "Pro Contractor",
       price: "$49",
       period: "per month",
-      description: "For contractors managing multiple projects",
+      description: "For contractors managing multiple well sites",
       features: [
         "Everything in Solo",
-        "Multi-project management",
-        "Advanced reporting",
-        "Custom invoice templates",
-        "Equipment logging",
+        "Multi-site project management",
+        "Advanced drilling/completion reporting",
+        "Custom service invoice templates",
+        "Equipment & rig logging",
         "Priority support",
-        "Integration with accounting software"
+        "Integration with oilfield accounting software"
       ],
       cta: "Start Free Trial",
       popular: true,
-      savings: "vs $400/mo in admin costs"
+      savings: "vs $600/mo in admin costs"
     },
     {
       name: "Team Contractor",
       price: "$89",
       period: "per month",
-      description: "For contractors with crews",
+      description: "For contractors with field crews",
       features: [
         "Everything in Pro",
-        "Team member management",
-        "Crew time tracking",
-        "Bulk invoice processing",
-        "Advanced analytics",
+        "Crew member management",
+        "Team service time tracking",
+        "Bulk operator invoice processing",
+        "Advanced oilfield analytics",
         "Custom workflows",
         "Dedicated support"
       ],
       cta: "Start Free Trial",
       popular: false,
-      savings: "vs $800/mo in overhead"
+      savings: "vs $1200/mo in overhead"
     }
   ];
 
   const features = [
     {
       icon: Timer,
-      title: "Smart Time Tracking",
-      description: "GPS-enabled tracking that automatically logs your location, hours, and breaks",
-      benefits: ["Never lose billable hours", "Automatic overtime calculation", "GPS proof of work location"]
+      title: "Smart Service Time Tracking",
+      description: "GPS-enabled tracking that automatically logs your well site location, service hours, and equipment usage",
+      benefits: ["Never lose billable service hours", "Automatic overtime calculation", "GPS proof of well site location"]
     },
     {
       icon: Camera,
-      title: "Photo Documentation",
-      description: "Capture and organize work progress photos with automatic date/location stamps",
-      benefits: ["Professional work documentation", "Automatic photo organization", "Client progress updates"]
+      title: "Site Documentation",
+      description: "Capture and organize well site photos, equipment inspections, and safety compliance documentation",
+      benefits: ["Professional site documentation", "Safety compliance photos", "Operator progress updates"]
     },
     {
       icon: FileText,
-      title: "Instant Invoicing",
-      description: "Generate professional invoices with one tap, including all hours and expenses",
-      benefits: ["Professional invoice templates", "Automatic calculations", "Instant client delivery"]
+      title: "Instant Service Invoicing",
+      description: "Generate professional service invoices with one tap, including all hours, equipment, and field expenses",
+      benefits: ["Professional operator invoice templates", "Automatic service calculations", "Instant operator delivery"]
     },
     {
       icon: Receipt,
-      title: "Expense Management",
-      description: "Snap photos of receipts and track all project expenses automatically",
-      benefits: ["AI receipt categorization", "Mileage tracking", "Tax-ready reports"]
+      title: "Equipment & Fuel Management",
+      description: "Snap photos of fuel receipts, equipment rentals, and track all oilfield expenses automatically",
+      benefits: ["AI receipt categorization", "Equipment usage tracking", "Tax-ready oilfield reports"]
     }
   ];
 
@@ -297,18 +299,18 @@ export default function ContractorMarketing() {
           >
             <motion.div variants={fadeInUp} className="flex justify-center mb-6">
               <div className="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-medium">
-                Used by 10,000+ Canadian Contractors
+                Used by 1,000+ Canadian Oil & Gas Subcontractors
               </div>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Stop Losing Money on
-              <span className="text-green-600 block">Paperwork & Lost Hours</span>
+              <span className="text-green-600 block">Service Hours & Lost Invoices</span>
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              The mobile app built for Canadian contractors. Track time with GPS, 
-              create professional invoices instantly, and get paid 3 days faster.
+              The mobile app built for Canadian oil & gas subcontractors. Track service time with GPS, 
+              create professional operator invoices instantly, and get paid 5 days faster.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -333,20 +335,20 @@ export default function ContractorMarketing() {
             {/* Trust Indicators */}
             <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-green-600">3 Days</div>
-                <div className="text-gray-600">Faster Payment</div>
+                <div className="text-3xl font-bold text-green-600">5 Days</div>
+                <div className="text-gray-600">Faster Operator Payment</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-green-600">$5K+</div>
+                <div className="text-3xl font-bold text-green-600">$8K+</div>
                 <div className="text-gray-600">Avg. Extra Income</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-green-600">50%</div>
+                <div className="text-3xl font-bold text-green-600">60%</div>
                 <div className="text-gray-600">Less Admin Time</div>
               </div>
               <div>
                 <div className="text-3xl font-bold text-green-600">100%</div>
-                <div className="text-gray-600">Accurate Tracking</div>
+                <div className="text-gray-600">Service Accuracy</div>
               </div>
             </motion.div>
           </motion.div>

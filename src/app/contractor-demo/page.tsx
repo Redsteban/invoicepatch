@@ -36,15 +36,15 @@ export default function ContractorDemo() {
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <div className="bg-green-100 text-green-600 px-4 py-2 rounded-full text-sm font-medium">
-              Contractor Demo Experience
+              Oil & Gas Contractor Demo Experience
             </div>
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            See How You'll Work Smarter
+            See How You'll Work Smarter in the Field
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Experience the mobile-first tools built specifically for contractors in the field. 
-            Track time, document work, and get paid faster.
+            Experience the mobile-first tools built specifically for oil & gas subcontractors. 
+            Track service time, document well sites, and get paid faster by operators.
           </p>
         </div>
 
@@ -58,26 +58,26 @@ export default function ContractorDemo() {
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Interactive Demo</h2>
               <p className="text-lg text-gray-600">
-                Try the actual mobile interface with real contractor workflows
+                Try the actual mobile interface with real oilfield contractor workflows
               </p>
             </div>
             
             <div className="space-y-4 mb-8">
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <Clock className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Start/stop work timer with GPS tracking</span>
+                <span className="text-gray-700">Start/stop service timer with GPS tracking at well sites</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <Camera className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Upload work photos and progress shots</span>
+                <span className="text-gray-700">Upload site photos and equipment inspection shots</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <FileText className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Generate professional invoices instantly</span>
+                <span className="text-gray-700">Generate professional operator invoices instantly</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <MapPin className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Verify location and track expenses</span>
+                <span className="text-gray-700">Verify well site location and track equipment expenses</span>
               </div>
             </div>
             
@@ -105,22 +105,22 @@ export default function ContractorDemo() {
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">14-Day Free Trial</h2>
               <p className="text-lg text-gray-600">
-                Use InvoicePatch on your actual projects with full support
+                Use InvoicePatch on your actual oilfield projects with full support
               </p>
             </div>
             
             <div className="space-y-4 mb-8">
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Track real work hours on your projects</span>
+                <span className="text-gray-700">Track real service hours on drilling/completion projects</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Create and send actual invoices to clients</span>
+                <span className="text-gray-700">Create and send actual invoices to operators</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                <span className="text-gray-700">Personal onboarding and training</span>
+                <span className="text-gray-700">Personal onboarding and oilfield training</span>
               </div>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
@@ -144,7 +144,7 @@ export default function ContractorDemo() {
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Quick Preview</h3>
             <p className="text-gray-600">
-              See the contractor workflow in 60 seconds
+              See the oilfield contractor workflow in 60 seconds
             </p>
           </div>
           
@@ -154,28 +154,28 @@ export default function ContractorDemo() {
                 <Clock className="w-6 h-6 text-green-600" />
               </div>
               <div className="text-sm font-medium text-gray-700">Clock In</div>
-              <div className="text-xs text-gray-500 mt-1">GPS verified</div>
+              <div className="text-xs text-gray-500 mt-1">GPS verified at well site</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Camera className="w-6 h-6 text-green-600" />
               </div>
-              <div className="text-sm font-medium text-gray-700">Document Work</div>
-              <div className="text-xs text-gray-500 mt-1">Photos & notes</div>
+              <div className="text-sm font-medium text-gray-700">Document Service</div>
+              <div className="text-xs text-gray-500 mt-1">Site photos & equipment</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <FileText className="w-6 h-6 text-green-600" />
               </div>
               <div className="text-sm font-medium text-gray-700">Generate Invoice</div>
-              <div className="text-xs text-gray-500 mt-1">One-tap creation</div>
+              <div className="text-xs text-gray-500 mt-1">One-tap operator invoice</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div className="text-sm font-medium text-gray-700">Get Paid</div>
-              <div className="text-xs text-gray-500 mt-1">3 days faster</div>
+              <div className="text-xs text-gray-500 mt-1">5 days faster</div>
             </div>
           </div>
           
@@ -191,11 +191,11 @@ export default function ContractorDemo() {
         {/* Bottom Support */}
         <div className="text-center mt-12 pt-8 border-t border-gray-200">
           <p className="text-gray-600 mb-4">
-            Questions about how InvoicePatch works for contractors?
+            Questions about how InvoicePatch works for oil & gas contractors?
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact-sales" className="inline-flex items-center text-green-600 font-medium hover:text-green-700 transition-colors">
-              Talk to Contractor Success Team
+              Talk to Oilfield Success Team
               <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

@@ -51,10 +51,10 @@ const ContractorDashboardOverview = () => {
 
   // Mock data
   const currentProject: ProjectInfo = {
-    name: 'Calgary Downtown Tower',
-    location: 'Site A - Foundation Work',
-    company: 'Alberta Construction Ltd.',
-    rate: 42.50,
+    name: 'Leduc County Well Site',
+    location: 'Site 12-24-049-25W4 - Drilling Operations',
+    company: 'Suncor Energy Services',
+    rate: 52.50,
     rateType: 'hourly'
   };
 
@@ -143,9 +143,9 @@ const ContractorDashboardOverview = () => {
       <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-lg p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Good morning, Contractor!</h2>
+            <h2 className="text-2xl font-bold mb-2">Good morning, Field Contractor!</h2>
             <p className="text-emerald-100 mb-4">
-              Ready for another productive day at {currentProject.name}?
+              Ready for another productive day at the {currentProject.name}?
             </p>
             <div className="flex items-center space-x-4 text-sm">
               <div className="flex items-center space-x-1">
