@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Header from "@/components/Header";
 import { Analytics } from "@vercel/analytics/next";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { RoleProvider } from "@/contexts/RoleContext";
+import RoleBreadcrumb from "@/components/RoleBreadcrumb";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,9 +17,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "InvoicePatch - Intelligent Invoice Reconciliation for Managers",
-  description: "Process all contractor payments in minutes, not hours or days. Upload contractor invoices and watch AI handle matching, validation, and exception detection in minutes.",
-  keywords: "invoicing, contractors, Canada, CRA compliant, HST, GST, payment tracking, automated reminders",
+  title: "InvoicePatch - Streamlined Invoice Processing",
+  description: "Automate your contractor invoice processing with AI-powered reconciliation and approval workflows",
+  keywords: "invoicing, contractors, Canada, CRA compliant, HST, GST, payment tracking, automated workflows",
   authors: [{ name: "InvoicePatch Team" }],
   creator: "InvoicePatch",
   publisher: "InvoicePatch",
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_CA",
     url: "https://invoicepatch.com",
-    title: "InvoicePatch - Professional Invoicing for Canadian Contractors",
-    description: "Stop losing money on unpaid invoices. Get paid 3x faster with CRA-compliant invoicing built for Canadian contractors.",
+    title: "InvoicePatch - Streamlined Invoice Processing",
+    description: "Automate your contractor invoice processing with AI-powered reconciliation and approval workflows",
     siteName: "InvoicePatch",
   },
   twitter: {
     card: "summary_large_image",
-    title: "InvoicePatch - Professional Invoicing for Canadian Contractors",
-    description: "Stop losing money on unpaid invoices. Get paid 3x faster with CRA-compliant invoicing built for Canadian contractors.",
+    title: "InvoicePatch - Streamlined Invoice Processing",
+    description: "Automate your contractor invoice processing with AI-powered reconciliation and approval workflows",
     creator: "@invoicepatch",
   },
 };
@@ -59,11 +59,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <Header />
+        <RoleProvider>
+          <RoleBreadcrumb />
           {children}
           <Analytics />
-        </AuthProvider>
+        </RoleProvider>
       </body>
     </html>
   );
