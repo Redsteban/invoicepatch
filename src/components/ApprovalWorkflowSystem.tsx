@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   CheckCircle, 
@@ -30,13 +30,15 @@ import {
   UserCheck,
   Timer,
   RefreshCw,
-  Archive
+  Archive,
+  Fuel,
+  Drill
 } from 'lucide-react'
 
 interface ApprovalItem {
   id: string
-  invoiceNumber: string
-  contractorName: string
+  ticketNumber: string
+  operatorName: string
   amount: number
   description: string
   submittedBy: string
@@ -44,12 +46,13 @@ interface ApprovalItem {
   currentLevel: number
   maxLevel: number
   status: 'pending' | 'approved' | 'rejected' | 'escalated' | 'expired'
-  priority: 'low' | 'medium' | 'high' | 'urgent'
+  priority: 'low' | 'medium' | 'high' | 'urgent' | 'safety-alert'
   dueDate: Date
   approvalHistory: ApprovalHistoryEntry[]
   attachments: string[]
-  category: 'materials' | 'labor' | 'equipment' | 'services' | 'other'
+  category: 'Drilling' | 'Completion' | 'Production' | 'Maintenance' | 'Logistics' | 'Other'
   projectCode?: string
+  afeNumber?: string
   digitalSignature?: string
   escalationCount: number
   isOverdue: boolean
@@ -91,9 +94,9 @@ const ApprovalWorkflowSystem: React.FC = () => {
   const [approvalItems, setApprovalItems] = useState<ApprovalItem[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [currentUser] = useState({
-    name: 'John Doe',
-    role: 'Senior Manager',
-    email: 'john.doe@company.com',
+    name: 'John "Rig" Doe',
+    role: 'Site Supervisor',
+    email: 'john.doe@oilfield.co',
     signature: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
   })
   const [filters, setFilters] = useState({
@@ -113,40 +116,40 @@ const ApprovalWorkflowSystem: React.FC = () => {
   const [approvalRules] = useState<ApprovalRule[]>([
     {
       id: 'rule1',
-      name: 'Small Invoices',
+      name: 'Standard Tickets',
       minAmount: 0,
-      maxAmount: 5000,
-      requiredRoles: ['Manager'],
+      maxAmount: 10000,
+      requiredRoles: ['Foreman'],
       autoEscalationHours: 24,
       requiresDigitalSignature: false,
       allowBatchApproval: true
     },
     {
       id: 'rule2',
-      name: 'Medium Invoices',
-      minAmount: 5001,
-      maxAmount: 25000,
-      requiredRoles: ['Manager', 'Senior Manager'],
+      name: 'High-Value Tickets',
+      minAmount: 10001,
+      maxAmount: 50000,
+      requiredRoles: ['Foreman', 'Site Supervisor'],
       autoEscalationHours: 48,
       requiresDigitalSignature: true,
       allowBatchApproval: true
     },
     {
       id: 'rule3',
-      name: 'Large Invoices',
-      minAmount: 25001,
-      maxAmount: 100000,
-      requiredRoles: ['Manager', 'Senior Manager', 'Finance Director'],
+      name: 'Major Tickets',
+      minAmount: 50001,
+      maxAmount: 250000,
+      requiredRoles: ['Foreman', 'Site Supervisor', 'Operations Manager'],
       autoEscalationHours: 72,
       requiresDigitalSignature: true,
       allowBatchApproval: false
     },
     {
       id: 'rule4',
-      name: 'Major Invoices',
-      minAmount: 100001,
+      name: 'Executive Tickets',
+      minAmount: 250001,
       maxAmount: Infinity,
-      requiredRoles: ['Manager', 'Senior Manager', 'Finance Director', 'CEO'],
+      requiredRoles: ['Foreman', 'Site Supervisor', 'Operations Manager', 'Director'],
       autoEscalationHours: 96,
       requiresDigitalSignature: true,
       allowBatchApproval: false
@@ -156,34 +159,35 @@ const ApprovalWorkflowSystem: React.FC = () => {
   // Generate mock approval items
   useEffect(() => {
     const generateMockItems = (): ApprovalItem[] => {
-      const contractors = ['ABC Construction', 'XYZ Plumbing', 'Elite Electrical', 'Metro HVAC', 'Prime Contractors']
-      const categories: ApprovalItem['category'][] = ['materials', 'labor', 'equipment', 'services', 'other']
-      const priorities: ApprovalItem['priority'][] = ['low', 'medium', 'high', 'urgent']
+      const operators = ['Apex Drilling', 'Horizon Wells', 'Rig Runners', 'Precision Flow', 'Titan Services']
+      const categories: ApprovalItem['category'][] = ['Drilling', 'Completion', 'Production', 'Maintenance', 'Logistics', 'Other']
+      const priorities: ApprovalItem['priority'][] = ['low', 'medium', 'high', 'urgent', 'safety-alert']
       const statuses: ApprovalItem['status'][] = ['pending', 'approved', 'rejected', 'escalated']
       
       return Array.from({ length: 30 }, (_, i) => {
-        const amount = Math.floor(Math.random() * 150000) + 1000
+        const amount = Math.floor(Math.random() * 300000) + 1000
         const submittedDate = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
         const dueDate = new Date(submittedDate.getTime() + (Math.random() * 7 + 1) * 24 * 60 * 60 * 1000)
         const isOverdue = new Date() > dueDate
         
         const getApprovalLevels = (amount: number): { current: number; max: number } => {
-          if (amount <= 5000) return { current: 1, max: 1 }
-          if (amount <= 25000) return { current: Math.floor(Math.random() * 2) + 1, max: 2 }
-          if (amount <= 100000) return { current: Math.floor(Math.random() * 3) + 1, max: 3 }
+          if (amount <= 10000) return { current: 1, max: 1 }
+          if (amount <= 50000) return { current: Math.floor(Math.random() * 2) + 1, max: 2 }
+          if (amount <= 250000) return { current: Math.floor(Math.random() * 3) + 1, max: 3 }
           return { current: Math.floor(Math.random() * 4) + 1, max: 4 }
         }
         
         const levels = getApprovalLevels(amount)
-        const priority = amount > 50000 ? 'high' : amount > 20000 ? 'medium' : 'low'
+        let priority: ApprovalItem['priority'] = amount > 100000 ? 'high' : amount > 25000 ? 'medium' : 'low'
+        if (Math.random() < 0.1) priority = 'safety-alert'
         
         const generateHistory = (): ApprovalHistoryEntry[] => {
           const history: ApprovalHistoryEntry[] = []
           const approvers = [
-            { name: 'Sarah Johnson', role: 'Manager' },
-            { name: 'Mike Wilson', role: 'Senior Manager' },
-            { name: 'Lisa Chen', role: 'Finance Director' },
-            { name: 'Robert Smith', role: 'CEO' }
+            { name: 'Hank Hill', role: 'Foreman' },
+            { name: 'John Doe', role: 'Site Supervisor' },
+            { name: 'Jane Smith', role: 'Operations Manager' },
+            { name: 'Richard Roe', role: 'Director' }
           ]
           
           for (let level = 1; level < levels.current; level++) {
@@ -195,7 +199,7 @@ const ApprovalWorkflowSystem: React.FC = () => {
               role: approver.role,
               action: Math.random() > 0.1 ? 'approved' : 'commented',
               timestamp: new Date(submittedDate.getTime() + level * 12 * 60 * 60 * 1000),
-              comments: Math.random() > 0.7 ? 'Approved - all documentation looks good' : undefined,
+              comments: Math.random() > 0.7 ? 'Approved - all looks good.' : undefined,
               signature: Math.random() > 0.5 ? 'digital_signature_data' : undefined,
               timeSpent: Math.floor(Math.random() * 30) + 5
             })
@@ -206,21 +210,22 @@ const ApprovalWorkflowSystem: React.FC = () => {
         
         return {
           id: `approval-${i + 1}`,
-          invoiceNumber: `INV-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-          contractorName: contractors[Math.floor(Math.random() * contractors.length)],
+          ticketNumber: `FT-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+          operatorName: operators[Math.floor(Math.random() * operators.length)],
           amount,
-          description: `${categories[Math.floor(Math.random() * categories.length)]} work for project ${Math.floor(Math.random() * 1000)}`,
-          submittedBy: 'System',
+          description: `${categories[Math.floor(Math.random() * categories.length)]} services for AFE ${Math.floor(Math.random() * 1000)}`,
+          submittedBy: 'Field Crew',
           submittedDate,
           currentLevel: levels.current,
           maxLevel: levels.max,
           status: Math.random() > 0.7 ? statuses[Math.floor(Math.random() * statuses.length)] : 'pending',
-          priority: priority === 'high' && Math.random() > 0.8 ? 'urgent' : priority,
+          priority,
           dueDate,
           approvalHistory: generateHistory(),
-          attachments: Array.from({ length: Math.floor(Math.random() * 4) + 1 }, (_, j) => `attachment-${j + 1}.pdf`),
+          attachments: Array.from({ length: Math.floor(Math.random() * 4) + 1 }, (_, j) => `doc-${j + 1}.pdf`),
           category: categories[Math.floor(Math.random() * categories.length)],
-          projectCode: `PRJ-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+          projectCode: `PROJ-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+          afeNumber: `AFE-${Math.floor(Math.random() * 500).toString().padStart(3, '0')}`,
           escalationCount: Math.floor(Math.random() * 3),
           isOverdue
         }
@@ -232,10 +237,10 @@ const ApprovalWorkflowSystem: React.FC = () => {
 
   const getRoleLevel = (role: string): number => {
     switch (role) {
-      case 'Manager': return 1
-      case 'Senior Manager': return 2
-      case 'Finance Director': return 3
-      case 'CEO': return 4
+      case 'Foreman': return 1
+      case 'Site Supervisor': return 2
+      case 'Operations Manager': return 3
+      case 'Director': return 4
       default: return 0
     }
   }
@@ -246,823 +251,404 @@ const ApprovalWorkflowSystem: React.FC = () => {
 
   const canApprove = (item: ApprovalItem): boolean => {
     const userLevel = getRoleLevel(currentUser.role)
-    return userLevel >= item.currentLevel && item.status === 'pending'
+    return item.status === 'pending' && userLevel === item.currentLevel
   }
 
-  const getStatusColor = (status: ApprovalItem['status']) => {
+  const getStatusInfo = (status: ApprovalItem['status']) => {
     switch (status) {
-      case 'pending': return 'text-yellow-600 bg-yellow-100'
-      case 'approved': return 'text-green-600 bg-green-100'
-      case 'rejected': return 'text-red-600 bg-red-100'
-      case 'escalated': return 'text-blue-600 bg-blue-100'
-      case 'expired': return 'text-gray-600 bg-gray-100'
-      default: return 'text-gray-600 bg-gray-100'
+      case 'approved': return { icon: <CheckCircle className="w-4 h-4 text-green-500" />, color: 'text-green-500', bg: 'bg-green-100' }
+      case 'pending': return { icon: <Clock className="w-4 h-4 text-yellow-500" />, color: 'text-yellow-500', bg: 'bg-yellow-100' }
+      case 'rejected': return { icon: <XCircle className="w-4 h-4 text-red-500" />, color: 'text-red-500', bg: 'bg-red-100' }
+      case 'escalated': return { icon: <ArrowUp className="w-4 h-4 text-purple-500" />, color: 'text-purple-500', bg: 'bg-purple-100' }
+      case 'expired': return { icon: <Timer className="w-4 h-4 text-gray-500" />, color: 'text-gray-500', bg: 'bg-gray-100' }
+      default: return { icon: <Clock className="w-4 h-4" />, color: 'text-gray-500', bg: 'bg-gray-100' }
     }
   }
 
-  const getPriorityColor = (priority: ApprovalItem['priority']) => {
+  const getPriorityInfo = (priority: ApprovalItem['priority']) => {
     switch (priority) {
-      case 'urgent': return 'text-red-600 bg-red-100'
-      case 'high': return 'text-orange-600 bg-orange-100'
-      case 'medium': return 'text-yellow-600 bg-yellow-100'
-      case 'low': return 'text-green-600 bg-green-100'
-      default: return 'text-gray-600 bg-gray-100'
-    }
-  }
-
-  const getStatusIcon = (status: ApprovalItem['status']) => {
-    switch (status) {
-      case 'pending': return <Clock className="w-4 h-4 text-yellow-500" />
-      case 'approved': return <CheckCircle className="w-4 h-4 text-green-500" />
-      case 'rejected': return <XCircle className="w-4 h-4 text-red-500" />
-      case 'escalated': return <ArrowUp className="w-4 h-4 text-blue-500" />
-      case 'expired': return <AlertTriangle className="w-4 h-4 text-gray-500" />
-      default: return <Clock className="w-4 h-4 text-gray-500" />
+      case 'safety-alert': return { icon: <AlertTriangle className="w-4 h-4 text-red-700" />, label: 'Safety Alert', color: 'text-red-700', bg: 'bg-red-100' }
+      case 'urgent': return { icon: <AlertTriangle className="w-4 h-4 text-red-600" />, label: 'Urgent', color: 'text-red-600', bg: 'bg-red-100' }
+      case 'high': return { icon: <ArrowUp className="w-4 h-4 text-orange-500" />, label: 'High', color: 'text-orange-500', bg: 'bg-orange-100' }
+      case 'medium': return { icon: <MoreHorizontal className="w-4 h-4 text-blue-500" />, label: 'Medium', color: 'text-blue-500', bg: 'bg-blue-100' }
+      case 'low': return { icon: <ArrowDown className="w-4 h-4 text-gray-500" />, label: 'Low', color: 'text-gray-500', bg: 'bg-gray-100' }
+      default: return { icon: <MoreHorizontal className="w-4 h-4" />, label: 'Normal', color: 'text-gray-500', bg: 'bg-gray-100' }
     }
   }
 
   const approveItem = (itemId: string, comments?: string) => {
-    setApprovalItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item
+    setApprovalItems(prevItems => {
+      const itemIndex = prevItems.findIndex(item => item.id === itemId);
+      if (itemIndex === -1) return prevItems;
+      const item = { ...prevItems[itemIndex] };
       
-      const newHistory: ApprovalHistoryEntry = {
-        id: `history-${Date.now()}`,
+      item.approvalHistory.push({
+        id: `history-${itemId}-${Date.now()}`,
         level: item.currentLevel,
         approver: currentUser.name,
         role: currentUser.role,
         action: 'approved',
         timestamp: new Date(),
         comments,
-        signature: digitalSignature || currentUser.signature,
-        timeSpent: Math.floor(Math.random() * 15) + 5
+        signature: digitalSignature,
+        timeSpent: Math.floor(Math.random() * 15) + 1 // placeholder
+      });
+
+      if (item.currentLevel < item.maxLevel) {
+        item.currentLevel += 1;
+        item.status = 'pending';
+      } else {
+        item.status = 'approved';
       }
       
-      const isFullyApproved = item.currentLevel >= item.maxLevel
-      
-      return {
-        ...item,
-        currentLevel: isFullyApproved ? item.currentLevel : item.currentLevel + 1,
-        status: isFullyApproved ? 'approved' : 'pending',
-        approvalHistory: [...item.approvalHistory, newHistory]
-      }
-    }))
-    
-    // Simulate email notification
-    console.log(`Email sent: Invoice ${approvalItems.find(i => i.id === itemId)?.invoiceNumber} approved by ${currentUser.name}`)
-  }
+      const newItems = [...prevItems];
+      newItems[itemIndex] = item;
+      return newItems;
+    });
+
+    setSelectedItem(null);
+    setShowBatchModal(false);
+  };
 
   const rejectItem = (itemId: string, reason: string) => {
-    setApprovalItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item
+     setApprovalItems(prevItems => {
+      const itemIndex = prevItems.findIndex(item => item.id === itemId);
+      if (itemIndex === -1) return prevItems;
+      const item = { ...prevItems[itemIndex] };
       
-      const newHistory: ApprovalHistoryEntry = {
-        id: `history-${Date.now()}`,
+      item.approvalHistory.push({
+        id: `history-${itemId}-${Date.now()}`,
         level: item.currentLevel,
         approver: currentUser.name,
         role: currentUser.role,
         action: 'rejected',
         timestamp: new Date(),
         comments: reason,
-        timeSpent: Math.floor(Math.random() * 20) + 10
-      }
+        signature: digitalSignature,
+        timeSpent: Math.floor(Math.random() * 15) + 1 // placeholder
+      });
       
-      return {
-        ...item,
-        status: 'rejected',
-        approvalHistory: [...item.approvalHistory, newHistory]
-      }
-    }))
-  }
+      item.status = 'rejected';
+      
+      const newItems = [...prevItems];
+      newItems[itemIndex] = item;
+      return newItems;
+    });
+
+    setSelectedItem(null);
+    setShowBatchModal(false);
+  };
 
   const escalateItem = (itemId: string, reason?: string) => {
-    setApprovalItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item
+    setApprovalItems(prevItems => {
+      const itemIndex = prevItems.findIndex(item => item.id === itemId);
+      if (itemIndex === -1) return prevItems;
+      const item = { ...prevItems[itemIndex] };
       
-      const newHistory: ApprovalHistoryEntry = {
-        id: `history-${Date.now()}`,
+      item.approvalHistory.push({
+        id: `history-${itemId}-${Date.now()}`,
         level: item.currentLevel,
         approver: currentUser.name,
         role: currentUser.role,
         action: 'escalated',
         timestamp: new Date(),
-        comments: reason || 'Escalated for further review',
-        timeSpent: Math.floor(Math.random() * 10) + 5
+        comments: reason,
+        timeSpent: Math.floor(Math.random() * 5) + 1
+      });
+      
+      item.status = 'escalated';
+      item.escalationCount += 1;
+      
+      // Logic for re-assigning to the next level could be added here
+      if(item.currentLevel < item.maxLevel) {
+          item.currentLevel += 1;
       }
       
-      return {
-        ...item,
-        currentLevel: Math.min(item.currentLevel + 1, item.maxLevel),
-        status: 'escalated',
-        escalationCount: item.escalationCount + 1,
-        approvalHistory: [...item.approvalHistory, newHistory]
-      }
-    }))
-  }
+      const newItems = [...prevItems];
+      newItems[itemIndex] = item;
+      return newItems;
+    });
+    setSelectedItem(null);
+  };
 
   const batchApprove = (itemIds: string[], comments?: string) => {
-    itemIds.forEach(id => approveItem(id, comments))
-    setSelectedItems([])
-    setShowBatchModal(false)
-  }
+    itemIds.forEach(id => approveItem(id, comments));
+    setSelectedItems([]);
+  };
 
-  const filteredItems = approvalItems.filter(item => {
-    const matchesSearch = searchTerm === '' || 
-      item.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.contractorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredItems = approvalItems
+    .filter(item => filters.status === 'all' || item.status === filters.status)
+    .filter(item => filters.priority === 'all' || item.priority === filters.priority)
+    .filter(item => filters.category === 'all' || item.category === filters.category)
+    .filter(item => !filters.assignedToMe || canApprove(item))
+    .filter(item => !filters.overdue || item.isOverdue)
+    .filter(item => 
+      item.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.operatorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesStatus = filters.status === 'all' || item.status === filters.status
-    const matchesPriority = filters.priority === 'all' || item.priority === filters.priority
-    const matchesLevel = filters.level === 'all' || item.currentLevel.toString() === filters.level
-    const matchesCategory = filters.category === 'all' || item.category === filters.category
-    const matchesAssignedToMe = !filters.assignedToMe || canApprove(item)
-    const matchesOverdue = !filters.overdue || item.isOverdue
-    
-    return matchesSearch && matchesStatus && matchesPriority && matchesLevel && 
-           matchesCategory && matchesAssignedToMe && matchesOverdue
-  })
+    );
 
-  const stats = {
-    total: approvalItems.length,
+  const dashboardStats = {
     pending: approvalItems.filter(i => i.status === 'pending').length,
-    myQueue: approvalItems.filter(i => canApprove(i)).length,
-    overdue: approvalItems.filter(i => i.isOverdue).length,
-    urgent: approvalItems.filter(i => i.priority === 'urgent').length,
-    totalValue: approvalItems.reduce((sum, item) => sum + item.amount, 0),
-    avgApprovalTime: 2.5, // hours
-    approvalRate: Math.round((approvalItems.filter(i => i.status === 'approved').length / approvalItems.length) * 100)
+    approved: approvalItems.filter(i => i.status === 'approved').length,
+    rejected: approvalItems.filter(i => i.status === 'rejected').length,
+    escalated: approvalItems.filter(i => i.status === 'escalated').length,
+    totalValue: approvalItems.reduce((acc, i) => acc + i.amount, 0),
+    avgApprovalTime: approvalItems.length > 0
+      ? approvalItems.flatMap(i => i.approvalHistory.map(h => h.timeSpent)).reduce((a, b) => a + b, 0) / 
+        (approvalItems.flatMap(i => i.approvalHistory).length || 1)
+      : 0
+  };
+  
+  const handleItemSelect = (id: string) => {
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])
+  }
+  
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedItems(filteredItems.map(i => i.id))
+    } else {
+      setSelectedItems([])
+    }
   }
 
-  const selectedItemData = selectedItem ? approvalItems.find(i => i.id === selectedItem) : null
-
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Approval Workflow</h1>
-            <p className="text-gray-600">Manage invoice approvals with role-based workflow</p>
-          </div>
-          <div className="flex space-x-3">
-            <button 
-              onClick={() => setShowBatchModal(true)}
-              disabled={selectedItems.length === 0}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              <CheckCircle className="w-4 h-4" />
-              <span>Batch Approve ({selectedItems.length})</span>
-            </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Export Report</span>
-            </button>
-            <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center space-x-2">
-              <Settings className="w-4 h-4" />
-              <span>Settings</span>
-            </button>
+  const renderDashboard = () => (
+    <div className="p-6">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6">Approval Dashboard</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard icon={<Clock/>} title="Pending Approvals" value={dashboardStats.pending} color="yellow" />
+        <StatCard icon={<CheckCircle/>} title="Approved This Month" value={dashboardStats.approved} color="green" />
+        <StatCard icon={<XCircle/>} title="Rejected This Month" value={dashboardStats.rejected} color="red" />
+        <StatCard icon={<TrendingUp/>} title="Total Value Pending" value={`$${(dashboardStats.totalValue/1000).toFixed(1)}k`} color="blue" />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Pending Items by Category</h3>
+          {/* Placeholder for a chart */}
+          <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
+            <p className="text-gray-500">Category breakdown chart</p>
           </div>
         </div>
-
-        {/* View Mode Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {[
-              { key: 'dashboard', label: 'Dashboard', icon: TrendingUp },
-              { key: 'list', label: 'Approval Queue', icon: Clipboard },
-              { key: 'detail', label: 'Item Detail', icon: Eye, disabled: !selectedItem }
-            ].map(({ key, label, icon: Icon, disabled }) => (
-              <button
-                key={key}
-                onClick={() => !disabled && setViewMode(key as any)}
-                disabled={disabled}
-                className={`${
-                  viewMode === key
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{label}</span>
-              </button>
-            ))}
-          </nav>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Approval Performance</h3>
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Avg. Approval Time</span>
+              <span className="font-bold text-gray-800">{dashboardStats.avgApprovalTime.toFixed(1)} mins</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">SLA Compliance</span>
+              <span className="font-bold text-green-600">98.5%</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Auto-Escalations</span>
+              <span className="font-bold text-orange-500">{dashboardStats.escalated}</span>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  )
 
-      {/* Dashboard View */}
-      {viewMode === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Alert Banner */}
-          {stats.urgent > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 border border-red-200 rounded-lg p-4"
-            >
-              <div className="flex items-center">
-                <Bell className="w-5 h-5 text-red-600 mr-3" />
-                <div>
-                  <h3 className="text-lg font-semibold text-red-800">Urgent Approvals Required</h3>
-                  <p className="text-red-700">{stats.urgent} urgent items need immediate attention</p>
-                </div>
-                <button 
-                  onClick={() => {
-                    setFilters(prev => ({ ...prev, priority: 'urgent' }))
-                    setViewMode('list')
-                  }}
-                  className="ml-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                >
-                  View Urgent
-                </button>
-              </div>
-            </motion.div>
-          )}
+  const StatCard = ({ icon, title, value, color }: {icon: React.ReactNode, title: string, value: string | number, color: string}) => {
+    const colors: { [key: string]: string } = {
+      yellow: 'text-yellow-600 bg-yellow-100',
+      green: 'text-green-600 bg-green-100',
+      red: 'text-red-600 bg-red-100',
+      blue: 'text-blue-600 bg-blue-100',
+    }
+    return (
+      <div className="bg-white p-5 rounded-lg shadow flex items-center">
+        <div className={`p-3 rounded-full ${colors[color]}`}>{icon}</div>
+        <div className="ml-4">
+          <p className="text-sm text-gray-500 font-medium">{title}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
+        </div>
+      </div>
+    )
+  }
 
-          {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { label: 'Total Items', value: stats.total, color: 'blue', icon: FileText },
-              { label: 'My Queue', value: stats.myQueue, color: 'green', icon: UserCheck },
-              { label: 'Overdue', value: stats.overdue, color: 'red', icon: Timer },
-              { label: 'Pending', value: stats.pending, color: 'yellow', icon: Clock }
-            ].map((stat) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    <p className="text-sm text-gray-600">{stat.label}</p>
-                  </div>
-                  <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                    <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
-                  </div>
-                </div>
-              </motion.div>
+  const renderList = () => (
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search tickets..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+            <FilterPill active={filters.status === 'all'} onClick={() => setFilters(f => ({ ...f, status: 'all' }))}>All</FilterPill>
+            <FilterPill active={filters.status === 'pending'} onClick={() => setFilters(f => ({ ...f, status: 'pending' }))}>Pending</FilterPill>
+            <FilterPill active={filters.status === 'approved'} onClick={() => setFilters(f => ({ ...f, status: 'approved' }))}>Approved</FilterPill>
+        </div>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" className="p-4"><input type="checkbox" onChange={handleSelectAll} checked={selectedItems.length === filteredItems.length && filteredItems.length > 0} className="rounded border-gray-300 text-green-600 focus:ring-green-500" /></th>
+              <th scope="col" className="px-6 py-3">Ticket Info</th>
+              <th scope="col" className="px-6 py-3">Amount</th>
+              <th scope="col" className="px-6 py-3">Status</th>
+              <th scope="col" className="px-6 py-3">Due Date</th>
+              <th scope="col" className="px-6 py-3">Priority</th>
+              <th scope="col" className="px-6 py-3">Approver</th>
+              <th scope="col" className="px-6 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredItems.map(item => (
+              <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
+                <td className="w-4 p-4"><input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemSelect(item.id)} className="rounded border-gray-300 text-green-600 focus:ring-green-500" /></td>
+                <td className="px-6 py-4">
+                  <div className="font-semibold text-gray-900">{item.ticketNumber}</div>
+                  <div className="text-xs text-gray-500">{item.operatorName}</div>
+                </td>
+                <td className="px-6 py-4 font-semibold text-gray-800">${item.amount.toLocaleString()}</td>
+                <td className="px-6 py-4"><span className={`inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium ${getStatusInfo(item.status).bg} ${getStatusInfo(item.status).color}`}>{getStatusInfo(item.status).icon} {item.status}</span></td>
+                <td className="px-6 py-4">{new Date(item.dueDate).toLocaleDateString()}</td>
+                <td className="px-6 py-4"><span className={`inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md text-xs font-medium ${getPriorityInfo(item.priority).bg} ${getPriorityInfo(item.priority).color}`}>{getPriorityInfo(item.priority).icon} {getPriorityInfo(item.priority).label}</span></td>
+                <td className="px-6 py-4">
+                  <div className="font-medium text-gray-800">Level {item.currentLevel}/{item.maxLevel}</div>
+                  <div className="text-xs text-gray-500">{getApprovalRule(item.amount)?.requiredRoles[item.currentLevel - 1]}</div>
+                </td>
+                <td className="px-6 py-4">
+                  <button onClick={() => { setSelectedItem(item.id); setViewMode('detail'); }} className="font-medium text-green-600 hover:underline">Details</button>
+                </td>
+              </tr>
             ))}
-          </div>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+  
+  const FilterPill = ({ children, active, onClick }: { children: React.ReactNode, active: boolean, onClick: () => void }) => (
+    <button onClick={onClick} className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${active ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+        {children}
+    </button>
+  )
 
-          {/* Approval Pipeline & Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Approval Pipeline</h3>
-              <div className="space-y-4">
-                {[
-                  { level: 'Manager', count: 8, color: 'blue' },
-                  { level: 'Senior Manager', count: 5, color: 'green' },
-                  { level: 'Finance Director', count: 3, color: 'yellow' },
-                  { level: 'CEO', count: 1, color: 'red' }
-                ].map((level) => (
-                  <div key={level.level} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full bg-${level.color}-500`} />
-                      <span className="text-gray-900">{level.level}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`bg-${level.color}-500 h-2 rounded-full`}
-                          style={{ width: `${(level.count / stats.pending) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-gray-900 w-4">{level.count}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+  const renderDetail = () => {
+    const item = approvalItems.find(i => i.id === selectedItem)
+    if (!item) return null
 
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">${(stats.totalValue / 1000000).toFixed(1)}M</p>
-                    <p className="text-sm text-blue-600">Total Value</p>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">2.5h</p>
-                    <p className="text-sm text-green-600">Avg Time</p>
-                  </div>
+    return (
+      <div className="p-6 bg-gray-50">
+        <button onClick={() => setViewMode('list')} className="text-green-600 hover:text-green-800 mb-4">&larr; Back to list</button>
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-900">{item.ticketNumber}</h2>
+                    <p className="text-gray-500">{item.operatorName} - {item.description}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-gray-900">95%</p>
-                  <p className="text-sm text-gray-600">Approval Rate</p>
+                <div className={`p-2 rounded-lg text-sm font-semibold ${getStatusInfo(item.status).bg} ${getStatusInfo(item.status).color}`}>
+                    {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                 </div>
-              </div>
             </div>
-          </div>
-
-          {/* Recent Items */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Items Requiring Your Approval</h3>
-              <button 
-                onClick={() => setViewMode('list')}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                View All →
-              </button>
-            </div>
-            <div className="space-y-3">
-              {filteredItems
-                .filter(item => canApprove(item))
-                .slice(0, 5)
-                .map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-gray-600">
-                        {getStatusIcon(item.status)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{item.invoiceNumber}</p>
-                        <p className="text-sm text-gray-600">{item.contractorName}</p>
-                      </div>
+            {/* Main content grid */}
+            <div className="grid md:grid-cols-3 gap-6">
+                {/* Left Column: Details */}
+                <div className="md:col-span-2 space-y-6">
+                    {/* Key Details */}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <InfoItem icon={<DollarSign/>} label="Amount" value={`$${item.amount.toLocaleString()}`} />
+                        <InfoItem icon={<Calendar/>} label="Submitted Date" value={new Date(item.submittedDate).toLocaleDateString()} />
+                        <InfoItem icon={<UserCheck/>} label="Submitted By" value={item.submittedBy} />
+                        <InfoItem icon={<Clock/>} label="Due Date" value={new Date(item.dueDate).toLocaleDateString()} />
+                        <InfoItem icon={<Drill/>} label="Category" value={item.category} />
+                        <InfoItem icon={<FileText/>} label="AFE Number" value={item.afeNumber || 'N/A'} />
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900">${item.amount.toLocaleString()}</p>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
-                          {item.priority.toUpperCase()}
-                        </span>
-                      </div>
-                      <button 
-                        onClick={() => {
-                          setSelectedItem(item.id)
-                          setViewMode('detail')
-                        }}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                      >
-                        Review
-                      </button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* List View */}
-      {viewMode === 'list' && (
-        <div className="space-y-6">
-          {/* Filters */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-              <div className="lg:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search invoices..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="escalated">Escalated</option>
-              </select>
-              
-              <select
-                value={filters.priority}
-                onChange={(e) => setFilters(prev => ({ ...prev, priority: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Priority</option>
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
-              
-              <select
-                value={filters.level}
-                onChange={(e) => setFilters(prev => ({ ...prev, level: e.target.value }))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Levels</option>
-                <option value="1">Level 1</option>
-                <option value="2">Level 2</option>
-                <option value="3">Level 3</option>
-                <option value="4">Level 4</option>
-              </select>
-              
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={filters.assignedToMe}
-                    onChange={(e) => setFilters(prev => ({ ...prev, assignedToMe: e.target.checked }))}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">My Queue</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Items List */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedItems(filteredItems.map(item => item.id))
-                        } else {
-                          setSelectedItems([])
-                        }
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm font-medium text-gray-700">
-                      Select All ({filteredItems.length})
-                    </span>
-                  </label>
-                  {selectedItems.length > 0 && (
-                    <span className="text-sm text-gray-600">
-                      {selectedItems.length} selected
-                    </span>
-                  )}
-                </div>
-                
-                {selectedItems.length > 0 && (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setShowBatchModal(true)}
-                      className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-                    >
-                      Batch Approve
-                    </button>
-                    <button className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                      Batch Reject
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="divide-y divide-gray-200">
-              {filteredItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="px-6 py-4 hover:bg-gray-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedItems(prev => [...prev, item.id])
-                          } else {
-                            setSelectedItems(prev => prev.filter(id => id !== item.id))
-                          }
-                        }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      
-                      <div className="flex items-center space-x-3">
-                        {getStatusIcon(item.status)}
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <p className="font-medium text-gray-900">{item.invoiceNumber}</p>
-                            {item.isOverdue && (
-                              <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                                OVERDUE
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600">{item.contractorName}</p>
-                          <p className="text-xs text-gray-500">{item.description}</p>
+                    {/* Approval Timeline */}
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Approval History</h3>
+                        <div className="border-l-2 border-gray-200 pl-4 space-y-6">
+                            {item.approvalHistory.map(h => (
+                                <div key={h.id} className="relative">
+                                    <div className="absolute -left-[2.8rem] top-1.5 w-4 h-4 bg-green-500 rounded-full border-4 border-white"></div>
+                                    <p className="font-semibold text-gray-800">{h.action.charAt(0).toUpperCase() + h.action.slice(1)} by {h.approver} ({h.role})</p>
+                                    <p className="text-sm text-gray-500">{new Date(h.timestamp).toLocaleString()}</p>
+                                    {h.comments && <p className="text-sm bg-gray-100 p-2 mt-2 rounded-md">"{h.comments}"</p>}
+                                </div>
+                            ))}
                         </div>
-                      </div>
                     </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900">${item.amount.toLocaleString()}</p>
-                        <p className="text-sm text-gray-600">Level {item.currentLevel}/{item.maxLevel}</p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(item.priority)}`}>
-                          {item.priority.toUpperCase()}
-                        </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                          {item.status.toUpperCase()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => {
-                            setSelectedItem(item.id)
-                            setViewMode('detail')
-                          }}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        
-                        {canApprove(item) && (
-                          <>
-                            <button
-                              onClick={() => approveItem(item.id)}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                const reason = prompt('Rejection reason:')
-                                if (reason) rejectItem(item.id, reason)
-                              }}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </>
+                </div>
+                {/* Right Column: Actions */}
+                <div className="space-y-6">
+                    <div className="bg-gray-100 p-4 rounded-lg">
+                        <h3 className="font-semibold text-gray-800 mb-3">Actions</h3>
+                        {canApprove(item) ? (
+                            <div className="space-y-2">
+                                <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Approve</button>
+                                <button className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">Reject</button>
+                                <button onClick={() => escalateItem(item.id)} className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">Escalate</button>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-gray-600">No actions available for you at this stage.</p>
                         )}
-                        
-                        <button className="text-gray-600 hover:text-gray-900">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-800 mb-3">Attachments ({item.attachments.length})</h3>
+                      <div className="space-y-2">
+                          {item.attachments.map(att => (
+                              <a key={att} href="#" className="flex items-center text-sm text-green-600 hover:underline">
+                                  <Download className="w-4 h-4 mr-2"/> {att}
+                              </a>
+                          ))}
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                </div>
             </div>
-          </div>
         </div>
-      )}
+      </div>
+    )
+  }
+  
+  const InfoItem = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
+    <div className="flex items-start">
+        <div className="text-gray-400 mt-0.5">{icon}</div>
+        <div className="ml-3">
+            <p className="text-xs text-gray-500">{label}</p>
+            <p className="font-semibold text-gray-800">{value}</p>
+        </div>
+    </div>
+  )
 
-      {/* Detail View */}
-      {viewMode === 'detail' && selectedItemData && (
-        <div className="space-y-6">
-          {/* Item Header */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedItemData.invoiceNumber}</h2>
-                <p className="text-gray-600">{selectedItemData.contractorName}</p>
-                <p className="text-sm text-gray-500">{selectedItemData.description}</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(selectedItemData.priority)}`}>
-                  {selectedItemData.priority.toUpperCase()} PRIORITY
-                </span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedItemData.status)}`}>
-                  {selectedItemData.status.toUpperCase()}
-                </span>
-              </div>
-            </div>
 
-            {/* Item Details */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                <p className="text-lg font-semibold text-gray-900">${selectedItemData.amount.toLocaleString()}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Approval Level</label>
-                <p className="text-gray-900">{selectedItemData.currentLevel}/{selectedItemData.maxLevel}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Submitted Date</label>
-                <p className="text-gray-900">{selectedItemData.submittedDate.toLocaleDateString()}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <p className={`${selectedItemData.isOverdue ? 'text-red-600 font-medium' : 'text-gray-900'}`}>
-                  {selectedItemData.dueDate.toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-
-            {/* Approval Actions */}
-            {canApprove(selectedItemData) && (
-              <div className="flex space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <button
-                  onClick={() => approveItem(selectedItemData.id, newComment)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center space-x-2"
-                >
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Approve</span>
+  return (
+    <div className="bg-gray-100 min-h-screen font-sans">
+      <div className="p-4 sm:p-6">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Approval Workflow</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage and approve field tickets efficiently.</p>
+          </div>
+          <div className="flex items-center gap-2 mt-4 sm:mt-0">
+            <button onClick={() => setViewMode('dashboard')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${viewMode === 'dashboard' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}>Dashboard</button>
+            <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${viewMode === 'list' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}>List View</button>
+            {selectedItems.length > 0 && (
+                 <button onClick={() => setShowBatchModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">
+                    Batch Actions ({selectedItems.length})
                 </button>
-                <button
-                  onClick={() => {
-                    const reason = prompt('Rejection reason:')
-                    if (reason) rejectItem(selectedItemData.id, reason)
-                  }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center space-x-2"
-                >
-                  <XCircle className="w-4 h-4" />
-                  <span>Reject</span>
-                </button>
-                <button className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 flex items-center space-x-2">
-                  <ArrowUp className="w-4 h-4" />
-                  <span>Escalate</span>
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2">
-                  <PenTool className="w-4 h-4" />
-                  <span>Digital Sign</span>
-                </button>
-              </div>
             )}
           </div>
+        </header>
 
-          {/* Approval History & Comments */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Approval History */}
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                Approval History
-              </h3>
-              
-              <div className="space-y-4">
-                {selectedItemData.approvalHistory.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">No approval history yet</p>
-                ) : (
-                  selectedItemData.approvalHistory.map((entry) => (
-                    <div key={entry.id} className="border-l-4 border-blue-200 pl-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{entry.approver}</p>
-                          <p className="text-sm text-gray-600">{entry.role} • Level {entry.level}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            entry.action === 'approved' ? 'bg-green-100 text-green-800' :
-                            entry.action === 'rejected' ? 'bg-red-100 text-red-800' :
-                            entry.action === 'escalated' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {entry.action.toUpperCase()}
-                          </span>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {entry.timestamp.toLocaleDateString()} {entry.timestamp.toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                      {entry.comments && (
-                        <p className="text-gray-700 mt-2 text-sm">{entry.comments}</p>
-                      )}
-                      {entry.signature && (
-                        <div className="flex items-center mt-2 text-xs text-green-600">
-                          <PenTool className="w-3 h-3 mr-1" />
-                          <span>Digitally Signed</span>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Comments */}
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Comments & Notes
-              </h3>
-              
-              <div className="space-y-4 mb-4">
-                <div className="border-l-4 border-yellow-200 pl-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">System</p>
-                      <p className="text-sm text-gray-600">Auto-generated</p>
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      {selectedItemData.submittedDate.toLocaleDateString()}
-                    </p>
-                  </div>
-                  <p className="text-gray-700 mt-2 text-sm">
-                    Invoice submitted for approval. Amount: ${selectedItemData.amount.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="border-t pt-4">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 resize-none"
-                  rows={3}
-                />
-                <div className="mt-2 flex justify-end">
-                  <button
-                    onClick={() => {
-                      // Add comment logic here
-                      setNewComment('')
-                    }}
-                    disabled={!newComment.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300"
-                  >
-                    Add Comment
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Attachments */}
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <FileText className="w-5 h-5 mr-2" />
-              Attachments
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {selectedItemData.attachments.map((attachment, index) => (
-                <div key={index} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                  <FileText className="w-8 h-8 text-blue-600 mr-3" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{attachment}</p>
-                    <p className="text-sm text-gray-600">PDF Document</p>
-                  </div>
-                  <button className="text-blue-600 hover:text-blue-800">
-                    <Download className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div>
+          {viewMode === 'dashboard' && renderDashboard()}
+          {viewMode === 'list' && renderList()}
+          {viewMode === 'detail' && renderDetail()}
         </div>
-      )}
-
-      {/* Batch Approval Modal */}
-      <AnimatePresence>
-        {showBatchModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-            onClick={() => setShowBatchModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white p-6 rounded-lg max-w-md w-full mx-4"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Batch Approval</h3>
-              <p className="text-gray-600 mb-4">
-                You are about to approve {selectedItems.length} items. This action cannot be undone.
-              </p>
-              <textarea
-                placeholder="Add approval comments (optional)..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 resize-none mb-4"
-                rows={3}
-              />
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowBatchModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    selectedItems.forEach(id => approveItem(id, 'Batch approval'))
-                    setSelectedItems([])
-                    setShowBatchModal(false)
-                  }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  Approve All
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   )
 }

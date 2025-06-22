@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { 
-  Building2, 
+  Drill, 
   ArrowRight, 
   Mail, 
   Phone, 
@@ -22,279 +22,198 @@ export default function ContactSales() {
     email: '',
     company: '',
     phone: '',
-    projectSize: '',
+    operationSize: '',
     message: ''
   });
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
     console.log('Form submitted:', formData);
-    // Redirect to success page or show confirmation
     router.push('/success');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       {/* Header */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Building2 className="w-8 h-8 text-blue-600 mr-2" />
+              <Drill className="w-8 h-8 text-green-600 mr-2" />
               <span className="text-2xl font-bold text-gray-900">
-                <span className="text-blue-600">Invoice</span>Patch
+                <span className="text-green-600">Invoice</span>Patch
               </span>
             </div>
             <button
               onClick={() => router.push('/manager-marketing')}
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 hover:text-green-600 transition-colors"
             >
-              Back to Marketing
+              Back to Features
             </button>
           </div>
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* Left Column - Contact Form */}
           <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="bg-white rounded-2xl p-8 shadow-xl"
+            className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg"
           >
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Let's Build Something Great Together
+              Optimize Your Field Operations
             </h1>
             <p className="text-lg text-gray-600 mb-8">
-              Get a custom solution tailored to your construction company's needs. 
-              Our enterprise team will work with you to create the perfect workflow.
+              Get a custom solution tailored to your oil & gas company's needs. 
+              Our enterprise team will help you design the perfect workflow.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                   <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    type="text" id="name" name="name" required
+                    value={formData.name} onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="John Smith"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Work Email *
-                  </label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Work Email *</label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    placeholder="john@company.com"
+                    type="email" id="email" name="email" required
+                    value={formData.email} onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="john@youroperations.com"
                   />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                    Company Name *
-                  </label>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">Company Name *</label>
                   <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    required
-                    value={formData.company}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    placeholder="ABC Construction"
+                    type="text" id="company" name="company" required
+                    value={formData.company} onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Precision Flow Services"
                   />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                   <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    type="tel" id="phone" name="phone"
+                    value={formData.phone} onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="projectSize" className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Size *
-                </label>
+                <label htmlFor="operationSize" className="block text-sm font-medium text-gray-700 mb-2">Operation Size *</label>
                 <select
-                  id="projectSize"
-                  name="projectSize"
-                  required
-                  value={formData.projectSize}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  id="operationSize" name="operationSize" required
+                  value={formData.operationSize} onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
-                  <option value="">Select project size</option>
-                  <option value="small">Small (1-10 contractors)</option>
-                  <option value="medium">Medium (11-50 contractors)</option>
-                  <option value="large">Large (51-200 contractors)</option>
-                  <option value="enterprise">Enterprise (200+ contractors)</option>
+                  <option value="">Select your scale</option>
+                  <option value="small">Small (1-10 Sub-Contractors)</option>
+                  <option value="medium">Medium (11-50 Sub-Contractors)</option>
+                  <option value="large">Large (51-200 Sub-Contractors)</option>
+                  <option value="enterprise">Enterprise (200+ Sub-Contractors)</option>
                 </select>
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Tell us about your needs
-                </label>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">How can we help?</label>
                 <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  placeholder="Describe your current challenges and what you're looking for..."
+                  id="message" name="message" rows={4}
+                  value={formData.message} onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Describe your current field ticket and payment challenges..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 group"
+                className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 group"
               >
-                <span>Get Custom Quote</span>
+                <span>Request a Custom Demo</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </form>
           </motion.div>
 
-          {/* Right Column - Information */}
-          <motion.div
+          {/* Right Column - Benefits */}
+          <motion.div 
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="space-y-8"
+            className="pt-8"
           >
-            {/* Contact Methods */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
-              
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Email Sales Team</div>
-                    <div className="text-gray-600">sales@invoicepatch.com</div>
-                  </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Enterprise-Grade Solution</h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Our platform is built for the demands of the oil and gas industry, providing security, scalability, and dedicated support.
+            </p>
+            
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                  <Shield className="w-6 h-6 text-green-600" />
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Phone className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Call Sales</div>
-                    <div className="text-gray-600">+1 (800) 555-0123</div>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Advanced Security</h3>
+                  <p className="text-gray-600">SOC 2 Type II compliance and data encryption at rest and in transit.</p>
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">Schedule Demo</div>
-                    <div className="text-gray-600">Book a personalized demo</div>
-                  </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                  <Zap className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Custom Integrations</h3>
+                  <p className="text-gray-600">Seamlessly connect with your existing ERP, accounting, and EHS systems.</p>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Dedicated Support</h3>
+                  <p className="text-gray-600">Get a dedicated account manager and priority support for your entire team.</p>
                 </div>
               </div>
             </div>
 
-            {/* Enterprise Features */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Enterprise Features</h3>
-              
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Or Contact Us Directly</h3>
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Custom integrations & APIs</span>
+                <div className="flex items-center text-gray-700">
+                  <Mail className="w-5 h-5 mr-3 text-green-600" />
+                  <a href="mailto:sales@invoicepatch.com" className="hover:text-green-700">sales@invoicepatch.com</a>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Dedicated account manager</span>
+                <div className="flex items-center text-gray-700">
+                  <Phone className="w-5 h-5 mr-3 text-green-600" />
+                  <span>+1 (800) 555-0199</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">White-label solutions</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Advanced security & compliance</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">Custom workflows & automation</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">SLA guarantees</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
-              <h3 className="text-xl font-bold mb-6">Trusted by Industry Leaders</h3>
-              
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <Users className="w-8 h-8 mx-auto mb-2 opacity-80" />
-                  <div className="text-2xl font-bold">500+</div>
-                  <div className="text-sm opacity-80">Companies</div>
-                </div>
-                <div>
-                  <Shield className="w-8 h-8 mx-auto mb-2 opacity-80" />
-                  <div className="text-2xl font-bold">SOC 2</div>
-                  <div className="text-sm opacity-80">Compliant</div>
-                </div>
-                <div>
-                  <Zap className="w-8 h-8 mx-auto mb-2 opacity-80" />
-                  <div className="text-2xl font-bold">99.9%</div>
-                  <div className="text-sm opacity-80">Uptime</div>
+                <div className="flex items-center text-gray-700">
+                  <Calendar className="w-5 h-5 mr-3 text-green-600" />
+                  <span>Mon - Fri, 8am - 6pm CST</span>
                 </div>
               </div>
             </div>

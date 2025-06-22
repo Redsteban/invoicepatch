@@ -1,19 +1,18 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Building2, HardHat, ArrowRight, Zap } from 'lucide-react';
+import { Drill, HardHat, ArrowRight, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
-  const { setRole, role } = useRole();
+  const { setRole } = useRole();
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
 
   useEffect(() => {
-    // Check if user has previously selected a role
     const savedRole = localStorage.getItem('userRole');
     if (savedRole && (savedRole === 'manager' || savedRole === 'contractor')) {
       setIsReturningUser(true);
@@ -22,58 +21,29 @@ export default function Home() {
 
   const handleRoleSelection = (selectedRole: 'manager' | 'contractor') => {
     setShowTransition(true);
-    
-    // Set role using context (which handles localStorage and cookies)
     setRole(selectedRole);
-    
-    // Add smooth transition delay
     setTimeout(() => {
-      // Redirect to appropriate landing page
-      if (selectedRole === 'manager') {
-        router.push('/manager-landing');
-      } else {
-        router.push('/contractor-landing');
-      }
+      const targetPath = selectedRole === 'manager' ? '/manager-landing' : '/contractor-landing';
+      router.push(targetPath);
     }, 300);
   };
 
   const handleSkipToDashboard = () => {
     const savedRole = localStorage.getItem('userRole');
-    if (savedRole === 'manager') {
-      router.push('/manager/dashboard');
-    } else if (savedRole === 'contractor') {
-      router.push('/contractor/dashboard');
-    }
+    const targetPath = savedRole === 'manager' ? '/manager/dashboard' : '/contractor/dashboard';
+    router.push(targetPath);
   };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } }
   };
 
-  const staggerChildren = {
-    visible: {
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const cardHover = {
-    hover: {
-      y: -8,
-      scale: 1.02,
-      transition: { duration: 0.3, ease: "easeOut" }
-    }
-  };
+  const staggerChildren = { visible: { transition: { staggerChildren: 0.2 } } };
+  const cardHover = { hover: { y: -8, scale: 1.02, transition: { duration: 0.3, ease: 'easeOut' } } };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center px-4">
-      {/* Transition Overlay */}
+    <main className="min-h-screen bg-gray-50 text-gray-800 flex items-center justify-center px-4">
       {showTransition && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -83,201 +53,114 @@ export default function Home() {
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              className="w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full mx-auto mb-4"
             />
-            <p className="text-gray-600">Loading your experience...</p>
+            <p className="text-gray-600">Configuring your dashboard...</p>
           </div>
         </motion.div>
       )}
 
       <div className="max-w-5xl mx-auto w-full">
-        {/* Returning User Quick Access */}
         {isReturningUser && (
-          <motion.div
-            variants={fadeInUp}
-            initial="hidden"
-            animate="visible"
-            className="text-center mb-8"
-          >
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 max-w-md mx-auto">
+          <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="text-center mb-8">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm max-w-md mx-auto">
               <div className="flex items-center justify-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-green-600" />
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome back!</h3>
-              <p className="text-gray-600 mb-4">Skip to your dashboard or explore a different role</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome Back!</h3>
+              <p className="text-gray-600 mb-4">Jump straight to your dashboard or select a different role.</p>
               <button
                 onClick={handleSkipToDashboard}
-                className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
               >
                 <Zap className="w-4 h-4" />
-                <span>Skip to Dashboard</span>
+                <span>Go to Dashboard</span>
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* Company Branding */}
-        <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          className="text-center mb-16"
-        >
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="text-center mb-16">
           <h1 className="text-6xl font-bold text-gray-900 mb-4">
             <span className="text-green-600">Invoice</span>Patch
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Streamlined invoice processing for construction teams
+            Streamlined Field Ticket Processing for Oil & Gas Operations
           </p>
         </motion.div>
 
-        {/* Role Selection Header */}
-        <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          className="text-center mb-12"
-        >
+        <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            {isReturningUser ? "Choose your role" : "Welcome! What's your role?"}
+            {isReturningUser ? "Review Your Role" : "Identify Your Role"}
           </h2>
           <p className="text-lg text-gray-600">
-            {isReturningUser 
-              ? "Select a role to explore different features and capabilities"
-              : "Choose your role to access the right tools and features for you"
-            }
+            {isReturningUser ? "Select a role to explore different features" : "Choose your role to get started."}
           </p>
         </motion.div>
 
-        {/* Role Selection Cards */}
-        <motion.div
-          variants={staggerChildren}
-          initial="hidden"
-          animate="visible"
-          className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto"
-        >
-          {/* Manager Card */}
+        <motion.div variants={staggerChildren} initial="hidden" animate="visible" className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <motion.div variants={fadeInUp}>
             <motion.button
               onClick={() => handleRoleSelection('manager')}
               variants={cardHover}
               whileHover="hover"
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-white rounded-3xl p-10 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 group text-left"
+              className="w-full h-full bg-white rounded-3xl p-10 border border-gray-200 hover:border-green-600/50 hover:shadow-lg transition-all duration-300 group text-left flex flex-col"
             >
-              <div className="flex flex-col items-center text-center">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-blue-200 transition-colors">
-                  <Building2 className="w-10 h-10 text-blue-600" />
+              <div className="flex-grow">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                  <Drill className="w-10 h-10 text-green-600" />
                 </div>
-
-                {/* Title */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  I'm a Manager
-                </h3>
-
-                {/* Description */}
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Operations Manager</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Process contractor invoices, manage approvals, handle payroll reconciliation, and access detailed analytics
+                  Process field tickets, manage approvals, reconcile costs, and access detailed operational analytics.
                 </p>
-
-                {/* Features List */}
                 <div className="space-y-2 mb-6 text-sm text-gray-700">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    Invoice processing & approval workflows
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    Contractor management & oversight
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    Payroll reconciliation & reporting
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                    Advanced analytics & insights
-                  </div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Field ticket validation</div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Sub-contractor management</div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Cost tracking & AFE reconciliation</div>
                 </div>
-
-                {/* CTA */}
-                <div className="flex items-center text-blue-600 font-semibold group-hover:text-blue-700 transition-colors">
-                  Explore Manager Experience
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </div>
+              </div>
+              <div className="mt-auto pt-4 border-t border-gray-200">
+                <span className="font-semibold text-green-600 flex items-center">
+                  Select Manager Role <ArrowRight className="w-4 h-4 ml-2" />
+                </span>
               </div>
             </motion.button>
           </motion.div>
 
-          {/* Contractor Card */}
           <motion.div variants={fadeInUp}>
             <motion.button
               onClick={() => handleRoleSelection('contractor')}
               variants={cardHover}
               whileHover="hover"
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-white rounded-3xl p-10 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 group text-left"
+              className="w-full h-full bg-white rounded-3xl p-10 border border-gray-200 hover:border-green-600/50 hover:shadow-lg transition-all duration-300 group text-left flex flex-col"
             >
-              <div className="flex flex-col items-center text-center">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 group-hover:bg-green-200 transition-colors">
+              <div className="flex-grow">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                   <HardHat className="w-10 h-10 text-green-600" />
                 </div>
-
-                {/* Title */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  I'm a Contractor
-                </h3>
-
-                {/* Description */}
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Field Sub-Contractor</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Create and submit invoices, track project time, manage expenses, and monitor payment status
+                  Submit daily field tickets, track your work hours, log equipment usage, and monitor payment status.
                 </p>
-
-                {/* Features List */}
                 <div className="space-y-2 mb-6 text-sm text-gray-700">
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    Automated invoice generation
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    Time tracking & project management
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    Expense tracking & receipts
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                    Payment status & history
-                  </div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Daily field ticket submission</div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Real-time hour and equipment logging</div>
+                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Automated payment tracking</div>
                 </div>
-
-                {/* CTA */}
-                <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700 transition-colors">
-                  Explore Contractor Experience
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </div>
+              </div>
+              <div className="mt-auto pt-4 border-t border-gray-200">
+                <span className="font-semibold text-green-600 flex items-center">
+                  Select Contractor Role <ArrowRight className="w-4 h-4 ml-2" />
+                </span>
               </div>
             </motion.button>
           </motion.div>
-        </motion.div>
-
-        {/* Footer Note */}
-        <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          className="text-center mt-12"
-        >
-          <p className="text-gray-500 text-sm">
-            Your role selection is saved for future visits. You can always change it later.
-          </p>
         </motion.div>
       </div>
     </main>

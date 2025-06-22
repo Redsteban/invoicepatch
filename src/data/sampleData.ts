@@ -86,16 +86,16 @@ export interface Testimonial {
 export const sampleContractors: Contractor[] = [
   {
     id: "CNT-001",
-    name: "John Martinez",
-    company: "Martinez Construction LLC",
-    email: "john@martinezconstruction.com",
+    name: "John Baker",
+    company: "Baker Oilfield Services",
+    email: "john@bakeroilfield.com",
     phone: "(555) 123-4567",
-    address: "1234 Industrial Blvd, Austin, TX 78745",
-    industry: "Construction",
-    specialty: ["Commercial Building", "Concrete Work", "Site Preparation"],
+    address: "1234 Rig Road, Midland, TX 79701",
+    industry: "Oil & Gas Services",
+    specialty: ["Well Servicing", "Flowback", "Water Hauling"],
     rating: 4.8,
     yearsExperience: 15,
-    certifications: ["OSHA 30", "Licensed General Contractor", "Bonded & Insured"],
+    certifications: ["H2S Alive", "PEC Safeland", "First Aid & CPR"],
     preferredPaymentTerms: "Net 30",
     taxId: "12-3456789",
     registrationDate: "2019-03-15",
@@ -103,20 +103,20 @@ export const sampleContractors: Contractor[] = [
     totalAmountBilled: 2450000,
     averageProcessingTime: 2.1,
     complianceScore: 95.2,
-    avatar: "/avatars/john-martinez.jpg"
+    avatar: "/avatars/john-baker.jpg"
   },
   {
     id: "CNT-002",
     name: "Sarah Chen",
-    company: "Chen Electrical Services",
-    email: "sarah@chenelectrical.com",
+    company: "Chen Energy Logistics",
+    email: "sarah@chenenergy.com",
     phone: "(555) 234-5678",
-    address: "567 Tech Drive, San Jose, CA 95110",
-    industry: "Electrical",
-    specialty: ["Industrial Wiring", "Smart Systems", "Emergency Repairs"],
+    address: "567 Pipeline Ave, Houston, TX 77002",
+    industry: "Oil & Gas Logistics",
+    specialty: ["Crude Hauling", "Rig Moving", "Equipment Transport"],
     rating: 4.9,
     yearsExperience: 12,
-    certifications: ["Master Electrician", "NECA Member", "Solar Installation Certified"],
+    certifications: ["CDL with Hazmat", "DOT Compliance", "ISNetworld Certified"],
     preferredPaymentTerms: "Net 15",
     taxId: "23-4567890",
     registrationDate: "2020-01-08",
@@ -260,24 +260,24 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-001",
     contractorId: "CNT-001",
-    contractorName: "John Martinez",
-    invoiceNumber: "MC-2024-0345",
-    poNumber: "PO-789123",
+    contractorName: "Baker Oilfield Services",
+    invoiceNumber: "BOS-2024-101",
+    poNumber: "PO-12345",
     amount: 15750.00,
-    description: "Foundation work for Building A",
-    category: "Construction",
-    industry: "Construction",
-    dateIssued: "2024-01-15",
-    dateDue: "2024-02-14",
-    dateSubmitted: "2024-01-16",
-    dateProcessed: "2024-01-17",
+    description: "Flowback services for Well Site 12B",
+    category: "Well Servicing",
+    industry: "Oil & Gas",
+    dateIssued: "2024-03-01",
+    dateDue: "2024-03-31",
+    dateSubmitted: "2024-03-02",
+    dateProcessed: "2024-03-03",
     status: "approved",
     fileFormat: "PDF",
-    fileName: "MC-2024-0345.pdf",
+    fileName: "BOS-2024-101.pdf",
     lineItems: [
-      { description: "Concrete foundation", quantity: 50, unitPrice: 250.00, total: 12500.00, category: "Materials" },
-      { description: "Labor - Foundation crew", quantity: 20, unitPrice: 125.00, total: 2500.00, category: "Labor" },
-      { description: "Equipment rental", quantity: 2, unitPrice: 375.00, total: 750.00, category: "Equipment" }
+      { description: "Flowback services", quantity: 1, unitPrice: 15000.00, total: 15000.00, category: "Well Servicing" },
+      { description: "Water hauling", quantity: 1, unitPrice: 750.00, total: 750.00, category: "Transportation" },
+      { description: "Equipment rental", quantity: 1, unitPrice: 300.00, total: 300.00, category: "Equipment" }
     ],
     flags: ["Perfect Match", "Fast Processing"],
     processingTime: 1.2,
@@ -290,14 +290,14 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-002",
     contractorId: "CNT-002",
-    contractorName: "Sarah Chen",
+    contractorName: "Chen Energy Logistics",
     invoiceNumber: "CE-2024-0156",
     poNumber: "PO-456789",
     amount: 8500.00,
     submittedAmount: 8750.00,
-    description: "Electrical panel upgrade",
-    category: "Electrical",
-    industry: "Electrical",
+    description: "Crude hauling",
+    category: "Transportation",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-10",
     dateDue: "2024-01-25",
     dateSubmitted: "2024-01-11",
@@ -305,10 +305,10 @@ export const sampleInvoices: Invoice[] = [
     fileFormat: "PDF",
     fileName: "CE-2024-0156.pdf",
     lineItems: [
-      { description: "200A electrical panel", quantity: 1, unitPrice: 2500.00, total: 2500.00, category: "Materials" },
-      { description: "Installation labor", quantity: 8, unitPrice: 125.00, total: 1000.00, category: "Labor" },
-      { description: "Permits and inspection", quantity: 1, unitPrice: 250.00, total: 250.00, category: "Administrative" },
-      { description: "Additional materials", quantity: 1, unitPrice: 4750.00, total: 4750.00, category: "Materials" }
+      { description: "Crude hauling", quantity: 1, unitPrice: 8000.00, total: 8000.00, category: "Transportation" },
+      { description: "Additional materials", quantity: 1, unitPrice: 4750.00, total: 4750.00, category: "Materials" },
+      { description: "Permits and inspection", quantity: 1, unitPrice: 250.00, total: 250.00, category: "Consulting" },
+      { description: "Installation labor", quantity: 8, unitPrice: 125.00, total: 1000.00, category: "Labor" }
     ],
     flags: ["Amount Discrepancy", "Manual Review Required"],
     notes: "Submitted amount $250 higher than PO. Under review for additional materials claim.",
@@ -320,12 +320,12 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-003",
     contractorId: "CNT-003",
-    contractorName: "Mike Rodriguez",
+    contractorName: "Rodriguez HVAC Solutions",
     invoiceNumber: "RH-2024-0089",
     amount: 12300.00,
     description: "HVAC system maintenance",
-    category: "HVAC",
-    industry: "HVAC",
+    category: "Maintenance",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-05",
     dateDue: "2024-02-04",
     dateSubmitted: "2024-01-20",
@@ -333,9 +333,9 @@ export const sampleInvoices: Invoice[] = [
     fileFormat: "PDF",
     fileName: "RH-2024-0089.pdf",
     lineItems: [
-      { description: "Quarterly maintenance", quantity: 1, unitPrice: 8000.00, total: 8000.00, category: "Service" },
+      { description: "Quarterly maintenance", quantity: 1, unitPrice: 8000.00, total: 8000.00, category: "Maintenance" },
       { description: "Filter replacement", quantity: 24, unitPrice: 125.00, total: 3000.00, category: "Materials" },
-      { description: "Emergency repair", quantity: 1, unitPrice: 1300.00, total: 1300.00, category: "Service" }
+      { description: "Emergency repair", quantity: 1, unitPrice: 1300.00, total: 1300.00, category: "Maintenance" }
     ],
     flags: ["No Matching PO", "Missing Documentation"],
     notes: "No matching purchase order found in system. Contractor claims emergency work authorization.",
@@ -348,13 +348,13 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-004",
     contractorId: "CNT-004",
-    contractorName: "Lisa Thompson",
+    contractorName: "Thompson Plumbing Pros",
     invoiceNumber: "TP-2024-0234",
     poNumber: "PO-123456",
     amount: 4850.00,
     description: "Emergency pipe repair",
-    category: "Plumbing",
-    industry: "Plumbing",
+    category: "Repair",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-12",
     dateDue: "2024-02-02",
     dateSubmitted: "2024-01-13",
@@ -362,7 +362,7 @@ export const sampleInvoices: Invoice[] = [
     fileFormat: "PDF",
     fileName: "TP-2024-0234.pdf",
     lineItems: [
-      { description: "Emergency service call", quantity: 1, unitPrice: 350.00, total: 350.00, category: "Service" },
+      { description: "Emergency service call", quantity: 1, unitPrice: 350.00, total: 350.00, category: "Repair" },
       { description: "Pipe replacement", quantity: 25, unitPrice: 180.00, total: 4500.00, category: "Materials" }
     ],
     flags: ["Duplicate Detected", "Previously Paid"],
@@ -375,13 +375,13 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-005",
     contractorId: "CNT-007",
-    contractorName: "Robert Wilson",
+    contractorName: "Wilson Roofing & Repair",
     invoiceNumber: "WR-2024-0078",
     poNumber: "PO-999888",
     amount: 125000.00,
     description: "Commercial roof replacement - Phase 1",
     category: "Roofing",
-    industry: "Roofing",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-08",
     dateDue: "2024-03-08",
     dateSubmitted: "2024-01-09",
@@ -406,13 +406,13 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-006",
     contractorId: "CNT-008",
-    contractorName: "Jennifer Lee",
+    contractorName: "Lee IT Solutions",
     invoiceNumber: "LIT-2024-0445",
     poNumber: "PO-654321",
     amount: 8750.00,
     description: "Network security audit and implementation",
-    category: "IT Services",
-    industry: "IT Services",
+    category: "Consulting",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-14",
     dateDue: "2024-01-29",
     dateSubmitted: "2024-01-15",
@@ -422,7 +422,7 @@ export const sampleInvoices: Invoice[] = [
     fileName: "LIT-2024-0445.pdf",
     lineItems: [
       { description: "Security audit - Senior consultant", quantity: 24, unitPrice: 225.00, total: 5400.00, category: "Consulting" },
-      { description: "Implementation - Technical specialist", quantity: 16, unitPrice: 175.00, total: 2800.00, category: "Implementation" },
+      { description: "Implementation - Technical specialist", quantity: 16, unitPrice: 175.00, total: 2800.00, category: "Consulting" },
       { description: "Security software licenses", quantity: 1, unitPrice: 550.00, total: 550.00, category: "Software" }
     ],
     flags: ["Perfect Match", "Time Tracking Verified"],
@@ -436,13 +436,13 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-007",
     contractorId: "CNT-005",
-    contractorName: "David Kim",
+    contractorName: "Kim Landscaping & Design",
     invoiceNumber: "KL-2024-0167",
     poNumber: "PO-777555",
     amount: 6750.00,
     description: "Winter landscape maintenance",
-    category: "Landscaping",
-    industry: "Landscaping",
+    category: "Maintenance",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-06",
     dateDue: "2024-01-21",
     dateSubmitted: "2024-01-07",
@@ -451,8 +451,8 @@ export const sampleInvoices: Invoice[] = [
     fileFormat: "PDF",
     fileName: "KL-2024-0167.pdf",
     lineItems: [
-      { description: "Tree trimming and pruning", quantity: 25, unitPrice: 125.00, total: 3125.00, category: "Service" },
-      { description: "Irrigation winterization", quantity: 1, unitPrice: 850.00, total: 850.00, category: "Service" },
+      { description: "Tree trimming and pruning", quantity: 25, unitPrice: 125.00, total: 3125.00, category: "Maintenance" },
+      { description: "Irrigation winterization", quantity: 1, unitPrice: 850.00, total: 850.00, category: "Maintenance" },
       { description: "Landscape cleanup", quantity: 32, unitPrice: 85.00, total: 2720.00, category: "Labor" },
       { description: "Salt and de-icing materials", quantity: 1, unitPrice: 55.00, total: 55.00, category: "Materials" }
     ],
@@ -467,14 +467,14 @@ export const sampleInvoices: Invoice[] = [
   {
     id: "INV-008",
     contractorId: "CNT-006",
-    contractorName: "Amanda Foster",
+    contractorName: "Foster Security Systems",
     invoiceNumber: "FS-2024-0298",
     poNumber: "PO-332211",
     amount: 23500.00,
     submittedAmount: 24750.00,
     description: "Access control system upgrade",
     category: "Security",
-    industry: "Security",
+    industry: "Oil & Gas",
     dateIssued: "2024-01-18",
     dateDue: "2024-02-17",
     dateSubmitted: "2024-01-19",
@@ -514,27 +514,27 @@ export const historicalData: HistoricalData[] = [
 ];
 
 // Success Stories and Testimonials
-export const testimonials: Testimonial[] = [
+export const sampleTestimonials: Testimonial[] = [
   {
     id: "TEST-001",
-    contractorName: "John Martinez",
-    company: "Martinez Construction LLC",
+    contractorName: "John Baker",
+    company: "Baker Oilfield Services",
     role: "Owner",
-    content: "InvoicePatch has revolutionized our billing process. What used to take weeks now takes just days. The automated matching is incredibly accurate, and I love getting paid faster!",
+    content: "InvoicePatch revolutionized how we handle our field tickets. What used to take days of paperwork now takes minutes.",
     rating: 5,
-    date: "2024-01-15",
-    industry: "Construction",
+    date: "2024-02-20",
+    industry: "Oil & Gas",
     featured: true
   },
   {
     id: "TEST-002",
     contractorName: "Sarah Chen",
-    company: "Chen Electrical Services",
+    company: "Chen Energy Logistics",
     role: "CEO",
     content: "The dispute resolution features are fantastic. When there's a discrepancy, the system clearly shows what needs attention. It's saved us countless hours of back-and-forth emails.",
     rating: 5,
     date: "2024-01-10",
-    industry: "Electrical",
+    industry: "Oil & Gas",
     featured: true
   },
   {
@@ -545,7 +545,7 @@ export const testimonials: Testimonial[] = [
     content: "The integration with our existing systems was seamless. The real-time tracking and notifications keep our team informed throughout the entire process.",
     rating: 5,
     date: "2024-01-08",
-    industry: "Security",
+    industry: "Oil & Gas",
     featured: false
   },
   {
@@ -556,7 +556,7 @@ export const testimonials: Testimonial[] = [
     content: "As a tech professional, I appreciate the sophisticated matching algorithms. The system accurately handles our complex time-based billing with multiple rate tiers.",
     rating: 5,
     date: "2024-01-05",
-    industry: "IT Services",
+    industry: "Oil & Gas",
     featured: true
   },
   {
@@ -567,7 +567,7 @@ export const testimonials: Testimonial[] = [
     content: "The mobile app makes it easy to submit invoices from job sites. The OCR technology accurately captures all the details, even from handwritten receipts.",
     rating: 4,
     date: "2023-12-28",
-    industry: "HVAC",
+    industry: "Oil & Gas",
     featured: false
   },
   {
@@ -578,43 +578,33 @@ export const testimonials: Testimonial[] = [
     content: "The seasonal billing features understand our industry's unique needs. InvoicePatch handles our varying workloads throughout the year perfectly.",
     rating: 5,
     date: "2023-12-20",
-    industry: "Landscaping",
+    industry: "Oil & Gas",
     featured: false
   }
 ];
 
 // Industry Categories and Job Types
-export const industryCategories = [
-  "Construction",
-  "Electrical",
-  "HVAC",
-  "Plumbing",
-  "Landscaping",
-  "Security",
-  "IT Services",
-  "Roofing",
-  "Painting",
-  "Flooring",
-  "Cleaning Services",
-  "Maintenance",
-  "Consulting"
+const industries = [
+  "Oil & Gas Services",
+  "Oil & Gas Logistics",
+  "Well Drilling",
+  "Pipeline Services",
+  "Directional Drilling",
+  "Environmental Services",
+  "Site Preparation",
 ];
 
-export const jobCategories = [
-  "Materials",
+const invoiceCategories = [
+  "Well Servicing",
+  "Equipment Rental",
   "Labor",
-  "Equipment",
-  "Service",
+  "Transportation",
+  "Materials",
   "Consulting",
-  "Administrative",
-  "Hardware",
-  "Software",
-  "Implementation",
-  "Emergency",
   "Maintenance",
-  "Installation",
-  "Repair",
-  "Inspection"
+  "Waste Disposal",
+  "Site Inspection",
+  "Environmental Remediation",
 ];
 
 // File Formats and Edge Cases
@@ -680,9 +670,9 @@ export const sampleData = {
   contractors: sampleContractors,
   invoices: sampleInvoices,
   historical: historicalData,
-  testimonials,
-  industryCategories,
-  jobCategories,
+  testimonials: sampleTestimonials,
+  industries,
+  invoiceCategories,
   fileFormats,
   edgeCases,
   performanceMetrics
