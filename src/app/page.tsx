@@ -1,23 +1,48 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Building2, HardHat, ArrowRight } from 'lucide-react';
+import { Building2, HardHat, ArrowRight, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
-  const { setRole } = useRole();
+  const { setRole, role } = useRole();
+  const [isReturningUser, setIsReturningUser] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
-  const handleRoleSelection = (role: 'manager' | 'contractor') => {
-    // Set role using context (which handles localStorage and cookies)
-    setRole(role);
+  useEffect(() => {
+    // Check if user has previously selected a role
+    const savedRole = localStorage.getItem('userRole');
+    if (savedRole && (savedRole === 'manager' || savedRole === 'contractor')) {
+      setIsReturningUser(true);
+    }
+  }, []);
+
+  const handleRoleSelection = (selectedRole: 'manager' | 'contractor') => {
+    setShowTransition(true);
     
-    // Redirect to appropriate dashboard/experience
-    if (role === 'manager') {
-      router.push('/manager/login');
-    } else {
-      router.push('/contractor');
+    // Set role using context (which handles localStorage and cookies)
+    setRole(selectedRole);
+    
+    // Add smooth transition delay
+    setTimeout(() => {
+      // Redirect to appropriate landing page
+      if (selectedRole === 'manager') {
+        router.push('/manager-landing');
+      } else {
+        router.push('/contractor-landing');
+      }
+    }, 300);
+  };
+
+  const handleSkipToDashboard = () => {
+    const savedRole = localStorage.getItem('userRole');
+    if (savedRole === 'manager') {
+      router.push('/manager/dashboard');
+    } else if (savedRole === 'contractor') {
+      router.push('/contractor/dashboard');
     }
   };
 
@@ -48,7 +73,52 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center px-4">
+      {/* Transition Overlay */}
+      {showTransition && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-white z-50 flex items-center justify-center"
+        >
+          <div className="text-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"
+            />
+            <p className="text-gray-600">Loading your experience...</p>
+          </div>
+        </motion.div>
+      )}
+
       <div className="max-w-5xl mx-auto w-full">
+        {/* Returning User Quick Access */}
+        {isReturningUser && (
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            className="text-center mb-8"
+          >
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 max-w-md mx-auto">
+              <div className="flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Welcome back!</h3>
+              <p className="text-gray-600 mb-4">Skip to your dashboard or explore a different role</p>
+              <button
+                onClick={handleSkipToDashboard}
+                className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+              >
+                <Zap className="w-4 h-4" />
+                <span>Skip to Dashboard</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {/* Company Branding */}
         <motion.div
           variants={fadeInUp}
@@ -72,10 +142,13 @@ export default function Home() {
           className="text-center mb-12"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome! What's your role?
+            {isReturningUser ? "Choose your role" : "Welcome! What's your role?"}
           </h2>
           <p className="text-lg text-gray-600">
-            Choose your role to access the right tools and features for you
+            {isReturningUser 
+              ? "Select a role to explore different features and capabilities"
+              : "Choose your role to access the right tools and features for you"
+            }
           </p>
         </motion.div>
 
@@ -133,7 +206,7 @@ export default function Home() {
 
                 {/* CTA */}
                 <div className="flex items-center text-blue-600 font-semibold group-hover:text-blue-700 transition-colors">
-                  Access Manager Dashboard
+                  Explore Manager Experience
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -187,7 +260,7 @@ export default function Home() {
 
                 {/* CTA */}
                 <div className="flex items-center text-green-600 font-semibold group-hover:text-green-700 transition-colors">
-                  Access Contractor Dashboard
+                  Explore Contractor Experience
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -203,7 +276,7 @@ export default function Home() {
           className="text-center mt-12"
         >
           <p className="text-gray-500 text-sm">
-            Need help choosing? <button className="text-blue-600 hover:text-blue-700 font-medium underline">Contact our support team</button>
+            Your role selection is saved for future visits. You can always change it later.
           </p>
         </motion.div>
       </div>

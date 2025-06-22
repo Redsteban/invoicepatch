@@ -244,7 +244,7 @@ export default function ContractorMarketing() {
                 Sign In
               </button>
               <button
-                onClick={() => router.push('/demo-selector')}
+                onClick={() => router.push('/contractor-demo')}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
               >
                 Try Demo
@@ -274,7 +274,7 @@ export default function ContractorMarketing() {
                   Sign In
                 </button>
                 <button
-                  onClick={() => router.push('/demo-selector')}
+                  onClick={() => router.push('/contractor-demo')}
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-center"
                 >
                   Try Demo
@@ -322,7 +322,7 @@ export default function ContractorMarketing() {
               </button>
               
               <button
-                onClick={() => router.push('/demo-selector')}
+                onClick={() => router.push('/contractor-demo')}
                 className="border-2 border-green-600 text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-center space-x-2 text-lg"
               >
                 <Sparkles className="w-6 h-6" />
@@ -698,7 +698,7 @@ export default function ContractorMarketing() {
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </button>
               <button
-                onClick={() => router.push('/demo-selector')}
+                onClick={() => router.push('/contractor-demo')}
                 className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors text-lg"
               >
                 Watch Demo
@@ -728,7 +728,7 @@ export default function ContractorMarketing() {
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><button onClick={() => router.push('/demo-selector')} className="hover:text-white transition-colors">Demo</button></li>
+                <li><button onClick={() => router.push('/contractor-demo')} className="hover:text-white transition-colors">Demo</button></li>
               </ul>
             </div>
             <div>
