@@ -8,6 +8,7 @@ import {
   PayrollSchedule,
   PayPeriod 
 } from '../../lib/payrollCalculation';
+import { getCurrentPayPeriod as newGetCurrentPayPeriod } from '@/lib/payroll';
 
 const PayrollCalendarDemo = () => {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);

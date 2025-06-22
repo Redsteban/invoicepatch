@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkOnboardingStatus } from '@/lib/onboarding-utils'
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // In a real app, you'd get the user ID from the authenticated session

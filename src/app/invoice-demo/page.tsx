@@ -7,7 +7,7 @@ import {
   calculatePayrollSchedule, 
   getCurrentPayPeriod, 
   getUpcomingDeadlines 
-} from '../../lib/payrollCalculation';
+} from '@/lib/payroll';
 import { GeneratedInvoice } from '../../lib/invoiceGeneration';
 
 const InvoiceDemo = () => {
@@ -352,7 +352,7 @@ const InvoiceDemo = () => {
               <h3 className="font-semibold text-gray-900 mb-3">1. Payroll Calculation & Calendar</h3>
               <pre className="text-sm bg-gray-50 p-4 rounded border overflow-x-auto">
 {`import PayrollCalendar from '@/components/PayrollCalendar';
-import { calculatePayrollSchedule, getCurrentPayPeriod } from '@/lib/payrollCalculation';
+import { calculatePayrollSchedule, getCurrentPayPeriod } from '@/lib/payroll';
 
 const schedule = calculatePayrollSchedule('${contractorData.startDate}', 26);
 const currentPeriod = getCurrentPayPeriod(schedule);

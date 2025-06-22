@@ -5,7 +5,7 @@ import {
   calculatePayrollSchedule, 
   getCurrentPayPeriod, 
   getUpcomingDeadlines 
-} from '../../lib/payrollCalculation';
+} from '@/lib/payroll';
 
 const PayrollIntegrationDemo = () => {
   const [formData, setFormData] = useState({

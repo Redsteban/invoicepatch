@@ -583,6 +583,54 @@ export const sampleTestimonials: Testimonial[] = [
   }
 ];
 
+export const testimonials: Testimonial[] = [
+    {
+    id: "TEST-001",
+    contractorName: "Bill Ryder",
+    company: "Ryder Flowback Inc.",
+    role: "Owner / Operator",
+    content: "InvoicePatch eliminated my paperwork completely. I just tap a few buttons on my phone at the well site, and my field ticket is done. My invoices are getting approved and paid in half the time.",
+    rating: 5,
+    date: "2024-06-15",
+    industry: "Oil & Gas Services",
+    featured: true
+  },
+  {
+    id: "TEST-002",
+    contractorName: "Maria Garcia",
+    company: "Garcia Hauling",
+    role: "Lead Driver",
+    content: "The GPS tracking and photo uploads are game-changers. There are never any questions from the operator about my hours or location. It's the most straightforward system I've ever used.",
+    rating: 5,
+    date: "2024-05-28",
+    industry: "Oil & Gas Logistics",
+    featured: false
+  },
+];
+
+export const industryCategories = [
+  {
+    name: "Oil & Gas Services",
+    description: "Well servicing, flowback, water hauling, and more.",
+    icon: "Drill"
+  },
+  {
+    name: "Oil & Gas Logistics",
+    description: "Crude hauling, rig moving, and equipment transport.",
+    icon: "Truck"
+  },
+  {
+    name: "General Construction",
+    description: "Commercial and residential construction projects.",
+    icon: "HardHat"
+  },
+  {
+    name: "Specialized Trades",
+    description: "HVAC, plumbing, electrical, and other trades.",
+    icon: "Wrench"
+  }
+];
+
 // Industry Categories and Job Types
 const industries = [
   "Oil & Gas Services",

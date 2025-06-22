@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -70,6 +70,25 @@ export default function ContractorTrialDemo() {
   const gst = subtotal * GST_RATE;
   const totalSubsistence = dailyEntries.length * SUBSISTENCE_PER_DAY;
   const grandTotal = subtotal + gst + totalSubsistence;
+
+  useEffect(() => {
+    // Simple fade-in animation for the final invoice
+    const styleId = 'fade-in-animation';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        @keyframes fade-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out forwards;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
@@ -228,16 +247,3 @@ export default function ContractorTrialDemo() {
     </div>
   );
 }
-
-// Simple fade-in animation for the final invoice
-const style = document.createElement('style');
-style.innerHTML = `
-  @keyframes fade-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .animate-fade-in {
-    animation: fade-in 0.5s ease-out forwards;
-  }
-`;
-document.head.appendChild(style);
