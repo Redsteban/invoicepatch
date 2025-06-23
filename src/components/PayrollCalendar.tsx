@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PayPeriod } from '@/lib/payrollCalculation';
+import { PayPeriod } from '@/lib/payroll';
 
 interface PayrollCalendarProps {
   periods: PayPeriod[]

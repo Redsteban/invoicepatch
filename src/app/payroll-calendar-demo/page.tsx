@@ -7,8 +7,7 @@ import {
   getCurrentPayPeriod, 
   PayrollSchedule,
   PayPeriod 
-} from '../../lib/payrollCalculation';
-import { getCurrentPayPeriod as newGetCurrentPayPeriod } from '@/lib/payroll';
+} from '@/lib/payroll';
 
 const PayrollCalendarDemo = () => {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -187,7 +186,7 @@ const PayrollCalendarDemo = () => {
             <h3 className="font-semibold text-gray-900 mb-3">Basic Usage</h3>
             <pre className="text-sm bg-white p-4 rounded border overflow-x-auto text-gray-700">
 {`import PayrollCalendar from '@/components/PayrollCalendar';
-import { calculatePayrollSchedule, getCurrentPayPeriod } from '@/lib/payrollCalculation';
+import { calculatePayrollSchedule, getCurrentPayPeriod } from '@/lib/payroll';
 
 function ContractorDashboard({ contractorData }) {
   const schedule = calculatePayrollSchedule(contractorData.startDate, 26);
@@ -248,20 +247,18 @@ async function getContractorPayroll(contractorId: string) {
   // If payroll schedule is stored in database
   if (contractor.payroll_schedule) {
     return {
-      periods: contractor.payroll_schedule,
-      currentPeriod: contractor.current_period,
-      contractorName: contractor.contractor_name
+      schedule: contractor.payroll_schedule,
+      currentPeriod: contractor.current_period
     };
   }
-
-  // Or calculate on-demand
+  
+  // Otherwise, generate it on the fly
   const schedule = calculatePayrollSchedule(contractor.start_date, 26);
   const currentPeriod = getCurrentPayPeriod(schedule);
-  
+
   return {
-    periods: schedule.periods,
-    currentPeriod: currentPeriod.periodNumber,
-    contractorName: contractor.contractor_name
+    schedule,
+    currentPeriod,
   };
 }`}
           </pre>
@@ -271,20 +268,19 @@ async function getContractorPayroll(contractorId: string) {
   );
 };
 
+// Helper functions for demo presets
 function getNextMonday(): Date {
-  const today = new Date();
-  const daysUntilMonday = (8 - today.getDay()) % 7;
-  const nextMonday = new Date(today);
-  nextMonday.setDate(today.getDate() + daysUntilMonday);
-  return nextMonday;
+  const date = new Date();
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1) + 7;
+  return new Date(date.setDate(diff));
 }
 
 function getNextWednesday(): Date {
-  const today = new Date();
-  const daysUntilWednesday = (10 - today.getDay()) % 7;
-  const nextWednesday = new Date(today);
-  nextWednesday.setDate(today.getDate() + daysUntilWednesday);
-  return nextWednesday;
+  const date = new Date();
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 3 ? 7 : 3);
+  return new Date(date.setDate(diff));
 }
 
 function formatDate(date: Date | string): string {
@@ -292,8 +288,7 @@ function formatDate(date: Date | string): string {
   return d.toLocaleDateString('en-CA', {
     weekday: 'short',
     month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+    day: 'numeric'
   });
 }
 

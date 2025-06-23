@@ -600,35 +600,21 @@ export const testimonials: Testimonial[] = [
     contractorName: "Maria Garcia",
     company: "Garcia Hauling",
     role: "Lead Driver",
-    content: "The GPS tracking and photo uploads are game-changers. There are never any questions from the operator about my hours or location. It's the most straightforward system I've ever used.",
+    content: "The GPS tracking and photo uploads mean I never have to argue about hours or deliveries. It's all there in the system. My dispatcher is happier, and so am I.",
     rating: 5,
-    date: "2024-05-28",
+    date: "2024-05-20",
     industry: "Oil & Gas Logistics",
     featured: false
-  },
+  }
 ];
 
 export const industryCategories = [
-  {
-    name: "Oil & Gas Services",
-    description: "Well servicing, flowback, water hauling, and more.",
-    icon: "Drill"
-  },
-  {
-    name: "Oil & Gas Logistics",
-    description: "Crude hauling, rig moving, and equipment transport.",
-    icon: "Truck"
-  },
-  {
-    name: "General Construction",
-    description: "Commercial and residential construction projects.",
-    icon: "HardHat"
-  },
-  {
-    name: "Specialized Trades",
-    description: "HVAC, plumbing, electrical, and other trades.",
-    icon: "Wrench"
-  }
+  { name: 'Drilling & Well Services', icon: 'Drill' },
+  { name: 'Completion & Production', icon: 'Cog' },
+  { name: 'Logistics & Hauling', icon: 'Truck' },
+  { name: 'Facilities & Maintenance', icon: 'Wrench' },
+  { name: 'Environmental Services', icon: 'Leaf' },
+  { name:alue: 'geophysical-services', label: 'Geophysical Services' },
 ];
 
 // Industry Categories and Job Types
