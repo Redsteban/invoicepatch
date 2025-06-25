@@ -8,7 +8,7 @@ import {
   formatPeriodDates,
   PayrollSchedule,
   PayPeriod 
-} from '../../../lib/payrollCalculation';
+} from '@/lib/payroll';
 
 const PayrollDemo = () => {
   const [contractStartDate, setContractStartDate] = useState('');
@@ -47,6 +47,18 @@ const PayrollDemo = () => {
   const getDayOfWeek = (date: Date) => {
     return date.toLocaleDateString('en-CA', { weekday: 'long' });
   };
+
+  const renderPeriod = (period: PayPeriod) => (
+    <div className="bg-white rounded-lg p-4">
+      <h3 className="font-medium text-gray-700 mb-1">Period</h3>
+      <p className="text-lg font-semibold text-green-600">
+        #{period.periodNumber}
+        {period.isPartialPeriod && (
+          <span className="text-sm text-orange-600 ml-2">(Partial)</span>
+        )}
+      </p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -93,15 +105,7 @@ const PayrollDemo = () => {
                     📅 Current Pay Period
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-lg p-4">
-                      <h3 className="font-medium text-gray-700 mb-1">Period</h3>
-                      <p className="text-lg font-semibold text-green-600">
-                        #{currentPeriod.periodNumber}
-                        {currentPeriod.isPartialPeriod && (
-                          <span className="text-sm text-orange-600 ml-2">(Partial)</span>
-                        )}
-                      </p>
-                    </div>
+                    {renderPeriod(currentPeriod)}
                     <div className="bg-white rounded-lg p-4">
                       <h3 className="font-medium text-gray-700 mb-1">Work Period</h3>
                       <p className="text-sm text-gray-600">

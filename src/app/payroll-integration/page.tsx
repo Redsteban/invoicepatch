@@ -209,7 +209,7 @@ const PayrollIntegrationDemo = () => {
               </h2>
               <pre className="text-sm bg-white p-4 rounded border overflow-x-auto text-gray-700">
 {`// Enhanced contractor setup with payroll
-import { calculatePayrollSchedule } from '@/lib/payrollCalculation'
+import { calculatePayrollSchedule } from '@/lib/payroll'
 
 export async function POST(request: NextRequest) {
   const { name, email, startDate } = await request.json()

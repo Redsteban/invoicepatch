@@ -7,7 +7,7 @@ import {
   getUpcomingDeadlines,
   PayrollSchedule,
   PayPeriod 
-} from '../../lib/payrollCalculation';
+} from '../../lib/payroll';
 
 interface PayrollIntegrationProps {
   contractorEmail: string;
@@ -230,7 +230,7 @@ const PayrollIntegration: React.FC<PayrollIntegrationProps> = ({
         <h3 className="font-semibold text-gray-900 mb-3">💻 Integration Code Example</h3>
         <pre className="text-sm text-gray-700 overflow-x-auto bg-white p-3 rounded border">
 {`// In app/api/contractor/setup/route.ts
-import { calculatePayrollSchedule } from '@/lib/payrollCalculation'
+import { calculatePayrollSchedule } from '@/lib/payroll'
 
 export async function POST(request: NextRequest) {
   const body = await request.json()

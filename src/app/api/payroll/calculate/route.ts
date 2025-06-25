@@ -3,7 +3,7 @@ import {
   calculatePayrollSchedule, 
   getCurrentPayPeriod, 
   getUpcomingDeadlines 
-} from '../../../../../lib/payrollCalculation';
+} from '@/lib/payroll';
 
 export async function POST(request: NextRequest) {
   try {

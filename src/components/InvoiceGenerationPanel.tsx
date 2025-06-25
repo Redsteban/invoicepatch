@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PayPeriod } from '../lib/payrollCalculation';
+import { PayPeriod } from '../lib/payroll';
 import { GeneratedInvoice, formatCurrency } from '../lib/invoiceGeneration';
 
 interface InvoiceGenerationPanelProps {

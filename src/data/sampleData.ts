@@ -614,7 +614,7 @@ export const industryCategories = [
   { name: 'Logistics & Hauling', icon: 'Truck' },
   { name: 'Facilities & Maintenance', icon: 'Wrench' },
   { name: 'Environmental Services', icon: 'Leaf' },
-  { name:alue: 'geophysical-services', label: 'Geophysical Services' },
+  { value: 'geophysical-services', label: 'Geophysical Services' },
 ];
 
 // Industry Categories and Job Types

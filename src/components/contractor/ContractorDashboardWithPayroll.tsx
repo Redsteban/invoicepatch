@@ -8,7 +8,7 @@ import {
   getUpcomingDeadlines,
   PayrollSchedule,
   PayPeriod 
-} from '../../lib/payrollCalculation';
+} from '../../lib/payroll';
 
 interface ContractorDashboardProps {
   contractorData: {
@@ -42,20 +42,31 @@ const ContractorDashboardWithPayroll: React.FC<ContractorDashboardProps> = ({ co
   const loadPayrollData = () => {
     try {
       let schedule: PayrollSchedule;
-      let currentPeriod: PayPeriod;
+      let currentPeriod: PayPeriod | null;
 
       // Use stored payroll data if available
       if (contractorData.payrollSchedule && contractorData.currentPeriod) {
         schedule = {
-          periods: contractorData.payrollSchedule,
-          firstPeriodEnd: contractorData.payrollSchedule[0]?.endDate || contractorData.startDate,
-          contractStartDate: contractorData.startDate
+          periods: contractorData.payrollSchedule.map(p => ({
+            ...p,
+            startDate: typeof p.startDate === 'string' ? new Date(p.startDate) : p.startDate,
+            endDate: typeof p.endDate === 'string' ? new Date(p.endDate) : p.endDate,
+            submissionDeadline: typeof p.submissionDeadline === 'string' ? new Date(p.submissionDeadline) : p.submissionDeadline,
+            paymentDate: typeof p.paymentDate === 'string' ? new Date(p.paymentDate) : p.paymentDate,
+          })),
+          firstPeriodEnd: typeof contractorData.payrollSchedule[0]?.endDate === 'string' ? new Date(contractorData.payrollSchedule[0]?.endDate) : contractorData.payrollSchedule[0]?.endDate || new Date(contractorData.startDate),
+          contractStartDate: typeof contractorData.startDate === 'string' ? new Date(contractorData.startDate) : contractorData.startDate
         };
-        currentPeriod = contractorData.payrollSchedule.find(p => p.periodNumber === contractorData.currentPeriod) || contractorData.payrollSchedule[0];
+        currentPeriod = schedule.periods.find(p => p.periodNumber === contractorData.currentPeriod) || schedule.periods[0];
       } else {
         // Calculate on-demand
         schedule = calculatePayrollSchedule(contractorData.startDate, 26);
         currentPeriod = getCurrentPayPeriod(schedule);
+      }
+      if (!currentPeriod) {
+        setPayrollData(null);
+        setLoading(false);
+        return;
       }
 
       const upcomingDeadlines = getUpcomingDeadlines(schedule, 60);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import { calculatePayrollSchedule } from '@/lib/payrollCalculation';
+import { calculatePayrollSchedule } from '@/lib/payroll';
 
 export async function POST(request: NextRequest) {
   try {

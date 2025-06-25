@@ -1,5 +1,5 @@
 import { supabaseAdmin } from './supabase';
-import { PayPeriod } from './payrollCalculation';
+import { PayPeriod } from './payroll';
 
 export interface DailyEntry {
   id: string;
