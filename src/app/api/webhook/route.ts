@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
   // Check if Stripe is configured
   if (!stripe) {
     console.warn('Stripe not configured - webhook cannot process payments');
-    return NextResponse.json({ received: false, error: 'Stripe not configured' }, { status: 500 });
+    return NextResponse.json({ received: false, error: 'Stripe not configured' }, { status: 501 });
   }
 
   // Check if during build time

@@ -9,13 +9,15 @@ export const stripePromise =
     : null;
 
 // Server-side Stripe - only initialize if we have a real secret key
-export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY!;
-export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
+export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
-export const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-05-28.basil', // Stripe v13
-  typescript: true,
-});
+export const stripe = STRIPE_SECRET_KEY
+  ? new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: '2025-05-28.basil',
+      typescript: true,
+    })
+  : null;
 
 export enum Plan {
   TRIAL = 'trial',
@@ -24,6 +26,7 @@ export enum Plan {
 }
 
 export async function createCustomer({ userId, email }: { userId: string; email: string }): Promise<string> {
+  if (!stripe) throw new Error('Stripe is not configured');
   const customer = await stripe.customers.create({
     email,
     metadata: { userId },
@@ -42,6 +45,7 @@ export async function createCheckoutSession({
   successUrl: string;
   cancelUrl: string;
 }) {
+  if (!stripe) throw new Error('Stripe is not configured');
   return stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
