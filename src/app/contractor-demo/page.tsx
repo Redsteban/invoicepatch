@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import FreemiumModal from '@/components/FreemiumModal';
 
 // Simulating a daily work entry
 interface DailyEntry {
@@ -19,6 +20,7 @@ interface DailyEntry {
   location: string;
   ticketNumber: string;
   dailyTotal: number;
+  worked: boolean;
 }
 
 // Main component for the interactive demo
@@ -63,6 +65,12 @@ export default function ContractorTrialDemo() {
   // Pay period start date
   const [payPeriodStart, setPayPeriodStart] = useState(() => new Date());
 
+  // Modal state
+  const [showFreemiumModal, setShowFreemiumModal] = useState(false);
+
+  // Reminder banner state
+  const [showLocationReminder, setShowLocationReminder] = useState(true);
+
   // Function to simulate the next day
   const handleNextDay = () => {
     if (day > TOTAL_DAYS) return;
@@ -100,6 +108,7 @@ export default function ContractorTrialDemo() {
       location: '',
       ticketNumber: ticketNumber,
       dailyTotal,
+      worked: true,
     };
     setDailyEntries([...dailyEntries, newEntry]);
     setTruckRate(truckRate);
@@ -108,6 +117,7 @@ export default function ContractorTrialDemo() {
     setOtherCharges(otherCharges);
     if (day === TOTAL_DAYS) {
       setSimulationComplete(true);
+      setShowFreemiumModal(true);
     } else {
       setDay(day + 1);
     }
@@ -144,6 +154,7 @@ export default function ContractorTrialDemo() {
         + (parseFloat(editFields.truckRate) || 0)
         + ((parseFloat(editFields.kmsDriven) || 0) * (parseFloat(editFields.kmsRate) || 0))
         + (parseFloat(editFields.otherCharges) || 0),
+      worked: editFields.worked !== undefined ? editFields.worked : true,
     } : e));
     setEditDay(null);
     setEditFields({});
@@ -153,11 +164,15 @@ export default function ContractorTrialDemo() {
     setEditFields({});
   };
 
-  // Calculated totals for the final invoice
-  const subtotal = dailyEntries.reduce((acc, entry) => acc + entry.dailyTotal, 0);
+  // Only include worked days in totals
+  const workedEntries = dailyEntries.filter(e => e.worked);
+  const subtotal = workedEntries.reduce((acc, entry) => acc + entry.dailyTotal, 0);
   const gst = subtotal * GST_RATE;
-  const totalSubsistence = dailyEntries.length * subsistence;
+  const totalSubsistence = workedEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
+
+  // Check if any entry is missing location
+  const anyMissingLocation = dailyEntries.some(e => !e.location?.trim());
 
   useEffect(() => {
     // Simple fade-in animation for the final invoice
@@ -180,6 +195,18 @@ export default function ContractorTrialDemo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      <FreemiumModal open={showFreemiumModal} onClose={() => setShowFreemiumModal(false)}>
+        <div className="flex flex-col items-center text-center">
+          <CheckCircle className="w-12 h-12 text-blue-600 mb-4" />
+          <h2 className="text-2xl font-bold mb-2 text-blue-700">Ready to use InvoicePatch for real?</h2>
+          <p className="text-gray-700 mb-4">Get started with our <span className="font-semibold text-blue-600">Freemium</span> version—no credit card required!</p>
+          <Link href="/freemium" className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center mb-2">
+            <span className="mr-2">Try Freemium Now</span>
+            <ArrowLeft className="w-5 h-5 rotate-180" />
+          </Link>
+          <button onClick={() => setShowFreemiumModal(false)} className="text-gray-500 underline text-sm mt-2">Maybe later</button>
+        </div>
+      </FreemiumModal>
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -243,7 +270,7 @@ export default function ContractorTrialDemo() {
                 <input type="text" value={clientAddress} onChange={e => setClientAddress(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Delivery Date</label>
                 <input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
               </div>
               <div>
@@ -385,6 +412,19 @@ export default function ContractorTrialDemo() {
         )}
 
         {/* Daily Entries Log */}
+        {dailyEntries.length > 0 && showLocationReminder && anyMissingLocation && (
+          <div className="mb-4 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded flex items-center justify-between">
+            <span>
+              <strong>Reminder:</strong> Don't forget to update the <span className="font-semibold">Location/Job Site</span> for each day's ticket!
+            </span>
+            <button
+              className="ml-4 text-yellow-700 hover:underline text-sm"
+              onClick={() => setShowLocationReminder(false)}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
         {dailyEntries.length > 0 && (
           <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center"><Calendar className="w-6 h-6 mr-3 text-green-600"/>Daily Work Log</h3>
@@ -394,17 +434,46 @@ export default function ContractorTrialDemo() {
                   {editDay === entry.day ? (
                     <div className="w-full">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-                        <input type="text" value={editFields.description} onChange={e => setEditFields({ ...editFields, description: e.target.value })} className="px-2 py-1 border rounded" placeholder="Description" />
-                        <input type="text" value={editFields.location} onChange={e => setEditFields({ ...editFields, location: e.target.value })} className="px-2 py-1 border rounded" placeholder="Location" />
-                        <input type="text" value={editFields.ticketNumber} onChange={e => setEditFields({ ...editFields, ticketNumber: e.target.value })} className="px-2 py-1 border rounded" placeholder="Ticket Number" />
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                          <input type="text" value={editFields.description} onChange={e => setEditFields({ ...editFields, description: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Description" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Location</label>
+                          <input type="text" value={editFields.location} onChange={e => setEditFields({ ...editFields, location: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Location" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Ticket Number</label>
+                          <input type="text" value={editFields.ticketNumber} onChange={e => setEditFields({ ...editFields, ticketNumber: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Ticket Number" />
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
-                        <input type="number" value={editFields.truckRate ?? ''} onChange={e => setEditFields({ ...editFields, truckRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Truck Rate" />
-                        <input type="number" value={editFields.kmsDriven ?? ''} onChange={e => setEditFields({ ...editFields, kmsDriven: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Driven" />
-                        <input type="number" value={editFields.kmsRate ?? ''} onChange={e => setEditFields({ ...editFields, kmsRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Rate" />
-                        <input type="number" value={editFields.otherCharges ?? ''} onChange={e => setEditFields({ ...editFields, otherCharges: e.target.value })} className="px-2 py-1 border rounded" placeholder="Other Charges" />
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Truck Rate ($)</label>
+                          <input type="number" value={editFields.truckRate ?? ''} onChange={e => setEditFields({ ...editFields, truckRate: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Truck Rate" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Kms Driven</label>
+                          <input type="number" value={editFields.kmsDriven ?? ''} onChange={e => setEditFields({ ...editFields, kmsDriven: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Kms Driven" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Kms Rate ($/km)</label>
+                          <input type="number" value={editFields.kmsRate ?? ''} onChange={e => setEditFields({ ...editFields, kmsRate: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Kms Rate" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Other Charges ($)</label>
+                          <input type="number" value={editFields.otherCharges ?? ''} onChange={e => setEditFields({ ...editFields, otherCharges: e.target.value })} className="px-2 py-1 border rounded w-full" placeholder="Other Charges" />
+                        </div>
                       </div>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex items-center gap-4 mt-2">
+                        <label className="flex items-center gap-2 text-sm font-medium">
+                          <input
+                            type="checkbox"
+                            checked={editFields.worked !== false}
+                            onChange={e => setEditFields({ ...editFields, worked: e.target.checked })}
+                          />
+                          Worked this day
+                        </label>
                         <button onClick={saveEditDay} className="bg-emerald-600 text-white px-4 py-1 rounded">Save</button>
                         <button onClick={cancelEditDay} className="bg-gray-200 text-gray-700 px-4 py-1 rounded">Cancel</button>
                       </div>
@@ -418,6 +487,13 @@ export default function ContractorTrialDemo() {
                       </div>
                       <span className="font-mono text-gray-700">${entry.dailyTotal.toFixed(2)}</span>
                       <button onClick={() => startEditDay(entry)} className="ml-4 text-emerald-600 hover:underline">Edit</button>
+                      <button
+                        className={`ml-4 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${entry.worked ? 'bg-green-200 text-green-800 border-green-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}
+                        onClick={() => setDailyEntries(dailyEntries.map(e => e.day === entry.day ? { ...e, worked: !e.worked } : e))}
+                        aria-label={entry.worked ? 'Mark as day off' : 'Mark as worked'}
+                      >
+                        {entry.worked ? 'Worked' : 'Day Off'}
+                      </button>
                     </>
                   )}
                 </div>
@@ -463,7 +539,7 @@ export default function ContractorTrialDemo() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dailyEntries.map(e => (
+                      {workedEntries.map(e => (
                         <tr key={e.day} className="border-b">
                           <td className="px-2 py-1 text-center">{e.day}</td>
                           <td className="px-2 py-1 text-center">{e.date}</td>
@@ -484,15 +560,15 @@ export default function ContractorTrialDemo() {
                 {/* Add breakdown for truck, kms, other charges */}
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Truck Charges</span>
-                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + e.truckRate, 0).toFixed(2)}</span>
+                  <span className="font-mono text-gray-800">${workedEntries.reduce((acc, e) => acc + e.truckRate, 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Kms Charges</span>
-                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + (e.kmsDriven * e.kmsRate), 0).toFixed(2)}</span>
+                  <span className="font-mono text-gray-800">${workedEntries.reduce((acc, e) => acc + (e.kmsDriven * e.kmsRate), 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Other Charges</span>
-                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + e.otherCharges, 0).toFixed(2)}</span>
+                  <span className="font-mono text-gray-800">${workedEntries.reduce((acc, e) => acc + e.otherCharges, 0).toFixed(2)}</span>
                 </div>
 
                 {/* Financial Calculations */}

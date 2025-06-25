@@ -122,6 +122,7 @@ export default function Header() {
             <NavLink href="/roi-calculator">ROI Calculator</NavLink>
             <NavLink href="/instant-proposal">Instant Proposal</NavLink>
             <NavLink href="/pricing">Pricing</NavLink>
+            <NavLink href="/freemium" className="text-blue-600 font-semibold border border-blue-100 bg-blue-50 rounded px-2 py-1 ml-2 hover:bg-blue-100 transition">Freemium</NavLink>
           </nav>
 
           {/* CTA Buttons */}
@@ -164,6 +165,9 @@ export default function Header() {
                 </NavLink>
                 <NavLink href="/pricing" onClick={handleLinkClick} className="block py-2">
                   Pricing
+                </NavLink>
+                <NavLink href="/freemium" onClick={handleLinkClick} className="block py-2 text-blue-600 font-semibold border border-blue-100 bg-blue-50 rounded px-2 py-1 mt-1 hover:bg-blue-100 transition">
+                  Freemium
                 </NavLink>
                 
                 <div className="pt-4 border-t border-[#e5e7eb]">
