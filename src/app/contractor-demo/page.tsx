@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 // Simulating a daily work entry
 interface DailyEntry {
   day: number;
+  date: string;
   description: string;
   hours: number;
   rate: number;
@@ -32,7 +33,7 @@ export default function ContractorTrialDemo() {
   
   // Constants for the simulation
   const GST_RATE = 0.05;
-  const TOTAL_DAYS = 15;
+  const TOTAL_DAYS = 14;
 
   // State management for the simulation
   const [day, setDay] = useState(1);
@@ -41,10 +42,10 @@ export default function ContractorTrialDemo() {
   const [invoiceSaved, setInvoiceSaved] = useState(false);
 
   // State for daily variables (allow string for empty input)
-  const [truckRate, setTruckRate] = useState<string | number>(0);
-  const [kmsDriven, setKmsDriven] = useState<string | number>(0);
-  const [kmsRate, setKmsRate] = useState<string | number>(0.5);
-  const [otherCharges, setOtherCharges] = useState<string | number>(0);
+  const [truckRate, setTruckRate] = useState<string>('');
+  const [kmsDriven, setKmsDriven] = useState<string>('');
+  const [kmsRate, setKmsRate] = useState<string>('0.5');
+  const [otherCharges, setOtherCharges] = useState<string>('');
 
   // Invoice metadata
   const [clientName, setClientName] = useState('Acme Energy Ltd.');
@@ -52,24 +53,44 @@ export default function ContractorTrialDemo() {
   const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [contractorName, setContractorName] = useState('John Doe');
   const [contractorAddress, setContractorAddress] = useState('456 Contractor Rd, Edmonton, AB');
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [clientInvoiceNumber, setClientInvoiceNumber] = useState('');
 
   // For editing daily entries
   const [editDay, setEditDay] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<any>({});
+
+  // Pay period start date
+  const [payPeriodStart, setPayPeriodStart] = useState(() => new Date());
 
   // Function to simulate the next day
   const handleNextDay = () => {
     if (day > TOTAL_DAYS) return;
     const hours = payType === 'hourly' ? 8 : 12;
     const base = payType === 'hourly' ? hours * rate : rate;
-    const truckRateNum = parseFloat(truckRate as string) || 0;
-    const kmsDrivenNum = parseFloat(kmsDriven as string) || 0;
-    const kmsRateNum = parseFloat(kmsRate as string) || 0;
-    const otherChargesNum = parseFloat(otherCharges as string) || 0;
+    const truckRateNum = parseFloat(truckRate) || 0;
+    const kmsDrivenNum = parseFloat(kmsDriven) || 0;
+    const kmsRateNum = parseFloat(kmsRate) || 0;
+    const otherChargesNum = parseFloat(otherCharges) || 0;
     const dailyTotal = base + truckRateNum + (kmsDrivenNum * kmsRateNum) + otherChargesNum;
+    // Calculate the date for this day
+    const entryDate = new Date(payPeriodStart);
+    entryDate.setDate(payPeriodStart.getDate() + (day - 1));
+    // Determine ticket number
+    let ticketNumber = '';
+    if (day === 1) {
+      ticketNumber = clientInvoiceNumber;
+    } else if (dailyEntries.length > 0) {
+      const prev = dailyEntries[dailyEntries.length - 1].ticketNumber;
+      const prevNum = parseInt(prev, 10);
+      if (!isNaN(prevNum)) {
+        ticketNumber = String(prevNum + 1);
+      }
+    }
     const newEntry: DailyEntry = {
       day: day,
-      description: `Work for ${companyName} - Day ${day}`,
+      date: entryDate.toISOString().slice(0, 10),
+      description: `Stack Production Testing - Day ${day}`,
       hours: hours,
       rate: rate,
       truckRate: truckRateNum,
@@ -77,7 +98,7 @@ export default function ContractorTrialDemo() {
       kmsRate: kmsRateNum,
       otherCharges: otherChargesNum,
       location: '',
-      ticketNumber: '',
+      ticketNumber: ticketNumber,
       dailyTotal,
     };
     setDailyEntries([...dailyEntries, newEntry]);
@@ -233,6 +254,22 @@ export default function ContractorTrialDemo() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contractor Address</label>
                 <input type="text" value={contractorAddress} onChange={e => setContractorAddress(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pay Period Start</label>
+                <input type="date" value={payPeriodStart.toISOString().slice(0, 10)} onChange={e => setPayPeriodStart(new Date(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pay Period End</label>
+                <input type="date" value={(() => { const d = new Date(payPeriodStart); d.setDate(d.getDate() + TOTAL_DAYS - 1); return d.toISOString().slice(0, 10); })()} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Number</label>
+                <input type="text" value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Client Invoice Number (first day ticket)</label>
+                <input type="text" value={clientInvoiceNumber} onChange={e => setClientInvoiceNumber(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
             </div>
           </div>
         </div>
@@ -362,10 +399,10 @@ export default function ContractorTrialDemo() {
                         <input type="text" value={editFields.ticketNumber} onChange={e => setEditFields({ ...editFields, ticketNumber: e.target.value })} className="px-2 py-1 border rounded" placeholder="Ticket Number" />
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
-                        <input type="number" value={editFields.truckRate} onChange={e => setEditFields({ ...editFields, truckRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Truck Rate" />
-                        <input type="number" value={editFields.kmsDriven} onChange={e => setEditFields({ ...editFields, kmsDriven: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Driven" />
-                        <input type="number" value={editFields.kmsRate} onChange={e => setEditFields({ ...editFields, kmsRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Rate" />
-                        <input type="number" value={editFields.otherCharges} onChange={e => setEditFields({ ...editFields, otherCharges: e.target.value })} className="px-2 py-1 border rounded" placeholder="Other Charges" />
+                        <input type="number" value={editFields.truckRate ?? ''} onChange={e => setEditFields({ ...editFields, truckRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Truck Rate" />
+                        <input type="number" value={editFields.kmsDriven ?? ''} onChange={e => setEditFields({ ...editFields, kmsDriven: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Driven" />
+                        <input type="number" value={editFields.kmsRate ?? ''} onChange={e => setEditFields({ ...editFields, kmsRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Rate" />
+                        <input type="number" value={editFields.otherCharges ?? ''} onChange={e => setEditFields({ ...editFields, otherCharges: e.target.value })} className="px-2 py-1 border rounded" placeholder="Other Charges" />
                       </div>
                       <div className="flex gap-2 mt-2">
                         <button onClick={saveEditDay} className="bg-emerald-600 text-white px-4 py-1 rounded">Save</button>
@@ -401,6 +438,8 @@ export default function ContractorTrialDemo() {
                   <div><span className="font-semibold">Invoice Date:</span> {invoiceDate}</div>
                   <div><span className="font-semibold">Contractor:</span> {contractorName}</div>
                   <div><span className="font-semibold">Contractor Address:</span> {contractorAddress}</div>
+                  <div><span className="font-semibold">Pay Period:</span> {payPeriodStart.toISOString().slice(0, 10)} to {(() => { const d = new Date(payPeriodStart); d.setDate(d.getDate() + TOTAL_DAYS - 1); return d.toISOString().slice(0, 10); })()}</div>
+                  <div><span className="font-semibold">Invoice Number:</span> {invoiceNumber || '-'}</div>
                 </div>
             </div>
             
@@ -412,6 +451,7 @@ export default function ContractorTrialDemo() {
                     <thead>
                       <tr className="bg-gray-100">
                         <th className="px-2 py-1">Day</th>
+                        <th className="px-2 py-1">Date</th>
                         <th className="px-2 py-1">Description</th>
                         <th className="px-2 py-1">Location</th>
                         <th className="px-2 py-1">Ticket #</th>
@@ -426,6 +466,7 @@ export default function ContractorTrialDemo() {
                       {dailyEntries.map(e => (
                         <tr key={e.day} className="border-b">
                           <td className="px-2 py-1 text-center">{e.day}</td>
+                          <td className="px-2 py-1 text-center">{e.date}</td>
                           <td className="px-2 py-1">{e.description}</td>
                           <td className="px-2 py-1">{e.location}</td>
                           <td className="px-2 py-1">{e.ticketNumber}</td>
