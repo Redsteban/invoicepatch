@@ -9,13 +9,59 @@ export const stripePromise =
     : null;
 
 // Server-side Stripe - only initialize if we have a real secret key
-export const stripe = 
-  process.env.STRIPE_SECRET_KEY && 
-  process.env.STRIPE_SECRET_KEY.startsWith('sk_')
-    ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-        apiVersion: '2025-05-28.basil',
-      })
-    : null;
+export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY!;
+export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
+
+export const stripe = new Stripe(STRIPE_SECRET_KEY, {
+  apiVersion: '2025-05-28.basil', // Stripe v13
+  typescript: true,
+});
+
+export enum Plan {
+  TRIAL = 'trial',
+  CONTRACTOR = 'contractor',
+  MANAGER = 'manager',
+}
+
+export async function createCustomer({ userId, email }: { userId: string; email: string }): Promise<string> {
+  const customer = await stripe.customers.create({
+    email,
+    metadata: { userId },
+  });
+  return customer.id;
+}
+
+export async function createCheckoutSession({
+  userId,
+  priceId,
+  successUrl,
+  cancelUrl,
+}: {
+  userId: string;
+  priceId: string;
+  successUrl: string;
+  cancelUrl: string;
+}) {
+  return stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card'],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    metadata: { userId },
+  });
+}
+
+// Re-export Stripe types for later use
+export type Customer = Stripe.Customer;
+export type CheckoutSession = Stripe.Checkout.Session;
+export type Event = Stripe.Event;
+export type WebhookEndpoint = Stripe.WebhookEndpoint;
 
 export const PRICE_IDS = {
   CONTRACTOR_MONTHLY: process.env.STRIPE_CONTRACTOR_MONTHLY_PRICE_ID || '',

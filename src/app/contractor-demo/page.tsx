@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save } from 'lucide-react';
+import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // Simulating a daily work entry
@@ -11,6 +11,12 @@ interface DailyEntry {
   description: string;
   hours: number;
   rate: number;
+  truckRate: number;
+  kmsDriven: number;
+  kmsRate: number;
+  otherCharges: number;
+  location: string;
+  ticketNumber: string;
   dailyTotal: number;
 }
 
@@ -18,9 +24,13 @@ interface DailyEntry {
 export default function ContractorTrialDemo() {
   const router = useRouter();
 
+  // State for user-configurable values
+  const [companyName, setCompanyName] = useState('My Company Inc.');
+  const [payType, setPayType] = useState<'daily' | 'hourly'>('hourly');
+  const [rate, setRate] = useState(72.50);
+  const [subsistence, setSubsistence] = useState(50.00);
+  
   // Constants for the simulation
-  const HOURLY_RATE = 72.50;
-  const SUBSISTENCE_PER_DAY = 50.00;
   const GST_RATE = 0.05;
   const TOTAL_DAYS = 15;
 
@@ -30,20 +40,51 @@ export default function ContractorTrialDemo() {
   const [simulationComplete, setSimulationComplete] = useState(false);
   const [invoiceSaved, setInvoiceSaved] = useState(false);
 
+  // State for daily variables (allow string for empty input)
+  const [truckRate, setTruckRate] = useState<string | number>(0);
+  const [kmsDriven, setKmsDriven] = useState<string | number>(0);
+  const [kmsRate, setKmsRate] = useState<string | number>(0.5);
+  const [otherCharges, setOtherCharges] = useState<string | number>(0);
+
+  // Invoice metadata
+  const [clientName, setClientName] = useState('Acme Energy Ltd.');
+  const [clientAddress, setClientAddress] = useState('123 Main St, Calgary, AB');
+  const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [contractorName, setContractorName] = useState('John Doe');
+  const [contractorAddress, setContractorAddress] = useState('456 Contractor Rd, Edmonton, AB');
+
+  // For editing daily entries
+  const [editDay, setEditDay] = useState<number | null>(null);
+  const [editFields, setEditFields] = useState<any>({});
+
   // Function to simulate the next day
   const handleNextDay = () => {
     if (day > TOTAL_DAYS) return;
-
+    const hours = payType === 'hourly' ? 8 : 12;
+    const base = payType === 'hourly' ? hours * rate : rate;
+    const truckRateNum = parseFloat(truckRate as string) || 0;
+    const kmsDrivenNum = parseFloat(kmsDriven as string) || 0;
+    const kmsRateNum = parseFloat(kmsRate as string) || 0;
+    const otherChargesNum = parseFloat(otherCharges as string) || 0;
+    const dailyTotal = base + truckRateNum + (kmsDrivenNum * kmsRateNum) + otherChargesNum;
     const newEntry: DailyEntry = {
       day: day,
-      description: `Well Site Servicing - Day ${day}`,
-      hours: 8,
-      rate: HOURLY_RATE,
-      dailyTotal: 8 * HOURLY_RATE,
+      description: `Work for ${companyName} - Day ${day}`,
+      hours: hours,
+      rate: rate,
+      truckRate: truckRateNum,
+      kmsDriven: kmsDrivenNum,
+      kmsRate: kmsRateNum,
+      otherCharges: otherChargesNum,
+      location: '',
+      ticketNumber: '',
+      dailyTotal,
     };
-
     setDailyEntries([...dailyEntries, newEntry]);
-
+    setTruckRate(truckRate);
+    setKmsDriven(kmsDriven);
+    setKmsRate(kmsRate);
+    setOtherCharges(otherCharges);
     if (day === TOTAL_DAYS) {
       setSimulationComplete(true);
     } else {
@@ -65,10 +106,36 @@ export default function ContractorTrialDemo() {
     setInvoiceSaved(true);
   };
 
+  // Edit daily entry
+  const startEditDay = (entry: DailyEntry) => {
+    setEditDay(entry.day);
+    setEditFields({ ...entry });
+  };
+  const saveEditDay = () => {
+    setDailyEntries(dailyEntries.map(e => e.day === editDay ? {
+      ...editFields,
+      truckRate: parseFloat(editFields.truckRate) || 0,
+      kmsDriven: parseFloat(editFields.kmsDriven) || 0,
+      kmsRate: parseFloat(editFields.kmsRate) || 0,
+      otherCharges: parseFloat(editFields.otherCharges) || 0,
+      dailyTotal:
+        (editFields.payType === 'hourly' ? (editFields.hours * editFields.rate) : editFields.rate)
+        + (parseFloat(editFields.truckRate) || 0)
+        + ((parseFloat(editFields.kmsDriven) || 0) * (parseFloat(editFields.kmsRate) || 0))
+        + (parseFloat(editFields.otherCharges) || 0),
+    } : e));
+    setEditDay(null);
+    setEditFields({});
+  };
+  const cancelEditDay = () => {
+    setEditDay(null);
+    setEditFields({});
+  };
+
   // Calculated totals for the final invoice
   const subtotal = dailyEntries.reduce((acc, entry) => acc + entry.dailyTotal, 0);
   const gst = subtotal * GST_RATE;
-  const totalSubsistence = dailyEntries.length * SUBSISTENCE_PER_DAY;
+  const totalSubsistence = dailyEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
 
   useEffect(() => {
@@ -141,6 +208,84 @@ export default function ContractorTrialDemo() {
           </div>
         </div>
 
+        {/* Invoice metadata section */}
+        <div className="max-w-4xl mx-auto py-6 px-4">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Invoice Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+                <input type="text" value={clientName} onChange={e => setClientName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Client Address</label>
+                <input type="text" value={clientAddress} onChange={e => setClientAddress(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
+                <input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contractor Name</label>
+                <input type="text" value={contractorName} onChange={e => setContractorName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contractor Address</label>
+                <input type="text" value={contractorAddress} onChange={e => setContractorAddress(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Configuration Section */}
+        {!simulationComplete && dailyEntries.length === 0 && (
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center"><Settings className="w-6 h-6 mr-3 text-green-600"/>Configure Your Simulation</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <input 
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pay Type</label>
+                <select 
+                  value={payType}
+                  onChange={(e) => setPayType(e.target.value as 'daily' | 'hourly')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="hourly">Hourly Rate</option>
+                  <option value="daily">Daily Rate</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {payType === 'hourly' ? 'Hourly Rate ($)' : 'Daily Rate ($)'}
+                </label>
+                <input 
+                  type="number"
+                  value={rate}
+                  onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Daily Subsistence ($)</label>
+                <input 
+                  type="number"
+                  value={subsistence}
+                  onChange={(e) => setSubsistence(parseFloat(e.target.value) || 0)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Simulation Controls and Status */}
         {!simulationComplete && (
            <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8 text-center">
@@ -148,8 +293,50 @@ export default function ContractorTrialDemo() {
                Simulating Day <span className="text-green-600">{day}</span> of {TOTAL_DAYS}
             </h2>
             <p className="text-gray-600 mb-6">
-              A standard 8-hour workday at ${HOURLY_RATE.toFixed(2)}/hr will be logged.
+              {payType === 'hourly' 
+                ? `An 8-hour workday at $${rate.toFixed(2)}/hr will be logged.`
+                : `A 12-hour workday at a daily rate of $${rate.toFixed(2)} will be logged.`
+              }
             </p>
+            {/* Daily variable inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-left">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Truck Rate ($)</label>
+                <input
+                  type="number"
+                  value={truckRate}
+                  onChange={e => setTruckRate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kms Driven (per day)</label>
+                <input
+                  type="number"
+                  value={kmsDriven}
+                  onChange={e => setKmsDriven(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kms Rate ($/km)</label>
+                <input
+                  type="number"
+                  value={kmsRate}
+                  onChange={e => setKmsRate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Other Charges ($)</label>
+                <input
+                  type="number"
+                  value={otherCharges}
+                  onChange={e => setOtherCharges(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
             <button 
               onClick={handleNextDay}
               className="bg-green-600 text-white px-12 py-4 rounded-lg font-semibold text-lg hover:bg-green-700 transition-transform duration-200 ease-in-out hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -166,12 +353,36 @@ export default function ContractorTrialDemo() {
             <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center"><Calendar className="w-6 h-6 mr-3 text-green-600"/>Daily Work Log</h3>
             <div className="space-y-3">
               {dailyEntries.map(entry => (
-                <div key={entry.day} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                  <div className="flex items-center">
-                    <Clock className="w-5 h-5 text-green-700 mr-3"/>
-                    <span className="font-medium text-gray-800">{entry.description}</span>
-                  </div>
-                  <span className="font-mono text-gray-700">${entry.dailyTotal.toFixed(2)}</span>
+                <div key={entry.day} className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-green-50 rounded-lg mb-2">
+                  {editDay === entry.day ? (
+                    <div className="w-full">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                        <input type="text" value={editFields.description} onChange={e => setEditFields({ ...editFields, description: e.target.value })} className="px-2 py-1 border rounded" placeholder="Description" />
+                        <input type="text" value={editFields.location} onChange={e => setEditFields({ ...editFields, location: e.target.value })} className="px-2 py-1 border rounded" placeholder="Location" />
+                        <input type="text" value={editFields.ticketNumber} onChange={e => setEditFields({ ...editFields, ticketNumber: e.target.value })} className="px-2 py-1 border rounded" placeholder="Ticket Number" />
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+                        <input type="number" value={editFields.truckRate} onChange={e => setEditFields({ ...editFields, truckRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Truck Rate" />
+                        <input type="number" value={editFields.kmsDriven} onChange={e => setEditFields({ ...editFields, kmsDriven: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Driven" />
+                        <input type="number" value={editFields.kmsRate} onChange={e => setEditFields({ ...editFields, kmsRate: e.target.value })} className="px-2 py-1 border rounded" placeholder="Kms Rate" />
+                        <input type="number" value={editFields.otherCharges} onChange={e => setEditFields({ ...editFields, otherCharges: e.target.value })} className="px-2 py-1 border rounded" placeholder="Other Charges" />
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <button onClick={saveEditDay} className="bg-emerald-600 text-white px-4 py-1 rounded">Save</button>
+                        <button onClick={cancelEditDay} className="bg-gray-200 text-gray-700 px-4 py-1 rounded">Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex-1">
+                        <span className="font-medium text-gray-800">{entry.description}</span>
+                        <span className="block text-xs text-gray-500">Location: {entry.location || '-'} | Ticket #: {entry.ticketNumber || '-'}</span>
+                        <span className="block text-xs text-gray-500">Hours: {entry.hours}, Rate: ${entry.rate}, Truck: ${entry.truckRate}, Kms: {entry.kmsDriven} @ ${entry.kmsRate}/km, Other: ${entry.otherCharges}</span>
+                      </div>
+                      <span className="font-mono text-gray-700">${entry.dailyTotal.toFixed(2)}</span>
+                      <button onClick={() => startEditDay(entry)} className="ml-4 text-emerald-600 hover:underline">Edit</button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -184,15 +395,63 @@ export default function ContractorTrialDemo() {
             <div className="text-center mb-8">
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4"/>
                 <h2 className="text-4xl font-extrabold text-gray-900">Invoice Ready for Submission</h2>
-                <p className="text-gray-600 mt-2">15-day work period completed and invoice generated.</p>
+                <div className="mt-2 text-gray-700">
+                  <div><span className="font-semibold">Client:</span> {clientName}</div>
+                  <div><span className="font-semibold">Client Address:</span> {clientAddress}</div>
+                  <div><span className="font-semibold">Invoice Date:</span> {invoiceDate}</div>
+                  <div><span className="font-semibold">Contractor:</span> {contractorName}</div>
+                  <div><span className="font-semibold">Contractor Address:</span> {contractorAddress}</div>
+                </div>
             </div>
             
             <div className="border-t border-gray-200 pt-6">
                 {/* Line Items */}
                 <h4 className="text-lg font-semibold text-gray-800 mb-2">Work Summary:</h4>
-                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                    <span className="text-gray-600 flex items-center"><FileText className="w-4 h-4 mr-2"/>Total from Daily Work Logs</span>
-                    <span className="font-mono text-gray-800">${subtotal.toFixed(2)}</span>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-xs mb-4">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="px-2 py-1">Day</th>
+                        <th className="px-2 py-1">Description</th>
+                        <th className="px-2 py-1">Location</th>
+                        <th className="px-2 py-1">Ticket #</th>
+                        <th className="px-2 py-1">Truck</th>
+                        <th className="px-2 py-1">Kms</th>
+                        <th className="px-2 py-1">Kms Rate</th>
+                        <th className="px-2 py-1">Other</th>
+                        <th className="px-2 py-1">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dailyEntries.map(e => (
+                        <tr key={e.day} className="border-b">
+                          <td className="px-2 py-1 text-center">{e.day}</td>
+                          <td className="px-2 py-1">{e.description}</td>
+                          <td className="px-2 py-1">{e.location}</td>
+                          <td className="px-2 py-1">{e.ticketNumber}</td>
+                          <td className="px-2 py-1 text-right">${e.truckRate}</td>
+                          <td className="px-2 py-1 text-right">{e.kmsDriven}</td>
+                          <td className="px-2 py-1 text-right">${e.kmsRate}</td>
+                          <td className="px-2 py-1 text-right">${e.otherCharges}</td>
+                          <td className="px-2 py-1 text-right font-bold">${e.dailyTotal.toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Add breakdown for truck, kms, other charges */}
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Truck Charges</span>
+                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + e.truckRate, 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Kms Charges</span>
+                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + (e.kmsDriven * e.kmsRate), 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Total Other Charges</span>
+                  <span className="font-mono text-gray-800">${dailyEntries.reduce((acc, e) => acc + e.otherCharges, 0).toFixed(2)}</span>
                 </div>
 
                 {/* Financial Calculations */}

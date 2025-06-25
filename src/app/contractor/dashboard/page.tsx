@@ -89,6 +89,24 @@ export default function ContractorDashboardPage() {
               </div>
             </div>
 
+            {/* Getting Started Guide */}
+            <div className="mb-6">
+              <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-lg p-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">See How It Works</h2>
+                  <p className="text-green-100 mt-1">
+                    Run a personalized 15-day invoice simulation to see your earnings calculated automatically.
+                  </p>
+                </div>
+                <a 
+                  href="/contractor-demo"
+                  className="bg-white text-green-700 font-bold px-5 py-3 rounded-lg hover:bg-green-50 transition-colors"
+                >
+                  Try the Demo
+                </a>
+              </div>
+            </div>
+
             {/* Tab Navigation */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
               <div className="flex overflow-x-auto">
