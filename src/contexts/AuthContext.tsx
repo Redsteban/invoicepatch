@@ -4,9 +4,19 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { User, Session } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// --- Supabase Environment Variable Check and Fallback ---
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
+
+if (!isSupabaseConfigured) {
+  console.warn('Supabase not configured, running in offline mode');
+}
+
+const supabase = isSupabaseConfigured
+  ? require('@supabase/supabase-js').createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 interface AuthContextType {
   user: User | null;
@@ -33,18 +43,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // If Supabase is not configured, provide a mock context and skip auth logic
+  if (!isSupabaseConfigured || process.env.NODE_ENV === 'development') {
+    const mockValue = {
+      user: null,
+      session: null,
+      loading: false,
+      signUp: async () => ({ data: null, error: 'Auth disabled (offline mode)' }),
+      signIn: async () => ({ data: null, error: 'Auth disabled (offline mode)' }),
+      signOut: async () => {},
+      resetPassword: async () => ({ data: null, error: 'Auth disabled (offline mode)' }),
+    };
+    return <AuthContext.Provider value={mockValue}>{children}</AuthContext.Provider>;
+  }
+
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
       setLoading(false);
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);

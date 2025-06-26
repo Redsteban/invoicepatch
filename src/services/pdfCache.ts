@@ -1,0 +1,1 @@
+export const pdfCache = new Map<string, { pdf: Buffer; expires: number }>(); 

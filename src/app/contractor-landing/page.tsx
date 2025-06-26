@@ -121,7 +121,7 @@ export default function ContractorLanding() {
                 className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors flex items-center justify-center space-x-2"
               >
                 <Sparkles className="w-5 h-5 text-green-500" />
-                <span>Watch Demo</span>
+                <span>Try it out!</span>
               </button>
             </motion.div>
           </motion.div>

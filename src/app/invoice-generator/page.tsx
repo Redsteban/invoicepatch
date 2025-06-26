@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   DocumentTextIcon,
@@ -14,6 +14,9 @@ import {
   MapPinIcon,
   TruckIcon
 } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
+
+const EmailCollectionModal = dynamic(() => import('@/components/EmailCollectionModal'), { ssr: false });
 
 // Canadian Provinces and their tax rates
 const CANADIAN_PROVINCES = {
@@ -138,6 +141,12 @@ const InvoiceGenerator = () => {
   });
 
   const [showPreview, setShowPreview] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [modalAction, setModalAction] = useState<'download' | 'email' | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const lastPdfBase64 = useRef<string | null>(null);
 
   // Calculate totals and taxes
   const calculateInvoice = () => {
@@ -198,6 +207,88 @@ const InvoiceGenerator = () => {
       ...invoiceData,
       lineItems: invoiceData.lineItems.filter(item => item.id !== id)
     });
+  };
+
+  // --- Modal Handlers ---
+  const handleOpenModal = (action: 'download' | 'email') => {
+    setModalAction(action);
+    setModalOpen(true);
+    setModalError(null);
+  };
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setModalError(null);
+  };
+
+  // --- Backend Integration ---
+  const handleDownloadPDF = async () => {
+    setIsGenerating(true);
+    setModalError(null);
+    try {
+      const res = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoiceData }),
+      });
+      if (!res.ok) throw new Error('Failed to generate PDF');
+      const { pdfBase64 } = await res.json();
+      lastPdfBase64.current = pdfBase64;
+      // Download PDF
+      const link = document.createElement('a');
+      link.href = `data:application/pdf;base64,${pdfBase64}`;
+      link.download = `Invoice-${invoiceData.invoiceNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e: any) {
+      setModalError(e.message || 'Failed to generate PDF.');
+      throw e;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleEmailSubmit = async (email: string, consent: boolean) => {
+    setIsSending(true);
+    setModalError(null);
+    try {
+      // Always generate PDF first if not already
+      let pdfBase64 = lastPdfBase64.current;
+      if (!pdfBase64) {
+        const res = await fetch('/api/pdf/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invoiceData }),
+        });
+        if (!res.ok) throw new Error('Failed to generate PDF');
+        const data = await res.json();
+        pdfBase64 = data.pdfBase64;
+        lastPdfBase64.current = pdfBase64;
+      }
+      // Send email
+      const res = await fetch('/api/email/send-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': process.env.NEXT_PUBLIC_CSRF_TOKEN || '',
+        },
+        body: JSON.stringify({
+          email,
+          consent: { consentMarketing: consent, consentUpdates: true },
+          invoiceData,
+          pdfBase64,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to send invoice');
+      }
+    } catch (e: any) {
+      setModalError(e.message || 'Failed to send invoice.');
+      throw e;
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -525,11 +616,17 @@ const InvoiceGenerator = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center gap-4">
-          <button className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+          <button
+            className="inline-flex items-center px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+            onClick={() => handleOpenModal('download')}
+          >
             <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
             Download PDF
           </button>
-          <button className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            onClick={() => handleOpenModal('email')}
+          >
             <EnvelopeIcon className="h-5 w-5 mr-2" />
             Email Invoice
           </button>
@@ -539,6 +636,42 @@ const InvoiceGenerator = () => {
           </button>
         </div>
       </div>
+      {/* Email Collection Modal */}
+      <EmailCollectionModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        invoiceData={{
+          contractorName: invoiceData.contractor.businessName,
+          contractorAddress: invoiceData.contractor.address,
+          contractorCity: invoiceData.contractor.city,
+          contractorProvince: invoiceData.contractor.province,
+          contractorPostal: invoiceData.contractor.postalCode,
+          contractorPhone: invoiceData.contractor.phone,
+          contractorEmail: invoiceData.contractor.email,
+          gstNumber: invoiceData.contractor.gstNumber,
+          clientName: invoiceData.client.companyName,
+          clientAddress: invoiceData.client.address,
+          clientCity: invoiceData.client.city,
+          clientProvince: invoiceData.client.province,
+          clientPostal: invoiceData.client.postalCode,
+          clientEmail: '',
+          invoiceNumber: invoiceData.invoiceNumber,
+          invoiceDate: invoiceData.invoiceDate,
+          dueDate: invoiceData.dueDate,
+          projectDescription: invoiceData.project.name,
+          lineItems: invoiceData.lineItems.map(item => ({
+            description: item.description,
+            quantity: item.quantity,
+            rate: item.rate,
+            amount: item.amount,
+          })),
+          notes: invoiceData.notes,
+        }}
+        onEmailSubmit={handleEmailSubmit}
+        onDownloadPDF={handleDownloadPDF}
+        isGenerating={isGenerating}
+        isSending={isSending}
+      />
     </div>
   );
 };

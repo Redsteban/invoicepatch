@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase } from 'lucide-react';
+import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase, Download, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FreemiumModal from '@/components/FreemiumModal';
+import dynamic from 'next/dynamic';
+const EmailCollectionModal = dynamic(() => import('@/components/EmailCollectionModal'), { ssr: false });
+
+// @ts-ignore
+const CSRF_TOKEN = process.env.NEXT_PUBLIC_CSRF_TOKEN || '';
 
 // Simulating a daily work entry
 interface DailyEntry {
@@ -66,7 +71,10 @@ export default function ContractorTrialDemo() {
   const [payPeriodStart, setPayPeriodStart] = useState(() => new Date());
 
   // Modal state
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [showFreemiumModal, setShowFreemiumModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   // Reminder banner state
   const [showLocationReminder, setShowLocationReminder] = useState(true);
@@ -117,7 +125,7 @@ export default function ContractorTrialDemo() {
     setOtherCharges(otherCharges);
     if (day === TOTAL_DAYS) {
       setSimulationComplete(true);
-      setShowFreemiumModal(true);
+      setShowEmailModal(true);
     } else {
       setDay(day + 1);
     }
@@ -193,8 +201,166 @@ export default function ContractorTrialDemo() {
     }
   }, []);
 
+  // Helper to build invoiceData for EmailCollectionModal
+  const buildInvoiceData = () => {
+    const periodStart = payPeriodStart;
+    const periodEnd = new Date(payPeriodStart);
+    periodEnd.setDate(periodEnd.getDate() + TOTAL_DAYS - 1);
+    return {
+      invoiceNumber: invoiceNumber || 'N/A',
+      issueDate: new Date(invoiceDate),
+      dueDate: periodEnd,
+      contractor: {
+        name: contractorName,
+        address: contractorAddress,
+        email: '',
+        phone: '',
+      },
+      client: {
+        name: clientName,
+        address: clientAddress,
+      },
+      period: {
+        startDate: new Date(periodStart),
+        endDate: new Date(periodEnd),
+      },
+      entries: workedEntries.map(e => ({
+        date: new Date(e.date),
+        description: e.description,
+        regularHours: e.hours, // or split if you have overtime/travel
+        overtimeHours: 0,
+        travelHours: 0,
+        amount: e.dailyTotal,
+        expenses: e.otherCharges || 0,
+      })),
+      summary: {
+        regularHours: workedEntries.reduce((acc, e) => acc + e.hours, 0),
+        overtimeHours: 0,
+        travelHours: 0,
+        totalHours: workedEntries.reduce((acc, e) => acc + e.hours, 0),
+        regularAmount: workedEntries.reduce((acc, e) => acc + e.rate * e.hours, 0),
+        overtimeAmount: 0,
+        travelAmount: 0,
+        expensesTotal: workedEntries.reduce((acc, e) => acc + (e.otherCharges || 0), 0),
+        subtotal,
+        gst: gst,
+        pst: 0,
+        total: grandTotal,
+      },
+      notes: '',
+    };
+  };
+
+  // Handlers for EmailCollectionModal
+  const handleEmailSubmit = async (email: string, consent: boolean) => {
+    setIsSending(true);
+    try {
+      if (!CSRF_TOKEN) {
+        return { error: 'CSRF token missing. Please contact support.' };
+      }
+      const res = await fetch('/api/email/send-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': CSRF_TOKEN,
+        },
+        body: JSON.stringify({
+          email,
+          consent,
+          invoiceData: buildInvoiceData(),
+        }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setShowEmailModal(false);
+        setShowFreemiumModal(true);
+      }
+      return result;
+    } catch (e: any) {
+      return { error: e?.message || 'Failed to send invoice.' };
+    } finally {
+      setIsSending(false);
+    }
+  };
+  const handleDownloadPDF = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoiceData: buildInvoiceData() }),
+      });
+      const result = await res.json();
+      if (res.ok && result.pdfUrl) {
+        window.open(result.pdfUrl, '_blank');
+        setShowEmailModal(false);
+      }
+      return result;
+    } catch (e: any) {
+      return { error: e?.message || 'Failed to download PDF.' };
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Function to generate the full 14-day log at once
+  const handleGenerateFullLog = () => {
+    const entries: DailyEntry[] = [];
+    for (let i = 1; i <= TOTAL_DAYS; i++) {
+      const hours = payType === 'hourly' ? 8 : 12;
+      const base = payType === 'hourly' ? hours * rate : rate;
+      const truckRateNum = parseFloat(truckRate) || 0;
+      const kmsDrivenNum = parseFloat(kmsDriven) || 0;
+      const kmsRateNum = parseFloat(kmsRate) || 0;
+      const otherChargesNum = parseFloat(otherCharges) || 0;
+      const dailyTotal = base + truckRateNum + (kmsDrivenNum * kmsRateNum) + otherChargesNum;
+      const entryDate = new Date(payPeriodStart);
+      entryDate.setDate(payPeriodStart.getDate() + (i - 1));
+      let ticketNumber = '';
+      if (i === 1) {
+        ticketNumber = clientInvoiceNumber;
+      } else if (entries.length > 0) {
+        const prev = entries[entries.length - 1].ticketNumber;
+        const prevNum = parseInt(prev, 10);
+        if (!isNaN(prevNum)) {
+          ticketNumber = String(prevNum + 1);
+        }
+      }
+      entries.push({
+        day: i,
+        date: entryDate.toISOString().slice(0, 10),
+        description: `Stack Production Testing - Day ${i}`,
+        hours: hours,
+        rate: rate,
+        truckRate: truckRateNum,
+        kmsDriven: kmsDrivenNum,
+        kmsRate: kmsRateNum,
+        otherCharges: otherChargesNum,
+        location: '',
+        ticketNumber: ticketNumber,
+        dailyTotal,
+        worked: true,
+      });
+    }
+    setDailyEntries(entries);
+    setSimulationComplete(true);
+    // Do NOT open the email modal here; let the user audit first
+    setShowEmailModal(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      <EmailCollectionModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        invoiceData={buildInvoiceData()}
+        onEmailSubmit={handleEmailSubmit}
+        onDownloadPDF={async () => {
+          await handleDownloadPDF();
+        }}
+        isGenerating={isGenerating}
+        isSending={isSending}
+      />
       <FreemiumModal open={showFreemiumModal} onClose={() => setShowFreemiumModal(false)}>
         <div className="flex flex-col items-center text-center">
           <CheckCircle className="w-12 h-12 text-blue-600 mb-4" />
@@ -408,6 +574,15 @@ export default function ContractorTrialDemo() {
             >
               Simulate Next Day
             </button>
+            {/* Add Generate 14-Day Log button if no days have been simulated yet */}
+            {dailyEntries.length === 0 && (
+              <button
+                onClick={handleGenerateFullLog}
+                className="ml-4 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-transform duration-200 ease-in-out hover:scale-105 mt-4"
+              >
+                Generate 14-Day Log
+              </button>
+            )}
           </div>
         )}
 
@@ -598,20 +773,26 @@ export default function ContractorTrialDemo() {
             </div>
 
             <div className="text-center mt-8">
-              {!invoiceSaved ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
-                  onClick={handleSaveInvoice}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center mx-auto"
+                  onClick={async () => {
+                    await handleDownloadPDF();
+                  }}
+                  className="flex-1 bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-emerald-700 transition-colors flex items-center justify-center mx-auto"
+                  disabled={isGenerating}
                 >
-                  <Save className="w-5 h-5 mr-3" />
-                  Save Invoice
+                  <Download className="w-5 h-5 mr-3" />
+                  {isGenerating ? 'Generating...' : 'Download PDF'}
                 </button>
-              ) : (
-                <div className="text-green-700 font-bold text-lg p-4 bg-green-100 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 mr-2" />
-                  Invoice Saved Successfully!
-                </div>
-              )}
+                <button
+                  onClick={() => setShowEmailModal(true)}
+                  className="flex-1 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center mx-auto"
+                  disabled={isSending}
+                >
+                  <Mail className="w-5 h-5 mr-3" />
+                  Email PDF
+                </button>
+              </div>
             </div>
 
             <p className="text-center text-sm text-gray-500 mt-4">

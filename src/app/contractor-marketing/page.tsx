@@ -328,7 +328,7 @@ export default function ContractorMarketing() {
                 className="border-2 border-green-600 text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center justify-center space-x-2 text-lg"
               >
                 <Sparkles className="w-6 h-6" />
-                <span>Watch Demo</span>
+                <span>Try it out!</span>
               </button>
             </motion.div>
 
