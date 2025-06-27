@@ -6,6 +6,8 @@ import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, Plu
 import { useRouter } from 'next/navigation';
 import FreemiumModal from '@/components/FreemiumModal';
 import dynamic from 'next/dynamic';
+import ProfessionalPDFPreview from '@/components/ProfessionalPDFPreview';
+import { generateHTMLToPDF } from '@/utils/htmlToPdfGenerator';
 const EmailCollectionModal = dynamic(() => import('@/components/EmailCollectionModal'), { ssr: false });
 
 // @ts-ignore
@@ -106,7 +108,7 @@ export default function ContractorTrialDemo() {
     const newEntry: DailyEntry = {
       day: day,
       date: entryDate.toISOString().slice(0, 10),
-      description: `Stack Production Testing - Day ${day}`,
+      description: 'Stack Production Testing',
       hours: hours,
       rate: rate,
       truckRate: truckRateNum,
@@ -226,12 +228,19 @@ export default function ContractorTrialDemo() {
       },
       entries: workedEntries.map(e => ({
         date: new Date(e.date),
-        description: e.description,
-        regularHours: e.hours, // or split if you have overtime/travel
-        overtimeHours: 0,
-        travelHours: 0,
-        amount: e.dailyTotal,
-        expenses: e.otherCharges || 0,
+        description: 'Stack Production Testing',
+        worked: e.worked,
+        hoursWorked: e.hours,
+        truckUsed: !!e.truckRate,
+        travelKms: e.kmsDriven,
+        subsistence: subsistence,
+        dailyTotal: e.dailyTotal,
+        location: e.location,
+        ticketNumber: e.ticketNumber,
+        truckRate: e.truckRate,
+        kmsDriven: e.kmsDriven,
+        kmsRate: e.kmsRate,
+        otherCharges: e.otherCharges,
       })),
       summary: {
         regularHours: workedEntries.reduce((acc, e) => acc + e.hours, 0),
@@ -329,7 +338,7 @@ export default function ContractorTrialDemo() {
       entries.push({
         day: i,
         date: entryDate.toISOString().slice(0, 10),
-        description: `Stack Production Testing - Day ${i}`,
+        description: 'Stack Production Testing',
         hours: hours,
         rate: rate,
         truckRate: truckRateNum,
@@ -354,12 +363,6 @@ export default function ContractorTrialDemo() {
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}
         invoiceData={buildInvoiceData()}
-        onEmailSubmit={handleEmailSubmit}
-        onDownloadPDF={async () => {
-          await handleDownloadPDF();
-        }}
-        isGenerating={isGenerating}
-        isSending={isSending}
       />
       <FreemiumModal open={showFreemiumModal} onClose={() => setShowFreemiumModal(false)}>
         <div className="flex flex-col items-center text-center">
@@ -776,7 +779,20 @@ export default function ContractorTrialDemo() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={async () => {
-                    await handleDownloadPDF();
+                    await generateHTMLToPDF({
+                      entries: workedEntries.map(e => ({
+                        ...e,
+                        completed: e.worked,
+                      })),
+                      contractorName,
+                      clientName,
+                      startDate: payPeriodStart.toISOString().slice(0, 10),
+                      endDate: (() => {
+                        const end = new Date(payPeriodStart);
+                        end.setDate(end.getDate() + TOTAL_DAYS - 1);
+                        return end.toISOString().slice(0, 10);
+                      })(),
+                    });
                   }}
                   className="flex-1 bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-emerald-700 transition-colors flex items-center justify-center mx-auto"
                   disabled={isGenerating}

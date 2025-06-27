@@ -39,32 +39,51 @@ export default function PDFDownloader({ simulationData, onDownloadComplete }: PD
       
       const invoiceEntries = simulationData.entries
         .filter(entry => entry.completed)
-        .map(entry => ({
+        .map((entry, index) => ({
+          day: index + 1,
           date: new Date(entry.date).toLocaleDateString(),
-          regularHours: entry.regularHours,
-          overtimeHours: entry.overtimeHours,
           description: entry.workDescription || 'Daily work completed',
-          amount: (entry.regularHours * hourlyRate) + (entry.overtimeHours * overtimeRate)
+          location: '',
+          ticketNumber: '',
+          truckRate: 0,
+          kmsDriven: 0,
+          kmsRate: 0,
+          otherCharges: 0,
+          dailyTotal: (entry.regularHours * hourlyRate) + (entry.overtimeHours * overtimeRate),
+          worked: true,
+          hoursWorked: entry.regularHours + entry.overtimeHours
         }));
       
-      const totals = calculateInvoiceTotals(invoiceEntries, hourlyRate);
+      const subtotal = invoiceEntries.reduce((sum, entry) => sum + entry.dailyTotal, 0);
+      const gst = subtotal * 0.05;
+      const subsistence = 700.00;
+      const grandTotal = subtotal + gst + subsistence;
       
       const invoiceData = {
         invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
-        contractorName: simulationData.contractorName || 'Your Name',
         clientName: simulationData.clientName || 'Client Company',
-        period: `${new Date(simulationData.startDate).toLocaleDateString()} - ${new Date(simulationData.endDate).toLocaleDateString()}`,
-        startDate: simulationData.startDate,
-        endDate: simulationData.endDate,
+        clientAddress: '123 Main St, Calgary, AB',
+        invoiceDate: new Date().toLocaleDateString('en-CA'),
+        contractorName: simulationData.contractorName || 'Your Name',
+        contractorAddress: '456 Contractor Rd, Edmonton, AB',
+        payPeriodStart: simulationData.startDate,
+        payPeriodEnd: simulationData.endDate,
         entries: invoiceEntries,
-        totals,
-        rate: hourlyRate
+        totals: {
+          subtotal,
+          gst,
+          subsistence,
+          grandTotal,
+          truckTotal: 0,
+          kmsTotal: 0,
+          otherTotal: 0
+        }
       };
       
       console.log('Generated invoice data:', invoiceData);
       
       // Generate and download PDF
-      generateInvoicePDF(invoiceData);
+      await generateInvoicePDF(invoiceData);
       
       setSuccess(true);
       onDownloadComplete?.();

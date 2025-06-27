@@ -1,6 +1,4 @@
 import jsPDF from 'jspdf';
-// @ts-ignore
-import autoTable from 'jspdf-autotable';
 
 interface InvoiceEntry {
   day: number;
@@ -41,7 +39,7 @@ interface InvoiceData {
   };
 }
 
-export function generateInvoicePDF(invoiceData: InvoiceData): jsPDF | null {
+export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPDF | null> {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -87,36 +85,51 @@ export function generateInvoicePDF(invoiceData: InvoiceData): jsPDF | null {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const tableColumns = [
+      { header: 'Day', dataKey: 'day' },
       { header: 'Date', dataKey: 'date' },
-      { header: 'Worked', dataKey: 'worked' },
-      { header: 'Hours Worked', dataKey: 'hoursWorked' },
-      { header: 'Truck Used', dataKey: 'truckUsed' },
-      { header: 'Travel KMs', dataKey: 'travelKms' },
-      { header: 'Subsistence', dataKey: 'subsistence' },
-      { header: 'Daily Total', dataKey: 'dailyTotal' },
+      { header: 'Description', dataKey: 'description' },
+      { header: 'Location', dataKey: 'location' },
+      { header: 'Ticket #', dataKey: 'ticketNumber' },
+      { header: 'Truck', dataKey: 'truckRate' },
+      { header: 'Kms', dataKey: 'kmsDriven' },
+      { header: 'Kms Rate', dataKey: 'kmsRate' },
+      { header: 'Other', dataKey: 'otherCharges' },
+      { header: 'Total', dataKey: 'dailyTotal' },
     ];
-    const tableRows = invoiceData.entries.map((entry) => ({
+    const tableRows = invoiceData.entries.map((entry, idx) => ({
+      day: idx + 1,
       date: entry.date,
-      worked: entry.worked ? '✓' : 'Day off',
-      hoursWorked: entry.worked ? (entry.hoursWorked ?? '') : '',
-      truckUsed: entry.worked && entry.truckUsed ? '✓' : '',
-      travelKms: entry.worked ? entry.travelKms : '',
-      subsistence: entry.worked ? `$${(entry.subsistence ?? 0).toFixed(2)}` : '',
-      dailyTotal: entry.worked ? `$${(entry.dailyTotal ?? 0).toFixed(2)}` : '',
+      description: entry.description,
+      location: entry.location || '',
+      ticketNumber: entry.ticketNumber || '',
+      truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
+      kmsDriven: entry.kmsDriven ?? '',
+      kmsRate: entry.kmsRate ? `$${Number(entry.kmsRate).toFixed(2)}` : '',
+      otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
+      dailyTotal: entry.dailyTotal ? `$${Number(entry.dailyTotal).toFixed(2)}` : '',
     }));
-    if (typeof autoTable === 'function') {
-      autoTable(doc, {
-        startY: y,
-        head: [tableColumns.map(col => col.header)],
-        body: tableRows.map(row => tableColumns.map(col => (row as any)[col.dataKey])),
-        styles: { font: 'helvetica', fontSize: 9, cellPadding: 1 },
-        headStyles: { fillColor: [243, 244, 246], textColor: 34, fontStyle: 'bold' },
-        alternateRowStyles: { fillColor: [250, 250, 250] },
-        margin: { left: margin, right: margin },
-        theme: 'grid',
-      });
-      y = (doc as any).lastAutoTable.finalY + 6;
-    } else {
+    
+    // Dynamic import for autoTable
+    try {
+      const autoTable = (await import('jspdf-autotable')).default;
+      if (typeof autoTable === 'function') {
+        autoTable(doc, {
+          startY: y,
+          head: [tableColumns.map(col => col.header)],
+          body: tableRows.map(row => tableColumns.map(col => (row as any)[col.dataKey])),
+          styles: { font: 'helvetica', fontSize: 9, cellPadding: 1 },
+          headStyles: { fillColor: [243, 244, 246], textColor: 34, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [250, 250, 250] },
+          margin: { left: margin, right: margin },
+          theme: 'grid',
+        });
+        y = (doc as any).lastAutoTable.finalY + 6;
+      } else {
+        doc.text('Table not available', margin, y);
+        y += 10;
+      }
+    } catch (importError) {
+      console.warn('AutoTable import failed, using fallback:', importError);
       doc.text('Table not available', margin, y);
       y += 10;
     }

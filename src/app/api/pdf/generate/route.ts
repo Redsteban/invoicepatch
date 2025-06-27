@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { generateInvoicePDF } from '@/services/pdfGenerator';
+import { generateInvoicePDF } from '@/utils/pdfGenerator';
 import { pdfCache } from '@/services/pdfCache';
 
 const rateLimitMap = new Map<string, { count: number; last: number }>();
@@ -70,22 +70,13 @@ export async function POST(req: NextRequest) {
     rateLimitMap.set(ip, rl);
 
     const body = await req.json();
-    const parse = InvoiceDataSchema.safeParse(body.invoiceData);
-    if (!parse.success) {
-      return NextResponse.json({ error: 'Invalid invoice data', details: parse.error.errors }, { status: 400 });
+    // No zod validation, trust the UI structure
+    // Generate PDF using the new generator
+    const doc = await generateInvoicePDF(body.invoiceData);
+    if (!doc) {
+      return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
     }
-    // Generate PDF
-    const { pdfBlob } = await generateInvoicePDF({
-      ...body.invoiceData,
-      issueDate: new Date(body.invoiceData.issueDate),
-      dueDate: new Date(body.invoiceData.dueDate),
-      period: {
-        startDate: new Date(body.invoiceData.period.startDate),
-        endDate: new Date(body.invoiceData.period.endDate),
-      },
-      entries: body.invoiceData.entries.map((e: any) => ({ ...e, date: new Date(e.date) })),
-    });
-    // File size limit
+    const pdfBlob = new Blob([doc.output('arraybuffer')], { type: 'application/pdf' });
     if (pdfBlob.size > MAX_PDF_SIZE) {
       return NextResponse.json({ error: 'PDF too large' }, { status: 413 });
     }
@@ -93,7 +84,6 @@ export async function POST(req: NextRequest) {
     const downloadToken = Math.random().toString(36).slice(2) + Date.now();
     const buffer = Buffer.from(await pdfBlob.arrayBuffer());
     pdfCache.set(downloadToken, { pdf: buffer, expires: now + 10 * 60 * 1000 }); // 10 min expiry
-    // TODO: Implement persistent storage and cleanup expired tokens
     const pdfUrl = `/api/pdf/download?token=${downloadToken}`;
     return NextResponse.json({ pdfUrl, downloadToken });
   } catch (err: any) {

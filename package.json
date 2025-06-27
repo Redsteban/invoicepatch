@@ -28,6 +28,7 @@
     "html2pdf.js": "^0.10.3",
     "isomorphic-dompurify": "^2.25.0",
     "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.513.0",
     "next": "14.2.29",
     "nodemailer": "^6.10.1",
