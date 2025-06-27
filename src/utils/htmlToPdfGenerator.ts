@@ -69,16 +69,16 @@ export async function generateHTMLToPDF(simulationData: any): Promise<void> {
 
 // Only invoice content: header, table, summary, grand total
 export function createInvoiceHTML(simulationData: any): string {
-  const completedEntries = simulationData.entries.filter((entry: any) => entry.completed);
+  const workedEntries = simulationData.entries.filter((entry: any) => entry.worked);
   
   // Use the exact calculated values from the preview instead of recalculating
-  const totalTruckCharges = simulationData.totalTruckCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
-  const totalKmsCharges = simulationData.totalKmsCharges || completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
-  const totalOtherCharges = simulationData.totalOtherCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
-  const subtotal = simulationData.subtotal || completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
+  const totalTruckCharges = simulationData.totalTruckCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = simulationData.totalKmsCharges || workedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = simulationData.totalOtherCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = simulationData.subtotal || workedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
-  const totalSubsistence = simulationData.totalSubsistence || completedEntries.length * subsistence;
+  const totalSubsistence = simulationData.totalSubsistence || workedEntries.length * subsistence;
   const grandTotal = simulationData.grandTotal || subtotal + gst + totalSubsistence;
   
   return `
@@ -114,19 +114,19 @@ export function createInvoiceHTML(simulationData: any): string {
             </tr>
           </thead>
           <tbody>
-            ${completedEntries.map((entry: any, index: number) => `
+            ${workedEntries.map((entry: any, index: number) => `
               <tr>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
-                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || simulationData.clientName}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.completed ? (entry.kmsDriven || 0) : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${subsistence.toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.completed ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.kmsDriven || 0) : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${subsistence.toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.worked ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
               </tr>
             `).join('')}
           </tbody>

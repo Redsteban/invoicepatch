@@ -187,20 +187,21 @@ async function generateInvoicePDFBuffer(invoiceData: any): Promise<Buffer> {
     doc.text('Work Summary:', 15, y);
     y += 10;
 
-    // Create table with entries
+    // Create table with entries - only show worked days
     const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
-    const tableData = invoiceData.entries.map((entry: any, index: number) => [
+    const workedEntries = invoiceData.entries.filter((entry: any) => entry.worked);
+    const tableData = workedEntries.map((entry: any, index: number) => [
       (index + 1).toString(),
       entry.date,
       entry.description,
       entry.location || '',
       entry.ticketNumber || '',
-      entry.completed ? `$${entry.truckRate}` : '-',
-      entry.completed ? entry.kmsDriven.toString() : '-',
-      entry.completed ? `$${entry.kmsRate}` : '-',
-      entry.completed ? `$${entry.otherCharges}` : '-',
-      entry.completed ? `$${invoiceData.subsistence.toFixed(2)}` : '-',
-      entry.completed ? `$${entry.dailyTotal.toFixed(2)}` : '-'
+      entry.worked ? `$${entry.truckRate}` : '-',
+      entry.worked ? entry.kmsDriven.toString() : '-',
+      entry.worked ? `$${entry.kmsRate}` : '-',
+      entry.worked ? `$${entry.otherCharges}` : '-',
+      entry.worked ? `$${invoiceData.subsistence.toFixed(2)}` : '-',
+      entry.worked ? `$${entry.dailyTotal.toFixed(2)}` : '-'
     ]);
 
     // Add table using autoTable
@@ -294,7 +295,7 @@ async function generateInvoicePDFBuffer(invoiceData: any): Promise<Buffer> {
 
 // Helper function to create the same HTML as the preview
 function createInvoiceHTML(invoiceData: any): string {
-  const completedEntries = invoiceData.entries.filter((entry: any) => entry.completed);
+  const workedEntries = invoiceData.entries.filter((entry: any) => entry.worked);
   
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #3c4043; line-height: 1.4;">
@@ -329,19 +330,19 @@ function createInvoiceHTML(invoiceData: any): string {
             </tr>
           </thead>
           <tbody>
-            ${completedEntries.map((entry: any, index: number) => `
+            ${workedEntries.map((entry: any, index: number) => `
               <tr>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
-                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || invoiceData.clientName}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.completed ? (entry.kmsDriven || 0) : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${invoiceData.subsistence.toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.completed ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.kmsDriven || 0) : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${invoiceData.subsistence.toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.worked ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
               </tr>
             `).join('')}
           </tbody>

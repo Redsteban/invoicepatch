@@ -245,12 +245,12 @@ export async function generateAndOpenPDF(simulationData: any): Promise<void> {
 
 // Convert simulation data to exact invoice format
 function convertToExactInvoiceData(simulationData: any): InvoiceData {
-  const completedEntries = simulationData.entries.filter((entry: any) => entry.completed);
+  const workedEntries = simulationData.entries.filter((entry: any) => entry.worked);
   
-  const entries = completedEntries.map((entry: any, index: number) => ({
+  const entries = workedEntries.map((entry: any, index: number) => ({
     day: index + 1,
     date: entry.date,
-    description: entry.description || 'Stack Production Testing',
+    description: entry.description || simulationData.clientName,
     location: entry.location || '',
     ticketNumber: entry.ticketNumber || '',
     truck: entry.truckRate || 0,
@@ -258,17 +258,17 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     kmsRate: entry.kmsRate || 0,
     other: entry.otherCharges || 0,
     total: entry.dailyTotal || 0,
-    worked: entry.completed || false
+    worked: entry.worked || false
   }));
 
   // Use the exact calculated values from the preview instead of recalculating
-  const totalTruckCharges = simulationData.totalTruckCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
-  const totalKmsCharges = simulationData.totalKmsCharges || completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
-  const totalOtherCharges = simulationData.totalOtherCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
-  const subtotal = simulationData.subtotal || completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
+  const totalTruckCharges = simulationData.totalTruckCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = simulationData.totalKmsCharges || workedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = simulationData.totalOtherCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = simulationData.subtotal || workedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
-  const totalSubsistence = simulationData.totalSubsistence || completedEntries.length * subsistence;
+  const totalSubsistence = simulationData.totalSubsistence || workedEntries.length * subsistence;
   const grandTotal = simulationData.grandTotal || subtotal + gst + totalSubsistence;
 
   return {
