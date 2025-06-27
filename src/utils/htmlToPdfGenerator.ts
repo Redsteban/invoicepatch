@@ -121,12 +121,12 @@ export function createInvoiceHTML(simulationData: any): string {
                 <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.truckRate || 0).toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven || 0}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.kmsRate || 0).toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.otherCharges || 0).toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${subsistence.toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">$${(entry.dailyTotal || 0).toFixed(2)}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.completed ? (entry.kmsDriven || 0) : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${subsistence.toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.completed ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
               </tr>
             `).join('')}
           </tbody>

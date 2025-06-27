@@ -181,6 +181,38 @@ export default function ContractorTrialDemo() {
   const totalSubsistence = workedEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
 
+  // Generate all days in the pay period (including days off)
+  const allDaysInPeriod = Array.from({ length: TOTAL_DAYS }, (_, i) => {
+    const dayNumber = i + 1;
+    const entryDate = new Date(payPeriodStart);
+    entryDate.setDate(payPeriodStart.getDate() + i);
+    const dateString = entryDate.toISOString().slice(0, 10);
+    
+    // Find if we have an entry for this day
+    const existingEntry = dailyEntries.find(e => e.day === dayNumber);
+    
+    if (existingEntry) {
+      return existingEntry;
+    } else {
+      // Create a day off entry
+      return {
+        day: dayNumber,
+        date: dateString,
+        description: 'Day Off',
+        hours: 0,
+        rate: 0,
+        truckRate: 0,
+        kmsDriven: 0,
+        kmsRate: 0,
+        otherCharges: 0,
+        location: '',
+        ticketNumber: '',
+        dailyTotal: 0,
+        worked: false,
+      };
+    }
+  });
+
   // Check if any entry is missing location
   const anyMissingLocation = dailyEntries.some(e => !e.location?.trim());
 
@@ -722,19 +754,19 @@ export default function ContractorTrialDemo() {
                       </tr>
                     </thead>
                     <tbody>
-                      {workedEntries.map(e => (
+                      {allDaysInPeriod.map(e => (
                         <tr key={e.day} className="border-b">
                           <td className="px-2 py-1 text-center">{e.day}</td>
                           <td className="px-2 py-1 text-center">{e.date}</td>
                           <td className="px-2 py-1">{e.description}</td>
                           <td className="px-2 py-1">{e.location}</td>
                           <td className="px-2 py-1">{e.ticketNumber}</td>
-                          <td className="px-2 py-1 text-right">${e.truckRate}</td>
-                          <td className="px-2 py-1 text-right">{e.kmsDriven}</td>
-                          <td className="px-2 py-1 text-right">${e.kmsRate}</td>
-                          <td className="px-2 py-1 text-right">${e.otherCharges}</td>
-                          <td className="px-2 py-1 text-right">${subsistence.toFixed(2)}</td>
-                          <td className="px-2 py-1 text-right font-bold">${e.dailyTotal.toFixed(2)}</td>
+                          <td className="px-2 py-1 text-right">{e.worked ? `$${e.truckRate}` : '-'}</td>
+                          <td className="px-2 py-1 text-right">{e.worked ? e.kmsDriven : '-'}</td>
+                          <td className="px-2 py-1 text-right">{e.worked ? `$${e.kmsRate}` : '-'}</td>
+                          <td className="px-2 py-1 text-right">{e.worked ? `$${e.otherCharges}` : '-'}</td>
+                          <td className="px-2 py-1 text-right">{e.worked ? `$${subsistence.toFixed(2)}` : '-'}</td>
+                          <td className="px-2 py-1 text-right font-bold">{e.worked ? `$${e.dailyTotal.toFixed(2)}` : '-'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -786,7 +818,7 @@ export default function ContractorTrialDemo() {
                 <button
                   onClick={async () => {
                     await generateHTMLToPDF({
-                      entries: workedEntries.map(e => ({
+                      entries: allDaysInPeriod.map(e => ({
                         ...e,
                         completed: e.worked,
                       })),

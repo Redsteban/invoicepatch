@@ -26,6 +26,7 @@ interface InvoiceData {
     kmsRate: number;
     other: number;
     total: number;
+    worked: boolean;
   }>;
   totals: {
     totalTruckCharges: number;
@@ -88,12 +89,12 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
     entry.description,
     entry.location,
     entry.ticketNumber,
-    `$${entry.truck.toFixed(2)}`,
-    entry.kms.toString(),
-    `$${entry.kmsRate.toFixed(2)}`,
-    `$${entry.other.toFixed(2)}`,
-    `$${(invoiceData.totals.subsistence / invoiceData.entries.length).toFixed(2)}`, // Daily subsistence rate
-    `$${entry.total.toFixed(2)}`
+    entry.worked ? `$${entry.truck.toFixed(2)}` : '-',
+    entry.worked ? entry.kms.toString() : '-',
+    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '-',
+    entry.worked ? `$${entry.other.toFixed(2)}` : '-',
+    entry.worked ? `$${(invoiceData.totals.subsistence / invoiceData.entries.length).toFixed(2)}` : '-', // Daily subsistence rate
+    entry.worked ? `$${entry.total.toFixed(2)}` : '-'
   ]);
 
   // Use autoTable with exact styling to match preview
@@ -257,7 +258,7 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     kmsRate: entry.kmsRate || 0,
     other: entry.otherCharges || 0,
     total: entry.dailyTotal || 0,
-    subsistence: simulationData.subsistence || 50.00
+    worked: entry.completed || false
   }));
 
   // Calculate totals exactly like in the preview

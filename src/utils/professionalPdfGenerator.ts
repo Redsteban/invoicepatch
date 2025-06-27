@@ -11,6 +11,7 @@ interface InvoiceEntry {
   kmsRate: number;
   other: number;
   total: number;
+  worked: boolean;
 }
 
 interface InvoiceData {
@@ -99,12 +100,12 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
     entry.description,
     entry.location || '',
     entry.ticketNumber || '',
-    `$${entry.truck.toFixed(2)}`,
-    entry.kms.toString(),
-    `$${entry.kmsRate.toFixed(2)}`,
-    `$${entry.other.toFixed(2)}`,
-    `$${dailySubsistence.toFixed(2)}`, // Use calculated daily subsistence rate
-    `$${entry.total.toFixed(2)}`
+    entry.worked ? `$${entry.truck.toFixed(2)}` : '-',
+    entry.worked ? entry.kms.toString() : '-',
+    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '-',
+    entry.worked ? `$${entry.other.toFixed(2)}` : '-',
+    entry.worked ? `$${dailySubsistence.toFixed(2)}` : '-', // Use calculated daily subsistence rate
+    entry.worked ? `$${entry.total.toFixed(2)}` : '-'
   ]);
 
   // Add work summary table
@@ -256,7 +257,8 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
       kms: entry.kmsDriven || 0, // Use actual kms
       kmsRate: entry.kmsRate || 0, // Use actual kms rate
       other: entry.otherCharges || 0, // Use actual other charges
-      total: entry.dailyTotal || 0 // Use actual daily total
+      total: entry.dailyTotal || 0, // Use actual daily total
+      worked: entry.completed || false
     }));
 
   // Calculate totals exactly like in the preview
