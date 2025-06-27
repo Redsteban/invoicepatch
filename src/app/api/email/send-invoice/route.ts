@@ -4,16 +4,23 @@ import nodemailer from 'nodemailer';
 interface EmailRequest {
   email: string;
   invoiceData: {
-    invoiceNumber: string;
+    entries: any[];
     contractorName: string;
     clientName: string;
-    period: string;
-    entries: any[];
-    totals: {
-      subtotal: number;
-      tax: number;
-      total: number;
-    };
+    clientAddress: string;
+    contractorAddress: string;
+    startDate: string;
+    endDate: string;
+    subsistence: number;
+    totalTruckCharges: number;
+    totalKmsCharges: number;
+    totalOtherCharges: number;
+    subtotal: number;
+    gst: number;
+    totalSubsistence: number;
+    grandTotal: number;
+    invoiceNumber: string;
+    invoiceDate: string;
   };
   consent: boolean;
 }
@@ -79,7 +86,7 @@ export async function POST(request: NextRequest) {
     await transporter.verify();
     console.log('✅ SMTP connection verified');
 
-    // Generate PDF buffer (modified version that returns buffer instead of downloading)
+    // Generate PDF buffer using the same HTML generator as the preview
     console.log('📄 Generating PDF...');
     const pdfBuffer = await generateInvoicePDFBuffer(body.invoiceData);
     console.log(`✅ PDF generated (${pdfBuffer.length} bytes)`);
@@ -131,23 +138,259 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to generate PDF as buffer
+// Helper function to generate PDF as buffer using the same HTML as preview
 async function generateInvoicePDFBuffer(invoiceData: any): Promise<Buffer> {
-  // Import jsPDF dynamically for server-side use
-  const jsPDF = (await import('jspdf')).default;
-  const doc = new jsPDF();
+  try {
+    // Import required libraries
+    const jsPDF = (await import('jspdf')).default;
+    const html2canvas = (await import('html2canvas')).default;
+    
+    // Create the same HTML as the preview
+    const invoiceHTML = createInvoiceHTML(invoiceData);
+    
+    // For server-side PDF generation, we'll use a simplified approach
+    // since html2canvas requires a DOM environment
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = 20;
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(60, 60, 60);
+    
+    // Center the header information
+    const centerText = (text: string, yPos: number) => {
+      const textWidth = doc.getTextWidth(text);
+      const x = (pageWidth - textWidth) / 2;
+      doc.text(text, x, yPos);
+    };
+
+    centerText(`Client: ${invoiceData.clientName}`, y);
+    y += 6;
+    centerText(`Client Address: ${invoiceData.clientAddress}`, y);
+    y += 6;
+    centerText(`Invoice Date: ${invoiceData.invoiceDate}`, y);
+    y += 6;
+    centerText(`Contractor: ${invoiceData.contractorName}`, y);
+    y += 6;
+    centerText(`Contractor Address: ${invoiceData.contractorAddress}`, y);
+    y += 6;
+    centerText(`Pay Period: ${invoiceData.startDate} to ${invoiceData.endDate}`, y);
+    y += 6;
+    centerText(`Invoice Number: ${invoiceData.invoiceNumber}`, y);
+    y += 15;
+
+    // Work Summary header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Work Summary:', 15, y);
+    y += 10;
+
+    // Create table with entries
+    const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
+    const tableData = invoiceData.entries.map((entry: any, index: number) => [
+      (index + 1).toString(),
+      entry.date,
+      entry.description,
+      entry.location || '',
+      entry.ticketNumber || '',
+      entry.completed ? `$${entry.truckRate}` : '-',
+      entry.completed ? entry.kmsDriven.toString() : '-',
+      entry.completed ? `$${entry.kmsRate}` : '-',
+      entry.completed ? `$${entry.otherCharges}` : '-',
+      entry.completed ? `$${invoiceData.subsistence.toFixed(2)}` : '-',
+      entry.completed ? `$${entry.dailyTotal.toFixed(2)}` : '-'
+    ]);
+
+    // Add table using autoTable
+    try {
+      const autoTable = (await import('jspdf-autotable')).default;
+      autoTable(doc, {
+        startY: y,
+        head: tableHeaders,
+        body: tableData,
+        theme: 'grid',
+        styles: {
+          fontSize: 9,
+          cellPadding: 2,
+          textColor: [60, 60, 60],
+          lineColor: [200, 200, 200],
+          lineWidth: 0.5,
+        },
+        headStyles: {
+          fillColor: [245, 245, 245],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
+          fontSize: 9,
+        },
+        margin: { left: 15, right: 15 },
+      });
+      y = (doc as any).lastAutoTable?.finalY + 10 || y + 50;
+    } catch (importError) {
+      console.warn('AutoTable import failed, using fallback:', importError);
+      y += 50;
+    }
+
+    // Summary sections
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(60, 60, 60);
+
+    doc.text('⊕ Total Truck Charges', 15, y);
+    doc.text(`$${invoiceData.totalTruckCharges.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 7;
+
+    doc.text('⊕ Total Kms Charges', 15, y);
+    doc.text(`$${invoiceData.totalKmsCharges.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 7;
+
+    doc.text('⊕ Total Other Charges', 15, y);
+    doc.text(`$${invoiceData.totalOtherCharges.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 15;
+
+    // Financial Summary
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Financial Summary:', 15, y);
+    y += 10;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+
+    doc.text('⊖ Subtotal', 15, y);
+    doc.text(`$${invoiceData.subtotal.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 8;
+
+    doc.text('% GST (5%)', 15, y);
+    doc.text(`$${invoiceData.gst.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 8;
+
+    // Subsistence with yellow background
+    doc.setFillColor(255, 255, 200);
+    doc.rect(10, y - 4, pageWidth - 20, 8, 'F');
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(10, y - 4, pageWidth - 20, 8, 'S');
+    
+    doc.text('⊕ Subsistence (Tax-Free)', 15, y);
+    doc.text(`$${invoiceData.totalSubsistence.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+    y += 15;
+
+    // Grand Total
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(34, 139, 34);
+    doc.text('$ Grand Total', 15, y);
+    doc.text(`$${invoiceData.grandTotal.toFixed(2)}`, pageWidth - 15, y, { align: 'right' });
+
+    // Convert to buffer
+    const pdfOutput = doc.output('arraybuffer');
+    return Buffer.from(pdfOutput);
+  } catch (error) {
+    console.error('PDF generation failed:', error);
+    throw error;
+  }
+}
+
+// Helper function to create the same HTML as the preview
+function createInvoiceHTML(invoiceData: any): string {
+  const completedEntries = invoiceData.entries.filter((entry: any) => entry.completed);
   
-  // Add content (simplified version)
-  doc.setFontSize(20);
-  doc.text('INVOICE', 105, 30, { align: 'center' });
-  
-  doc.setFontSize(12);
-  doc.text(`Invoice #: ${invoiceData.invoiceNumber}`, 20, 50);
-  doc.text(`Total: $${invoiceData.totals.total.toFixed(2)}`, 20, 70);
-  
-  // Convert to buffer
-  const pdfOutput = doc.output('arraybuffer');
-  return Buffer.from(pdfOutput);
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #3c4043; line-height: 1.4;">
+      <!-- Header Section - Exact match to preview -->
+      <div style="text-align: center; margin-bottom: 30px; font-size: 11px;">
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client:</span> ${invoiceData.clientName}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client Address:</span> ${invoiceData.clientAddress}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Invoice Date:</span> ${invoiceData.invoiceDate}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor:</span> ${invoiceData.contractorName}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor Address:</span> ${invoiceData.contractorAddress}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Pay Period:</span> ${invoiceData.startDate} to ${invoiceData.endDate}</div>
+        <div><span style="font-weight: 600;">Invoice Number:</span> ${invoiceData.invoiceNumber}</div>
+      </div>
+
+      <!-- Work Summary -->
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-weight: bold; font-size: 12px; margin-bottom: 10px; color: black;">Work Summary:</h3>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc; font-size: 9px;">
+          <thead>
+            <tr style="background-color: #f5f5f5;">
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Day</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Date</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Description</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Location</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Ticket #</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Truck</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms Rate</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Other</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Subsistence</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${completedEntries.map((entry: any, index: number) => `
+              <tr>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.completed ? (entry.kmsDriven || 0) : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.completed ? `$${invoiceData.subsistence.toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.completed ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary Sections - Exact match to preview -->
+      <div style="margin-bottom: 20px; font-size: 11px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>⊕ Total Truck Charges</span>
+          <span>$${invoiceData.totalTruckCharges.toFixed(2)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>⊕ Total Kms Charges</span>
+          <span>$${invoiceData.totalKmsCharges.toFixed(2)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>⊕ Total Other Charges</span>
+          <span>$${invoiceData.totalOtherCharges.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <!-- Financial Summary - Exact match to preview -->
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-weight: bold; font-size: 12px; margin-bottom: 10px; color: black;">Financial Summary:</h3>
+        <div style="font-size: 11px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #f9fafb; padding: 4px; border-radius: 3px;">
+            <span>⊖ Subtotal</span>
+            <span>$${invoiceData.subtotal.toFixed(2)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #f9fafb; padding: 4px; border-radius: 3px;">
+            <span>% GST (5%)</span>
+            <span>$${invoiceData.gst.toFixed(2)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #fef3c7; padding: 4px; border-radius: 3px; border: 1px solid #fde68a;">
+            <span>⊕ Subsistence (Tax-Free)</span>
+            <span>$${invoiceData.totalSubsistence.toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grand Total - Exact match to preview -->
+      <div style="text-align: center; margin-top: 20px; border-top: 2px dashed #d1d5db; padding-top: 15px;">
+        <div style="font-size: 18px; font-weight: bold; color: #059669;">
+          $ Grand Total: $${invoiceData.grandTotal.toFixed(2)}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // Helper function to create email HTML
@@ -176,8 +419,8 @@ function createInvoiceEmailHTML(invoiceData: any, email: string): string {
         <h3>Invoice Summary:</h3>
         <ul>
           <li>Invoice Number: ${invoiceData.invoiceNumber}</li>
-          <li>Period: ${invoiceData.period}</li>
-          <li>Total Amount: $${invoiceData.totals.total.toFixed(2)}</li>
+          <li>Period: ${invoiceData.startDate} to ${invoiceData.endDate}</li>
+          <li>Total Amount: $${invoiceData.grandTotal.toFixed(2)}</li>
         </ul>
         
         <p>If you have any questions, please don't hesitate to contact us.</p>
