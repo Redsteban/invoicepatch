@@ -713,6 +713,7 @@ export default function ContractorTrialDemo() {
                         <th className="px-2 py-1">Kms</th>
                         <th className="px-2 py-1">Kms Rate</th>
                         <th className="px-2 py-1">Other</th>
+                        <th className="px-2 py-1">Subsistence</th>
                         <th className="px-2 py-1">Total</th>
                       </tr>
                     </thead>
@@ -728,6 +729,7 @@ export default function ContractorTrialDemo() {
                           <td className="px-2 py-1 text-right">{e.kmsDriven}</td>
                           <td className="px-2 py-1 text-right">${e.kmsRate}</td>
                           <td className="px-2 py-1 text-right">${e.otherCharges}</td>
+                          <td className="px-2 py-1 text-right">${subsistence.toFixed(2)}</td>
                           <td className="px-2 py-1 text-right font-bold">${e.dailyTotal.toFixed(2)}</td>
                         </tr>
                       ))}

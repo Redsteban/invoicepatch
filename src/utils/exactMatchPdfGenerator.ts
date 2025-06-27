@@ -80,18 +80,19 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   yPos += 10;
 
   // Create table with exact column widths and styling
-  const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Total']];
+  const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
   
   const tableData = invoiceData.entries.map(entry => [
     entry.day.toString(),
     entry.date,
     entry.description,
-    entry.location || '',
-    entry.ticketNumber || '',
-    entry.truck === 0 ? '$0' : `$${entry.truck.toFixed(2)}`,
+    entry.location,
+    entry.ticketNumber,
+    `$${entry.truck.toFixed(2)}`,
     entry.kms.toString(),
-    `$${entry.kmsRate.toFixed(1)}`,
-    entry.other === 0 ? '$0' : `$${entry.other.toFixed(2)}`,
+    `$${entry.kmsRate.toFixed(2)}`,
+    `$${entry.other.toFixed(2)}`,
+    `$${50.00.toFixed(2)}`, // Daily subsistence rate
     `$${entry.total.toFixed(2)}`
   ]);
 
@@ -126,7 +127,8 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
         6: { halign: 'center', cellWidth: 12 },  // Kms
         7: { halign: 'right', cellWidth: 18 },   // Kms Rate
         8: { halign: 'right', cellWidth: 15 },   // Other
-        9: { halign: 'right', cellWidth: 22 },   // Total
+        9: { halign: 'right', cellWidth: 18 },   // Subsistence
+        10: { halign: 'right', cellWidth: 22 },  // Total
       },
       margin: { left: 15, right: 15 },
     });

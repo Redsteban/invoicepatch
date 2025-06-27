@@ -90,16 +90,19 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   yPosition += 10;
 
   // Prepare table data
-  const tableData = invoiceData.entries.map(entry => [
-    entry.day.toString(),
+  const entries = invoiceData.entries;
+  const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
+  const tableData = entries.map((entry, index) => [
+    (index + 1).toString(),
     entry.date,
     entry.description,
     entry.location || '',
     entry.ticketNumber || '',
-    entry.truck === 0 ? '$0' : `$${entry.truck.toFixed(2)}`,
+    `$${entry.truck.toFixed(2)}`,
     entry.kms.toString(),
-    `$${entry.kmsRate.toFixed(1)}`,
-    entry.other === 0 ? '$0' : `$${entry.other.toFixed(2)}`,
+    `$${entry.kmsRate.toFixed(2)}`,
+    `$${entry.other.toFixed(2)}`,
+    `$${50.00.toFixed(2)}`, // Daily subsistence rate
     `$${entry.total.toFixed(2)}`
   ]);
 
@@ -108,7 +111,7 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
     const autoTable = (await import('jspdf-autotable')).default;
     autoTable(doc, {
       startY: yPosition,
-      head: [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Total']],
+      head: tableHeaders,
       body: tableData,
       theme: 'grid',
       styles: {
@@ -131,7 +134,8 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
         6: { halign: 'center', cellWidth: 12 }, // Kms
         7: { halign: 'right', cellWidth: 20 },  // Kms Rate
         8: { halign: 'right', cellWidth: 18 },  // Other
-        9: { halign: 'right', cellWidth: 25 },  // Total
+        9: { halign: 'right', cellWidth: 25 },  // Subsistence
+        10: { halign: 'right', cellWidth: 25 },  // Total
       },
       margin: { left: 15, right: 15 },
     });

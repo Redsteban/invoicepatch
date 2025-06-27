@@ -109,6 +109,7 @@ export function createInvoiceHTML(simulationData: any): string {
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms Rate</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Other</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Subsistence</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Total</th>
             </tr>
           </thead>
@@ -124,6 +125,7 @@ export function createInvoiceHTML(simulationData: any): string {
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven || 0}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.kmsRate || 0).toFixed(2)}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.otherCharges || 0).toFixed(2)}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${subsistence.toFixed(2)}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">$${(entry.dailyTotal || 0).toFixed(2)}</td>
               </tr>
             `).join('')}
