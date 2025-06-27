@@ -198,7 +198,7 @@ export default function ContractorTrialDemo() {
       return {
         day: dayNumber,
         date: dateString,
-        description: 'Day Off',
+        description: 'Days Off',
         hours: 0,
         rate: 0,
         truckRate: 0,
