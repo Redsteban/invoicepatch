@@ -108,7 +108,7 @@ export default function ContractorTrialDemo() {
     const newEntry: DailyEntry = {
       day: day,
       date: entryDate.toISOString().slice(0, 10),
-      description: 'Stack Production Testing',
+      description: clientName,
       hours: hours,
       rate: rate,
       truckRate: truckRateNum,
@@ -346,7 +346,7 @@ export default function ContractorTrialDemo() {
       entries.push({
         day: i,
         date: entryDate.toISOString().slice(0, 10),
-        description: 'Stack Production Testing',
+        description: clientName,
         hours: hours,
         rate: rate,
         truckRate: truckRateNum,
