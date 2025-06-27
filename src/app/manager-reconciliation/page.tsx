@@ -118,8 +118,8 @@ export default function ManagerReconciliationPage() {
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <PlayIcon className="h-5 w-5 sm:h-6 sm:w-6 mb-2 sm:mb-0 sm:mr-3" />
                 <div>
-                  <h3 className="font-semibold text-sm sm:text-base">Manager Demo - Oil & Gas Reconciliation</h3>
-                  <p className="text-blue-100 text-xs sm:text-sm">Experience automated invoice processing with realistic project data from major energy companies</p>
+                  <h3 className="font-semibold text-sm sm:text-base">Manager Demo - Invoice Reconciliation</h3>
+                  <p className="text-blue-100 text-xs sm:text-sm">Experience automated invoice processing with realistic project data from major companies</p>
                 </div>
               </div>
               <div className="text-left lg:text-right">

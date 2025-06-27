@@ -43,7 +43,7 @@ export default function ManagerDemo() {
             See Your ROI in Real-Time
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Experience the AI-powered invoice processing that saves construction managers 
+            Experience the AI-powered invoice processing that saves office managers 
             6+ hours weekly and reduces costs by $50K+ annually.
           </p>
         </div>
@@ -191,9 +191,9 @@ export default function ManagerDemo() {
         {/* Value Proposition */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white mt-12">
           <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold mb-4">Why Construction Managers Choose InvoicePatch</h3>
+            <h3 className="text-3xl font-bold mb-4">Why Office Managers Choose InvoicePatch</h3>
             <p className="text-xl opacity-90 max-w-2xl mx-auto">
-              Join 500+ construction companies that have eliminated invoice processing headaches
+              Join 500+ companies that have eliminated invoice processing headaches
             </p>
           </div>
           

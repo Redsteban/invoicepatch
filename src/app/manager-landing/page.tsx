@@ -43,8 +43,8 @@ export default function ManagerLanding() {
   const features = [
     {
       icon: FileText,
-      title: "Field Ticket Processing",
-      description: "Automated field ticket validation, and approval workflows"
+      title: "Invoice Processing",
+      description: "Automated invoice validation, and approval workflows"
     },
     {
       icon: Users,
@@ -97,11 +97,11 @@ export default function ManagerLanding() {
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Command Your
-              <span className="text-green-600 block">Oil & Gas Operations</span>
+              <span className="text-green-600 block">Operations</span>
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
-              Transform your oil and gas project management with AI-powered field ticket processing, 
+              Transform your project management with AI-powered invoice processing, 
               real-time analytics, and streamlined sub-contractor oversight.
             </motion.p>
 
@@ -136,8 +136,8 @@ export default function ManagerLanding() {
           viewport={{ once: true, margin: "-100px" }}
           className="text-center mb-16"
         >
-          <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-gray-900 mb-4">
-            Total Control, From Wellhead to Invoice
+          <motion.h2 variants={fadeInUp} className="text-3xl font-bold text-gray-900 mb-4">
+            Powerful tools designed specifically for operations managers
           </motion.h2>
           <motion.p variants={fadeInUp} className="text-lg text-gray-600 max-w-2xl mx-auto">
             Powerful tools designed specifically for oil & gas operations managers

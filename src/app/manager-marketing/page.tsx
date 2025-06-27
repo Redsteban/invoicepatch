@@ -53,7 +53,7 @@ export default function ManagerMarketing() {
   const painPoints = [
     {
       icon: Clock,
-      problem: "Manual Field Ticket Chaos",
+      problem: "Manual Invoice Chaos",
       solution: "Automated AI-Powered Validation",
       description: "Eliminate 80% of manual data entry and slash processing time from days to minutes."
     },
@@ -61,13 +61,13 @@ export default function ManagerMarketing() {
       icon: DollarSign,
       problem: "Operational Cost Blind Spots",
       solution: "Real-Time Cost & Equipment Tracking",
-      description: "Get instant alerts on budget variances and equipment costs before they impact your AFE."
+      description: "Get instant alerts on budget variances and equipment costs before they impact your budget."
     },
     {
       icon: Users,
       problem: "Sub-Contractor Compliance Risks",
       solution: "Automated Compliance & Certification Hub",
-      description: "Ensure 100% compliance with automated ticket validation and instant alerts for missing docs."
+      description: "Ensure 100% compliance with automated invoice validation and instant alerts for missing docs."
     },
     {
       icon: BarChart3,
@@ -79,26 +79,26 @@ export default function ManagerMarketing() {
 
   const testimonials = [
     {
-      name: "David Chen",
+      name: "Sarah Chen",
       title: "Operations Manager",
-      company: "Precision Flow Services",
-      quote: "InvoicePatch cut our field ticket processing time by over 85%. What used to take days of manual reconciliation now happens in near real-time. The impact on our cash flow was immediate.",
+      company: "Rock solid services",
+      quote: "InvoicePatch cut our invoice processing time by over 85%. What used to take days of manual reconciliation now happens in near real-time. The impact on our cash flow was immediate.",
       rating: 5,
       metrics: "85% time savings"
     },
     {
       name: "Aisha Khan",
       title: "Site Supervisor",
-      company: "Rock solid drilling",
-      quote: "The real-time cost tracking is a game-changer. We identified a potential $200K overage on a multi-well pad and course-corrected instantly, saving the project's profitability.",
+      company: "Rock solid services",
+      quote: "The real-time cost tracking is a game-changer. We identified a potential $200K overage on a multi-site project and course-corrected instantly, saving the project's profitability.",
       rating: 5,
       metrics: "$200K saved"
     },
     {
       name: "Brian Miller",
-      title: "Completions Superintendent",
-      company: "Apex Well Servicing",
-      quote: "Sub-contractor compliance is no longer our biggest operational risk. InvoicePatch automates everything, ensuring every ticket is backed by valid certs. It's a lifesaver.",
+      title: "Operations Superintendent",
+      company: "Apex Services",
+      quote: "Sub-contractor compliance is no longer our biggest operational risk. InvoicePatch automates everything, ensuring every invoice is backed by valid documentation. It's a lifesaver.",
       rating: 5,
       metrics: "100% compliance"
     }
@@ -109,9 +109,9 @@ export default function ManagerMarketing() {
       name: "Field Pro",
       price: "$499",
       period: "per month",
-      description: "Perfect for small to medium-sized operators and service companies.",
+      description: "Perfect for small to medium-sized companies and service providers.",
       features: [
-        "Up to 100 field tickets/month",
+        "Up to 100 invoices/month",
         "Standard analytics dashboard",
         "Email & chat support",
         "Core integrations (accounting)",
@@ -124,14 +124,14 @@ export default function ManagerMarketing() {
       name: "Operations Command",
       price: "$999",
       period: "per month",
-      description: "Ideal for growing operators managing multiple sites.",
+      description: "Ideal for growing companies managing multiple sites.",
       features: [
-        "Up to 500 field tickets/month",
+        "Up to 500 invoices/month",
         "Advanced ops analytics & reporting",
         "Priority support",
         "Custom integrations (ERP, EHS)",
         "API access",
-        "Multi-well pad & project management",
+        "Multi-site & project management",
         "Automated compliance tracking"
       ],
       cta: "Start Free Trial",
@@ -141,9 +141,9 @@ export default function ManagerMarketing() {
       name: "Enterprise",
       price: "Custom",
       period: "pricing",
-      description: "For large-scale oil & gas producers and service providers.",
+      description: "For large-scale producers and service providers.",
       features: [
-        "Unlimited field tickets",
+        "Unlimited invoices",
         "Custom analytics dashboards",
         "Dedicated success manager",
         "White-label options",
@@ -240,17 +240,17 @@ export default function ManagerMarketing() {
           >
             <motion.div variants={fadeInUp} className="flex justify-center mb-6">
               <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium border border-green-200">
-                Trusted by 100+ Oil & Gas Operations Managers
+                Trusted by 100+ Operations Managers
               </div>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
               Stop Drowning in
-              <span className="text-green-600 block">Field Ticket Paperwork</span>
+              <span className="text-green-600 block">Invoice Paperwork</span>
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
-              The AI-powered platform for oil & gas that automates field ticket processing,
+              The AI-powered platform that automates invoice processing,
               slashes costs, and gives you total control over your operations.
             </motion.p>
 
@@ -332,8 +332,8 @@ export default function ManagerMarketing() {
             variants={fadeInUp}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Praised by O&G Leaders</h2>
-            <p className="text-lg text-gray-600">See how we're transforming operations across the Permian, Bakken, and beyond.</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Praised by Industry Leaders</h2>
+            <p className="text-lg text-gray-600">See how we're transforming operations across various industries.</p>
           </motion.div>
 
           <motion.div
@@ -453,10 +453,10 @@ export default function ManagerMarketing() {
             className="text-center bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl p-12 text-white"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold mb-4">
-              Ready to Eliminate Field Ticket Headaches?
+              Ready to Eliminate Invoice Headaches?
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-              Start your free trial today and experience the future of oil & gas operations management. No credit card required.
+              Start your free trial today and experience the future of operations management. No credit card required.
             </motion.p>
             <motion.div variants={fadeInUp}>
               <button
@@ -481,7 +481,7 @@ export default function ManagerMarketing() {
             </span>
           </div>
           <p className="text-gray-500 mb-4">
-            Automating the flow of field data for the modern oil & gas industry.
+            Automating the flow of invoice data for the modern business.
           </p>
           <div className="flex justify-center space-x-6">
             <a href="#features" className="text-gray-600 hover:text-green-600">Features</a>
