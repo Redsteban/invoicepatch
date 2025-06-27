@@ -86,15 +86,15 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   const tableData = invoiceData.entries.map(entry => [
     entry.day.toString(),
     entry.date,
-    entry.description,
-    entry.location,
-    entry.ticketNumber,
-    entry.worked ? `$${entry.truck.toFixed(2)}` : '-',
-    entry.worked ? entry.kms.toString() : '-',
-    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '-',
-    entry.worked ? `$${entry.other.toFixed(2)}` : '-',
-    entry.worked ? `$${(invoiceData.totals.subsistence / invoiceData.entries.length).toFixed(2)}` : '-', // Daily subsistence rate
-    entry.worked ? `$${entry.total.toFixed(2)}` : '-'
+    entry.worked ? entry.description : 'Days Off',
+    entry.worked ? entry.location : '',
+    entry.worked ? entry.ticketNumber : '',
+    entry.worked ? `$${entry.truck.toFixed(2)}` : '',
+    entry.worked ? entry.kms.toString() : '',
+    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '',
+    entry.worked ? `$${entry.other.toFixed(2)}` : '',
+    entry.worked ? `$${(invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked).length).toFixed(2)}` : '', // Daily subsistence rate
+    entry.worked ? `$${entry.total.toFixed(2)}` : ''
   ]);
 
   // Use autoTable with exact styling to match preview
@@ -245,10 +245,12 @@ export async function generateAndOpenPDF(simulationData: any): Promise<void> {
 
 // Convert simulation data to exact invoice format
 function convertToExactInvoiceData(simulationData: any): InvoiceData {
-  const workedEntries = simulationData.entries.filter((entry: any) => entry.worked);
+  // Include all days, not just worked days
+  const allEntries = simulationData.entries;
+  const workedEntries = allEntries.filter((entry: any) => entry.worked);
   
-  const entries = workedEntries.map((entry: any, index: number) => ({
-    day: index + 1,
+  const entries = allEntries.map((entry: any) => ({
+    day: entry.day,
     date: entry.date,
     description: entry.description || simulationData.clientName,
     location: entry.location || '',
@@ -258,7 +260,7 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     kmsRate: entry.kmsRate || 0,
     other: entry.otherCharges || 0,
     total: entry.dailyTotal || 0,
-    worked: entry.worked || false
+    worked: entry.worked,
   }));
 
   // Use the exact calculated values from the preview instead of recalculating

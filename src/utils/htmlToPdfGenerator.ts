@@ -69,7 +69,9 @@ export async function generateHTMLToPDF(simulationData: any): Promise<void> {
 
 // Only invoice content: header, table, summary, grand total
 export function createInvoiceHTML(simulationData: any): string {
-  const workedEntries = simulationData.entries.filter((entry: any) => entry.worked);
+  // Show all days, not just worked days
+  const allEntries = simulationData.entries;
+  const workedEntries = allEntries.filter((entry: any) => entry.worked);
   
   // Use the exact calculated values from the preview instead of recalculating
   const totalTruckCharges = simulationData.totalTruckCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
@@ -114,19 +116,19 @@ export function createInvoiceHTML(simulationData: any): string {
             </tr>
           </thead>
           <tbody>
-            ${workedEntries.map((entry: any, index: number) => `
+            ${allEntries.map((entry: any, index: number) => `
               <tr>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.day}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
-                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || simulationData.clientName}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.truckRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.kmsDriven || 0) : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.kmsRate || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.otherCharges || 0).toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${subsistence.toFixed(2)}` : '-'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.worked ? `$${(entry.dailyTotal || 0).toFixed(2)}` : '-'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">${entry.worked ? (entry.description || simulationData.clientName) : 'Days Off'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.location || '') : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.ticketNumber || '') : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.truckRate || 0).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.kmsDriven || 0) : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.kmsRate || 0).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.otherCharges || 0).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${subsistence.toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.worked ? `$${(entry.dailyTotal || 0).toFixed(2)}` : ''}</td>
               </tr>
             `).join('')}
           </tbody>

@@ -93,19 +93,20 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   // Prepare table data
   const entries = invoiceData.entries;
   const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
-  const dailySubsistence = invoiceData.totals.subsistence / entries.length; // Calculate daily subsistence rate
-  const tableData = entries.map((entry, index) => [
-    (index + 1).toString(),
+  const workedEntries = entries.filter(entry => entry.worked);
+  const dailySubsistence = invoiceData.totals.subsistence / workedEntries.length; // Calculate daily subsistence rate
+  const tableData = entries.map((entry) => [
+    entry.day.toString(),
     entry.date,
-    entry.description,
-    entry.location || '',
-    entry.ticketNumber || '',
-    entry.worked ? `$${entry.truck.toFixed(2)}` : '-',
-    entry.worked ? entry.kms.toString() : '-',
-    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '-',
-    entry.worked ? `$${entry.other.toFixed(2)}` : '-',
-    entry.worked ? `$${dailySubsistence.toFixed(2)}` : '-', // Use calculated daily subsistence rate
-    entry.worked ? `$${entry.total.toFixed(2)}` : '-'
+    entry.worked ? entry.description : 'Days Off',
+    entry.worked ? (entry.location || '') : '',
+    entry.worked ? (entry.ticketNumber || '') : '',
+    entry.worked ? `$${entry.truck.toFixed(2)}` : '',
+    entry.worked ? entry.kms.toString() : '',
+    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '',
+    entry.worked ? `$${entry.other.toFixed(2)}` : '',
+    entry.worked ? `$${dailySubsistence.toFixed(2)}` : '', // Use calculated daily subsistence rate
+    entry.worked ? `$${entry.total.toFixed(2)}` : ''
   ]);
 
   // Add work summary table
@@ -245,21 +246,22 @@ export async function generateAndPreviewPDF(invoiceData: InvoiceData): Promise<v
 
 // Helper function to convert your simulation data to invoice format
 export function convertSimulationToInvoiceData(simulationData: any): InvoiceData {
-  const workedEntries: InvoiceEntry[] = simulationData.entries
-    .filter((entry: any) => entry.worked)
-    .map((entry: any, index: number) => ({
-      day: index + 1,
-      date: entry.date, // Use date string directly
-      description: entry.description || simulationData.clientName,
-      location: entry.location || '', // Empty as shown in reference
-      ticketNumber: entry.ticketNumber || '', // Empty as shown in reference
-      truck: entry.truckRate || 0, // Use actual truck rate
-      kms: entry.kmsDriven || 0, // Use actual kms
-      kmsRate: entry.kmsRate || 0, // Use actual kms rate
-      other: entry.otherCharges || 0, // Use actual other charges
-      total: entry.dailyTotal || 0, // Use actual daily total
-      worked: entry.worked || false
-    }));
+  // Include all days, not just worked days
+  const allEntries: InvoiceEntry[] = simulationData.entries.map((entry: any) => ({
+    day: entry.day,
+    date: entry.date, // Use date string directly
+    description: entry.description || simulationData.clientName,
+    location: entry.location || '', // Empty as shown in reference
+    ticketNumber: entry.ticketNumber || '', // Empty as shown in reference
+    truck: entry.truckRate || 0, // Use actual truck rate
+    kms: entry.kmsDriven || 0, // Use actual kms
+    kmsRate: entry.kmsRate || 0, // Use actual kms rate
+    other: entry.otherCharges || 0, // Use actual other charges
+    total: entry.dailyTotal || 0, // Use actual daily total
+    worked: entry.worked || false
+  }));
+
+  const workedEntries = allEntries.filter(entry => entry.worked);
 
   // Use the exact calculated values from the preview instead of recalculating
   const totalTruckCharges = simulationData.totalTruckCharges || workedEntries.reduce((sum, entry) => sum + entry.truck, 0);
