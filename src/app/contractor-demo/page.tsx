@@ -794,6 +794,7 @@ export default function ContractorTrialDemo() {
                         end.setDate(end.getDate() + TOTAL_DAYS - 1);
                         return end.toISOString().slice(0, 10);
                       })(),
+                      subsistence: subsistence,
                     });
                   }}
                   className="flex-1 bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-emerald-700 transition-colors flex items-center justify-center mx-auto"

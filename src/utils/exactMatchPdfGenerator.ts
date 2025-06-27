@@ -92,7 +92,7 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
     entry.kms.toString(),
     `$${entry.kmsRate.toFixed(2)}`,
     `$${entry.other.toFixed(2)}`,
-    `$${50.00.toFixed(2)}`, // Daily subsistence rate
+    `$${(invoiceData.totals.subsistence / invoiceData.entries.length).toFixed(2)}`, // Daily subsistence rate
     `$${entry.total.toFixed(2)}`
   ]);
 
@@ -256,7 +256,8 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     kms: entry.kmsDriven || 0,
     kmsRate: entry.kmsRate || 0,
     other: entry.otherCharges || 0,
-    total: entry.dailyTotal || 0
+    total: entry.dailyTotal || 0,
+    subsistence: simulationData.subsistence || 50.00
   }));
 
   // Calculate totals exactly like in the preview
@@ -265,7 +266,7 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
   const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
   const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
-  const subsistence = 50.00; // Per day subsistence rate
+  const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
   const totalSubsistence = completedEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
 

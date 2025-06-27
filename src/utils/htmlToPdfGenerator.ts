@@ -77,7 +77,7 @@ export function createInvoiceHTML(simulationData: any): string {
   const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
   const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
-  const subsistence = 50.00; // Per day subsistence rate
+  const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
   const totalSubsistence = completedEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
   

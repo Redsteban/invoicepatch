@@ -92,6 +92,7 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   // Prepare table data
   const entries = invoiceData.entries;
   const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
+  const dailySubsistence = invoiceData.totals.subsistence / entries.length; // Calculate daily subsistence rate
   const tableData = entries.map((entry, index) => [
     (index + 1).toString(),
     entry.date,
@@ -102,7 +103,7 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
     entry.kms.toString(),
     `$${entry.kmsRate.toFixed(2)}`,
     `$${entry.other.toFixed(2)}`,
-    `$${50.00.toFixed(2)}`, // Daily subsistence rate
+    `$${dailySubsistence.toFixed(2)}`, // Use calculated daily subsistence rate
     `$${entry.total.toFixed(2)}`
   ]);
 
@@ -264,7 +265,7 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
   const totalOtherCharges = entries.reduce((sum, entry) => sum + entry.other, 0);
   const subtotal = entries.reduce((sum, entry) => sum + entry.total, 0);
   const gst = subtotal * 0.05; // 5% GST
-  const subsistence = 50.00; // Per day subsistence rate
+  const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
   const totalSubsistence = entries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
 
