@@ -659,7 +659,11 @@ export default function ContractorTrialDemo() {
                   ) : (
                     <>
                       <div className="flex-1">
-                        <span className="font-medium text-gray-800">{entry.description}</span>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-800">{entry.description}</span>
+                          <span className="text-sm text-gray-500">• Day {entry.day}</span>
+                          <span className="text-sm text-gray-500">• {entry.date}</span>
+                        </div>
                         <span className="block text-xs text-gray-500">Location: {entry.location || '-'} | Ticket #: {entry.ticketNumber || '-'}</span>
                         <span className="block text-xs text-gray-500">Hours: {entry.hours}, Rate: ${entry.rate}, Truck: ${entry.truckRate}, Kms: {entry.kmsDriven} @ ${entry.kmsRate}/km, Other: ${entry.otherCharges}</span>
                       </div>
