@@ -235,60 +235,36 @@ export default function ContractorTrialDemo() {
     }
   }, []);
 
-  // Helper to build invoiceData for EmailCollectionModal
-  const buildInvoiceData = () => {
+  // Returns the exact data structure used for the preview and PDF/email
+  const getPreviewInvoiceData = () => {
     const periodStart = payPeriodStart;
     const periodEnd = new Date(payPeriodStart);
     periodEnd.setDate(periodEnd.getDate() + TOTAL_DAYS - 1);
     return {
-      invoiceNumber: invoiceNumber || 'N/A',
-      issueDate: new Date(invoiceDate),
-      dueDate: periodEnd,
-      contractor: {
-        name: contractorName,
-        address: contractorAddress,
-        email: '',
-        phone: '',
-      },
-      client: {
-        name: clientName,
-        address: clientAddress,
-      },
-      period: {
-        startDate: new Date(periodStart),
-        endDate: new Date(periodEnd),
-      },
-      entries: workedEntries.map(e => ({
-        date: new Date(e.date),
-        description: 'Stack Production Testing',
-        worked: e.worked,
-        hoursWorked: e.hours,
-        truckUsed: !!e.truckRate,
-        travelKms: e.kmsDriven,
-        subsistence: subsistence,
-        dailyTotal: e.dailyTotal,
-        location: e.location,
-        ticketNumber: e.ticketNumber,
-        truckRate: e.truckRate,
-        kmsDriven: e.kmsDriven,
-        kmsRate: e.kmsRate,
-        otherCharges: e.otherCharges,
+      entries: allDaysInPeriod.map(e => ({
+        ...e,
+        completed: e.worked,
       })),
-      summary: {
-        regularHours: workedEntries.reduce((acc, e) => acc + e.hours, 0),
-        overtimeHours: 0,
-        travelHours: 0,
-        totalHours: workedEntries.reduce((acc, e) => acc + e.hours, 0),
-        regularAmount: workedEntries.reduce((acc, e) => acc + e.rate * e.hours, 0),
-        overtimeAmount: 0,
-        travelAmount: 0,
-        expensesTotal: workedEntries.reduce((acc, e) => acc + (e.otherCharges || 0), 0),
-        subtotal,
-        gst: gst,
-        pst: 0,
-        total: grandTotal,
-      },
-      notes: '',
+      contractorName,
+      clientName,
+      clientAddress,
+      contractorAddress,
+      startDate: payPeriodStart.toISOString().slice(0, 10),
+      endDate: (() => {
+        const end = new Date(payPeriodStart);
+        end.setDate(end.getDate() + TOTAL_DAYS - 1);
+        return end.toISOString().slice(0, 10);
+      })(),
+      subsistence: subsistence,
+      totalTruckCharges: workedEntries.reduce((acc, e) => acc + e.truckRate, 0),
+      totalKmsCharges: workedEntries.reduce((acc, e) => acc + (e.kmsDriven * e.kmsRate), 0),
+      totalOtherCharges: workedEntries.reduce((acc, e) => acc + e.otherCharges, 0),
+      subtotal: subtotal,
+      gst: gst,
+      totalSubsistence: totalSubsistence,
+      grandTotal: grandTotal,
+      invoiceNumber: invoiceNumber || '-',
+      invoiceDate: invoiceDate,
     };
   };
 
@@ -308,7 +284,7 @@ export default function ContractorTrialDemo() {
         body: JSON.stringify({
           email,
           consent,
-          invoiceData: buildInvoiceData(),
+          invoiceData: getPreviewInvoiceData(),
         }),
       });
       const result = await res.json();
@@ -329,7 +305,7 @@ export default function ContractorTrialDemo() {
       const res = await fetch('/api/pdf/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invoiceData: buildInvoiceData() }),
+        body: JSON.stringify({ invoiceData: getPreviewInvoiceData() }),
       });
       const result = await res.json();
       if (res.ok && result.pdfUrl) {
@@ -394,7 +370,7 @@ export default function ContractorTrialDemo() {
       <EmailCollectionModal
         isOpen={showEmailModal}
         onClose={() => setShowEmailModal(false)}
-        invoiceData={buildInvoiceData()}
+        invoiceData={getPreviewInvoiceData()}
       />
       <FreemiumModal open={showFreemiumModal} onClose={() => setShowFreemiumModal(false)}>
         <div className="flex flex-col items-center text-center">
