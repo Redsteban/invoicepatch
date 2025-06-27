@@ -246,7 +246,7 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
   
   const entries = completedEntries.map((entry: any, index: number) => ({
     day: index + 1,
-    date: new Date(entry.date).toLocaleDateString('en-CA'),
+    date: entry.date,
     description: entry.description || 'Stack Production Testing',
     location: entry.location || '',
     ticketNumber: entry.ticketNumber || '',

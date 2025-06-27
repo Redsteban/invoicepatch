@@ -243,7 +243,7 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
     .filter((entry: any) => entry.completed)
     .map((entry: any, index: number) => ({
       day: index + 1,
-      date: new Date(entry.date).toLocaleDateString('en-CA'), // YYYY-MM-DD format
+      date: entry.date, // Use date string directly
       description: entry.description || 'Stack Production Testing',
       location: entry.location || '', // Empty as shown in reference
       ticketNumber: entry.ticketNumber || '', // Empty as shown in reference

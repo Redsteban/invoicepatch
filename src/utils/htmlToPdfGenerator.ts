@@ -115,7 +115,7 @@ export function createInvoiceHTML(simulationData: any): string {
             ${completedEntries.map((entry: any, index: number) => `
               <tr>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${new Date(entry.date).toLocaleDateString('en-CA')}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
                 <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
