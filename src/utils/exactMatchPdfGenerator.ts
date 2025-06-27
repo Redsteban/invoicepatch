@@ -261,24 +261,24 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     worked: entry.completed || false
   }));
 
-  // Calculate totals exactly like in the preview
-  const totalTruckCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
-  const totalKmsCharges = completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
-  const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
-  const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
-  const gst = subtotal * 0.05;
+  // Use the exact calculated values from the preview instead of recalculating
+  const totalTruckCharges = simulationData.totalTruckCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = simulationData.totalKmsCharges || completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = simulationData.totalOtherCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = simulationData.subtotal || completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
+  const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
-  const totalSubsistence = completedEntries.length * subsistence;
-  const grandTotal = subtotal + gst + totalSubsistence;
+  const totalSubsistence = simulationData.totalSubsistence || completedEntries.length * subsistence;
+  const grandTotal = simulationData.grandTotal || subtotal + gst + totalSubsistence;
 
   return {
     client: {
       name: simulationData.clientName || 'Acme Energy Ltd.',
-      address: '123 Main St, Calgary, AB'
+      address: simulationData.clientAddress || '123 Main St, Calgary, AB'
     },
     contractor: {
       name: simulationData.contractorName || 'John Doe',
-      address: '456 Contractor Rd, Edmonton, AB'
+      address: simulationData.contractorAddress || '456 Contractor Rd, Edmonton, AB'
     },
     invoiceDate: new Date().toLocaleDateString('en-CA'),
     payPeriod: {

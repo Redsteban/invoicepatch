@@ -824,6 +824,8 @@ export default function ContractorTrialDemo() {
                       })),
                       contractorName,
                       clientName,
+                      clientAddress,
+                      contractorAddress,
                       startDate: payPeriodStart.toISOString().slice(0, 10),
                       endDate: (() => {
                         const end = new Date(payPeriodStart);
@@ -831,6 +833,13 @@ export default function ContractorTrialDemo() {
                         return end.toISOString().slice(0, 10);
                       })(),
                       subsistence: subsistence,
+                      totalTruckCharges: workedEntries.reduce((acc, e) => acc + e.truckRate, 0),
+                      totalKmsCharges: workedEntries.reduce((acc, e) => acc + (e.kmsDriven * e.kmsRate), 0),
+                      totalOtherCharges: workedEntries.reduce((acc, e) => acc + e.otherCharges, 0),
+                      subtotal: subtotal,
+                      gst: gst,
+                      totalSubsistence: totalSubsistence,
+                      grandTotal: grandTotal,
                     });
                   }}
                   className="flex-1 bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold text-lg hover:bg-emerald-700 transition-colors flex items-center justify-center mx-auto"

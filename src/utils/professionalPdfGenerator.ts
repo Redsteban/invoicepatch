@@ -261,15 +261,15 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
       worked: entry.completed || false
     }));
 
-  // Calculate totals exactly like in the preview
-  const totalTruckCharges = entries.reduce((sum, entry) => sum + entry.truck, 0);
-  const totalKmsCharges = entries.reduce((sum, entry) => sum + (entry.kms * entry.kmsRate), 0);
-  const totalOtherCharges = entries.reduce((sum, entry) => sum + entry.other, 0);
-  const subtotal = entries.reduce((sum, entry) => sum + entry.total, 0);
-  const gst = subtotal * 0.05; // 5% GST
+  // Use the exact calculated values from the preview instead of recalculating
+  const totalTruckCharges = simulationData.totalTruckCharges || entries.reduce((sum, entry) => sum + entry.truck, 0);
+  const totalKmsCharges = simulationData.totalKmsCharges || entries.reduce((sum, entry) => sum + (entry.kms * entry.kmsRate), 0);
+  const totalOtherCharges = simulationData.totalOtherCharges || entries.reduce((sum, entry) => sum + entry.other, 0);
+  const subtotal = simulationData.subtotal || entries.reduce((sum, entry) => sum + entry.total, 0);
+  const gst = simulationData.gst || subtotal * 0.05; // 5% GST
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
-  const totalSubsistence = entries.length * subsistence;
-  const grandTotal = subtotal + gst + totalSubsistence;
+  const totalSubsistence = simulationData.totalSubsistence || entries.length * subsistence;
+  const grandTotal = simulationData.grandTotal || subtotal + gst + totalSubsistence;
 
   return {
     client: {

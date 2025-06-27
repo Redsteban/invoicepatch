@@ -71,25 +71,25 @@ export async function generateHTMLToPDF(simulationData: any): Promise<void> {
 export function createInvoiceHTML(simulationData: any): string {
   const completedEntries = simulationData.entries.filter((entry: any) => entry.completed);
   
-  // Calculate totals exactly like in the preview
-  const totalTruckCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
-  const totalKmsCharges = completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
-  const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
-  const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
-  const gst = subtotal * 0.05;
+  // Use the exact calculated values from the preview instead of recalculating
+  const totalTruckCharges = simulationData.totalTruckCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = simulationData.totalKmsCharges || completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = simulationData.totalOtherCharges || completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = simulationData.subtotal || completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
+  const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
-  const totalSubsistence = completedEntries.length * subsistence;
-  const grandTotal = subtotal + gst + totalSubsistence;
+  const totalSubsistence = simulationData.totalSubsistence || completedEntries.length * subsistence;
+  const grandTotal = simulationData.grandTotal || subtotal + gst + totalSubsistence;
   
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #3c4043; line-height: 1.4;">
       <!-- Header Section - Exact match to preview -->
       <div style="text-align: center; margin-bottom: 30px; font-size: 11px;">
         <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client:</span> ${simulationData.clientName || 'Acme Energy Ltd.'}</div>
-        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client Address:</span> 123 Main St, Calgary, AB</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client Address:</span> ${simulationData.clientAddress || '123 Main St, Calgary, AB'}</div>
         <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Invoice Date:</span> ${new Date().toLocaleDateString('en-CA')}</div>
         <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor:</span> ${simulationData.contractorName || 'John Doe'}</div>
-        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor Address:</span> 456 Contractor Rd, Edmonton, AB</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor Address:</span> ${simulationData.contractorAddress || '456 Contractor Rd, Edmonton, AB'}</div>
         <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Pay Period:</span> ${simulationData.startDate} to ${simulationData.endDate}</div>
         <div><span style="font-weight: 600;">Invoice Number:</span> -</div>
       </div>
