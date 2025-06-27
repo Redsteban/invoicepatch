@@ -244,17 +244,21 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
     .map((entry: any, index: number) => ({
       day: index + 1,
       date: new Date(entry.date).toLocaleDateString('en-CA'), // YYYY-MM-DD format
-      description: entry.workDescription || 'Stack Production Testing',
-      location: '', // Empty as shown in reference
-      ticketNumber: '', // Empty as shown in reference
-      truck: 0, // $0 as shown in reference
-      kms: 0, // 0 as shown in reference
-      kmsRate: 0.5, // $0.5 as shown in reference
-      other: 0, // $0 as shown in reference
-      total: 580.00 // $580.00 as shown in reference
+      description: entry.description || 'Stack Production Testing',
+      location: entry.location || '', // Empty as shown in reference
+      ticketNumber: entry.ticketNumber || '', // Empty as shown in reference
+      truck: entry.truckRate || 0, // Use actual truck rate
+      kms: entry.kmsDriven || 0, // Use actual kms
+      kmsRate: entry.kmsRate || 0, // Use actual kms rate
+      other: entry.otherCharges || 0, // Use actual other charges
+      total: entry.dailyTotal || 0 // Use actual daily total
     }));
 
-  const subtotal = entries.length * 580.00; // Each day is $580
+  // Calculate totals exactly like in the preview
+  const totalTruckCharges = entries.reduce((sum, entry) => sum + entry.truck, 0);
+  const totalKmsCharges = entries.reduce((sum, entry) => sum + (entry.kms * entry.kmsRate), 0);
+  const totalOtherCharges = entries.reduce((sum, entry) => sum + entry.other, 0);
+  const subtotal = entries.reduce((sum, entry) => sum + entry.total, 0);
   const gst = subtotal * 0.05; // 5% GST
   const subsistence = 700.00; // Fixed subsistence amount
   const grandTotal = subtotal + gst + subsistence;
@@ -276,9 +280,9 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
     invoiceNumber: simulationData.invoiceNumber || '-',
     entries,
     totals: {
-      totalTruckCharges: 0.00,
-      totalKmsCharges: 0.00,
-      totalOtherCharges: 0.00,
+      totalTruckCharges,
+      totalKmsCharges,
+      totalOtherCharges,
       subtotal,
       gst,
       subsistence,

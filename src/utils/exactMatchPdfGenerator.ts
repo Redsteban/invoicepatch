@@ -247,17 +247,21 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
   const entries = completedEntries.map((entry: any, index: number) => ({
     day: index + 1,
     date: new Date(entry.date).toLocaleDateString('en-CA'),
-    description: 'Stack Production Testing',
-    location: '',
-    ticketNumber: '',
-    truck: 0,
-    kms: 0,
-    kmsRate: 0.5,
-    other: 0,
-    total: 580.00
+    description: entry.description || 'Stack Production Testing',
+    location: entry.location || '',
+    ticketNumber: entry.ticketNumber || '',
+    truck: entry.truckRate || 0,
+    kms: entry.kmsDriven || 0,
+    kmsRate: entry.kmsRate || 0,
+    other: entry.otherCharges || 0,
+    total: entry.dailyTotal || 0
   }));
 
-  const subtotal = entries.length * 580.00;
+  // Calculate totals exactly like in the preview
+  const totalTruckCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
   const subsistence = 700.00;
   const grandTotal = subtotal + gst + subsistence;
@@ -279,9 +283,9 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
     invoiceNumber: '-',
     entries,
     totals: {
-      totalTruckCharges: 0.00,
-      totalKmsCharges: 0.00,
-      totalOtherCharges: 0.00,
+      totalTruckCharges,
+      totalKmsCharges,
+      totalOtherCharges,
       subtotal,
       gst,
       subsistence,

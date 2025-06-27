@@ -70,22 +70,27 @@ export async function generateHTMLToPDF(simulationData: any): Promise<void> {
 // Only invoice content: header, table, summary, grand total
 export function createInvoiceHTML(simulationData: any): string {
   const completedEntries = simulationData.entries.filter((entry: any) => entry.completed);
-  const subtotal = completedEntries.length * 580.00;
+  
+  // Calculate totals exactly like in the preview
+  const totalTruckCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
+  const totalKmsCharges = completedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
+  const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
+  const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
   const subsistence = 700.00;
   const grandTotal = subtotal + gst + subsistence;
   
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #3c4043; line-height: 1.4;">
-      <!-- Header Section -->
+      <!-- Header Section - Exact match to preview -->
       <div style="text-align: center; margin-bottom: 30px; font-size: 11px;">
-        <div style="margin-bottom: 4px;">Client: ${simulationData.clientName || 'Acme Energy Ltd.'}</div>
-        <div style="margin-bottom: 4px;">Client Address: 123 Main St, Calgary, AB</div>
-        <div style="margin-bottom: 4px;">Invoice Date: ${new Date().toLocaleDateString('en-CA')}</div>
-        <div style="margin-bottom: 4px;">Contractor: ${simulationData.contractorName || 'John Doe'}</div>
-        <div style="margin-bottom: 4px;">Contractor Address: 456 Contractor Rd, Edmonton, AB</div>
-        <div style="margin-bottom: 4px;">Pay Period: ${simulationData.startDate} to ${simulationData.endDate}</div>
-        <div>Invoice Number: -</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client:</span> ${simulationData.clientName || 'Acme Energy Ltd.'}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Client Address:</span> 123 Main St, Calgary, AB</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Invoice Date:</span> ${new Date().toLocaleDateString('en-CA')}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor:</span> ${simulationData.contractorName || 'John Doe'}</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Contractor Address:</span> 456 Contractor Rd, Edmonton, AB</div>
+        <div style="margin-bottom: 4px;"><span style="font-weight: 600;">Pay Period:</span> ${simulationData.startDate} to ${simulationData.endDate}</div>
+        <div><span style="font-weight: 600;">Invoice Number:</span> -</div>
       </div>
 
       <!-- Work Summary -->
@@ -111,58 +116,58 @@ export function createInvoiceHTML(simulationData: any): string {
               <tr>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${index + 1}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${new Date(entry.date).toLocaleDateString('en-CA')}</td>
-                <td style="border: 1px solid #ccc; padding: 6px;">Stack Production Testing</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;"></td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;"></td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$0</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">0</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$0.5</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$0</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$580.00</td>
+                <td style="border: 1px solid #ccc; padding: 6px;">${entry.description || 'Stack Production Testing'}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.ticketNumber || ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.truckRate || 0).toFixed(2)}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven || 0}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.kmsRate || 0).toFixed(2)}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(entry.otherCharges || 0).toFixed(2)}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">$${(entry.dailyTotal || 0).toFixed(2)}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
 
-      <!-- Summary Sections -->
+      <!-- Summary Sections - Exact match to preview -->
       <div style="margin-bottom: 20px; font-size: 11px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span>⊕ Total Truck Charges</span>
-          <span>$0.00</span>
+          <span>$${totalTruckCharges.toFixed(2)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span>⊕ Total Kms Charges</span>
-          <span>$0.00</span>
+          <span>$${totalKmsCharges.toFixed(2)}</span>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span>⊕ Total Other Charges</span>
-          <span>$0.00</span>
+          <span>$${totalOtherCharges.toFixed(2)}</span>
         </div>
       </div>
 
-      <!-- Financial Summary -->
+      <!-- Financial Summary - Exact match to preview -->
       <div style="margin-bottom: 20px;">
         <h3 style="font-weight: bold; font-size: 12px; margin-bottom: 10px; color: black;">Financial Summary:</h3>
         <div style="font-size: 11px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #f9fafb; padding: 4px; border-radius: 3px;">
             <span>⊖ Subtotal</span>
             <span>$${subtotal.toFixed(2)}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #f9fafb; padding: 4px; border-radius: 3px;">
             <span>% GST (5%)</span>
             <span>$${gst.toFixed(2)}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #fffacd; padding: 4px; border-radius: 3px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #fef3c7; padding: 4px; border-radius: 3px; border: 1px solid #fde68a;">
             <span>⊕ Subsistence (Tax-Free)</span>
             <span>$${subsistence.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
-      <!-- Grand Total -->
-      <div style="text-align: center; margin-top: 20px;">
-        <div style="font-size: 16px; font-weight: bold; color: #228b22;">
+      <!-- Grand Total - Exact match to preview -->
+      <div style="text-align: center; margin-top: 20px; border-top: 2px dashed #d1d5db; padding-top: 15px;">
+        <div style="font-size: 18px; font-weight: bold; color: #059669;">
           $ Grand Total: $${grandTotal.toFixed(2)}
         </div>
       </div>
