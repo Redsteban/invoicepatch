@@ -260,8 +260,9 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
   const totalOtherCharges = entries.reduce((sum, entry) => sum + entry.other, 0);
   const subtotal = entries.reduce((sum, entry) => sum + entry.total, 0);
   const gst = subtotal * 0.05; // 5% GST
-  const subsistence = 700.00; // Fixed subsistence amount
-  const grandTotal = subtotal + gst + subsistence;
+  const subsistence = 50.00; // Per day subsistence rate
+  const totalSubsistence = entries.length * subsistence;
+  const grandTotal = subtotal + gst + totalSubsistence;
 
   return {
     client: {
@@ -285,7 +286,7 @@ export function convertSimulationToInvoiceData(simulationData: any): InvoiceData
       totalOtherCharges,
       subtotal,
       gst,
-      subsistence,
+      subsistence: totalSubsistence,
       grandTotal
     }
   };

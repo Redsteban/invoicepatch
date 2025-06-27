@@ -77,8 +77,9 @@ export function createInvoiceHTML(simulationData: any): string {
   const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
   const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
-  const subsistence = 700.00;
-  const grandTotal = subtotal + gst + subsistence;
+  const subsistence = 50.00; // Per day subsistence rate
+  const totalSubsistence = completedEntries.length * subsistence;
+  const grandTotal = subtotal + gst + totalSubsistence;
   
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #3c4043; line-height: 1.4;">
@@ -160,7 +161,7 @@ export function createInvoiceHTML(simulationData: any): string {
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 6px; background-color: #fef3c7; padding: 4px; border-radius: 3px; border: 1px solid #fde68a;">
             <span>⊕ Subsistence (Tax-Free)</span>
-            <span>$${subsistence.toFixed(2)}</span>
+            <span>$${totalSubsistence.toFixed(2)}</span>
           </div>
         </div>
       </div>

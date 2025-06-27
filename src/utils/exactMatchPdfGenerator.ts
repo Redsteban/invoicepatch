@@ -263,8 +263,9 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
   const totalOtherCharges = completedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
   const subtotal = completedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
   const gst = subtotal * 0.05;
-  const subsistence = 700.00;
-  const grandTotal = subtotal + gst + subsistence;
+  const subsistence = 50.00; // Per day subsistence rate
+  const totalSubsistence = completedEntries.length * subsistence;
+  const grandTotal = subtotal + gst + totalSubsistence;
 
   return {
     client: {
@@ -288,7 +289,7 @@ function convertToExactInvoiceData(simulationData: any): InvoiceData {
       totalOtherCharges,
       subtotal,
       gst,
-      subsistence,
+      subsistence: totalSubsistence,
       grandTotal
     }
   };
