@@ -1,3 +1,4 @@
+// Fixed jspdf-autotable build issue with dynamic imports - v2
 import jsPDF from 'jspdf';
 
 interface InvoiceEntry {
