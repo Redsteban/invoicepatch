@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRole } from '@/contexts/RoleContext';
+import { useContractor } from '@/contexts/ContractorContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ContractorDashboardOverview from '@/components/contractor/ContractorDashboardOverview';
 import TimeTrackingWidget from '@/components/contractor/TimeTrackingWidget';
 import InvoiceStatusWidget from '@/components/contractor/InvoiceStatusWidget';
 import TicketInformationForm from '@/components/contractor/TicketInformationForm';
+import SimulationIndicator, { SimulationBanner, SimulationBadge } from '@/components/contractor/SimulationIndicator';
+import SimulationLauncher, { SimulationLauncherCompact } from '@/components/contractor/SimulationLauncher';
 
 type ActiveView = 'overview' | 'time-tracking' | 'ticket-info' | 'invoices' | 'history' | 'expenses' | 'payments' | 'settings';
 
@@ -15,10 +18,11 @@ export default function ContractorDashboardPage() {
   const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const { role } = useRole();
+  const { isSimulationMode, dashboard } = useContractor();
 
   // Handle URL parameters
   useEffect(() => {
-    const tab = searchParams.get('tab');
+    const tab = searchParams?.get('tab');
     if (tab && ['overview', 'time-tracking', 'ticket-info', 'invoices', 'history', 'expenses', 'payments', 'settings'].includes(tab)) {
       setActiveView(tab as ActiveView);
     }
@@ -53,16 +57,22 @@ export default function ContractorDashboardPage() {
         {/* Mobile padding for sidebar button */}
         <div className="lg:hidden h-16"></div>
         
+        {/* Simulation Banner */}
+        <SimulationBanner />
+        
         {/* Content Area */}
         <div className="p-6">
             {/* Header */}
             <div className="mb-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Contractor Dashboard</h1>
-                  <p className="text-gray-600 mt-1">
-                    Welcome back! Track your work, manage invoices, and monitor your earnings.
-                  </p>
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Contractor Dashboard</h1>
+                    <p className="text-gray-600 mt-1">
+                      Welcome back! Track your work, manage invoices, and monitor your earnings.
+                    </p>
+                  </div>
+                  <SimulationBadge />
                 </div>
                 
                 {/* Quick Actions */}
@@ -89,23 +99,47 @@ export default function ContractorDashboardPage() {
               </div>
             </div>
 
-            {/* Getting Started Guide */}
-            <div className="mb-6">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-lg p-6 flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-bold">See How It Works</h2>
-                  <p className="text-green-100 mt-1">
-                    Run a personalized 15-day invoice simulation to see your earnings calculated automatically.
-                  </p>
+            {/* Getting Started Guide or Simulation Launcher */}
+            {!isSimulationMode ? (
+              <div className="mb-6">
+                <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-lg p-6 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold">See How It Works</h2>
+                    <p className="text-green-100 mt-1">
+                      Run a personalized 15-day invoice simulation to see your earnings calculated automatically.
+                    </p>
+                  </div>
+                  <a 
+                    href="/contractor-demo"
+                    className="bg-white text-green-700 font-bold px-5 py-3 rounded-lg hover:bg-green-50 transition-colors"
+                  >
+                    Try the Demo
+                  </a>
                 </div>
-                <a 
-                  href="/contractor-demo"
-                  className="bg-white text-green-700 font-bold px-5 py-3 rounded-lg hover:bg-green-50 transition-colors"
-                >
-                  Try the Demo
-                </a>
               </div>
-            </div>
+            ) : (
+              <div className="mb-6">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold">Simulation Active</h2>
+                      <p className="text-blue-100 mt-1">
+                        You're experiencing a {dashboard?.trialInvoice ? '15-day' : ''} work simulation. 
+                        All data is generated for demonstration purposes.
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold">
+                        Day {dashboard?.summary?.daysWorked || 0} of 15
+                      </div>
+                      <div className="text-blue-100 text-sm">
+                        {dashboard?.summary?.completionRate ? Math.round(dashboard.summary.completionRate) : 0}% Complete
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Tab Navigation */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-6">
@@ -143,6 +177,9 @@ export default function ContractorDashboardPage() {
               {renderContent()}
             </div>
         </div>
+
+        {/* Simulation Indicator (Fixed Position) */}
+        <SimulationIndicator />
       </div>
     </ProtectedRoute>
   );
