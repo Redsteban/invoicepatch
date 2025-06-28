@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useContractor } from '@/contexts/ContractorContext';
 import { 
   BarChart3, 
   Clock, 
@@ -21,7 +22,9 @@ import {
   MapPin,
   Truck,
   Calculator,
-  FileImage
+  FileImage,
+  Target,
+  Zap
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -34,6 +37,12 @@ interface SidebarItem {
 const ContractorSidebar = () => {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { 
+    isSimulationMode, 
+    simulationDay, 
+    startSimulation, 
+    exitSimulation
+  } = useContractor();
 
   const mainNavItems: SidebarItem[] = [
     {
@@ -116,7 +125,7 @@ const ContractorSidebar = () => {
     if (href === '/contractor/dashboard') {
       return pathname === href;
     }
-    return pathname.startsWith(href);
+    return pathname?.startsWith(href) || false;
   };
 
   const SidebarContent = () => (
@@ -124,7 +133,7 @@ const ContractorSidebar = () => {
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="bg-emerald-600 p-2 rounded-lg">
+          <div className={`p-2 rounded-lg ${isSimulationMode ? 'bg-blue-600' : 'bg-emerald-600'}`}>
             <HardHat className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -132,6 +141,73 @@ const ContractorSidebar = () => {
             <p className="text-sm text-gray-600">Work Portal</p>
           </div>
         </div>
+      </div>
+
+      {/* Simulation Mode Section */}
+      <div className="p-4 border-b border-gray-200">
+        {isSimulationMode ? (
+          <div className="space-y-3">
+            {/* Simulation Status */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Target className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-semibold text-blue-800">Demo Mode</span>
+              </div>
+              <div className="text-xs text-blue-700 mb-3">
+                Day {simulationDay}/15 - Interactive Demo
+              </div>
+              <button
+                onClick={exitSimulation}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors"
+              >
+                Exit Demo
+              </button>
+            </div>
+            
+            {/* Simulation Features Highlight */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-semibold text-blue-800">Demo Features</span>
+              </div>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div>• Interactive invoice generation</div>
+                <div>• Real-time calculations</div>
+                <div>• PDF preview & download</div>
+                <div>• Progressive scenarios</div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* Demo Call-to-Action */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Play className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-semibold text-blue-800">Try 15-Day Demo</span>
+              </div>
+              <p className="text-xs text-blue-700 mb-3">
+                Experience the full contractor workflow with interactive scenarios
+              </p>
+              <button
+                onClick={() => startSimulation('oil_gas')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors"
+              >
+                Start Demo
+              </button>
+            </div>
+            
+            {/* Quick Demo Info */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+              <div className="text-xs text-gray-600 space-y-1">
+                <div>• 15 progressive scenarios</div>
+                <div>• Real invoice generation</div>
+                <div>• PDF download & email</div>
+                <div>• No data saved</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -149,7 +225,9 @@ const ContractorSidebar = () => {
                   href={item.href}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.href)
-                      ? 'bg-emerald-100 text-emerald-700'
+                      ? isSimulationMode 
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-emerald-100 text-emerald-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   onClick={() => setIsMobileOpen(false)}
@@ -184,7 +262,9 @@ const ContractorSidebar = () => {
                   href={item.href}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.href)
-                      ? 'bg-emerald-100 text-emerald-700'
+                      ? isSimulationMode 
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-emerald-100 text-emerald-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   onClick={() => setIsMobileOpen(false)}
@@ -215,7 +295,9 @@ const ContractorSidebar = () => {
                   href={item.href}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive(item.href)
-                      ? 'bg-emerald-100 text-emerald-700'
+                      ? isSimulationMode 
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-emerald-100 text-emerald-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   onClick={() => setIsMobileOpen(false)}
@@ -238,13 +320,19 @@ const ContractorSidebar = () => {
 
       {/* Footer */}
       <div className="p-4 border-t border-gray-200">
-        <div className="bg-emerald-50 rounded-lg p-3">
+        <div className={`rounded-lg p-3 ${isSimulationMode ? 'bg-blue-50' : 'bg-emerald-50'}`}>
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-emerald-700">Work Status</span>
+            <div className={`w-2 h-2 rounded-full animate-pulse ${isSimulationMode ? 'bg-blue-500' : 'bg-emerald-500'}`}></div>
+            <span className={`text-sm font-medium ${isSimulationMode ? 'text-blue-700' : 'text-emerald-700'}`}>
+              {isSimulationMode ? 'Demo Status' : 'Work Status'}
+            </span>
           </div>
-          <p className="text-xs text-emerald-600">Ready to work</p>
-          <p className="text-xs text-gray-500">Calgary Downtown - Site A</p>
+          <p className={`text-xs ${isSimulationMode ? 'text-blue-600' : 'text-emerald-600'}`}>
+            {isSimulationMode ? 'Demo mode active' : 'Ready to work'}
+          </p>
+          <p className="text-xs text-gray-500">
+            {isSimulationMode ? 'Interactive simulation' : 'Calgary Downtown - Site A'}
+          </p>
         </div>
       </div>
     </div>
