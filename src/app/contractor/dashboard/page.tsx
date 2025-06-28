@@ -14,11 +14,33 @@ import SimulationLauncher, { SimulationLauncherCompact } from '@/components/cont
 
 type ActiveView = 'overview' | 'time-tracking' | 'ticket-info' | 'invoices' | 'history' | 'expenses' | 'payments' | 'settings';
 
-export default function ContractorDashboardPage() {
+export default function ContractorDashboard() {
   const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const { role } = useRole();
-  const { isSimulationMode, dashboard } = useContractor();
+  const { 
+    dashboard, 
+    isLoading, 
+    error,
+    // Add simulation props
+    isSimulationMode,
+    simulationDay,
+    simulationData,
+    advanceSimulationDay
+  } = useContractor();
+
+  const getSimulationProgress = () => {
+    return {
+      percentage: Math.round((simulationDay / 15) * 100)
+    };
+  };
+
+  const getCurrentScenario = () => {
+    if (!isSimulationMode || !simulationData.scenarios) return null;
+    return simulationData.scenarios[simulationDay] || null;
+  };
+
+  const currentScenario = getCurrentScenario();
 
   // Handle URL parameters
   useEffect(() => {
@@ -27,6 +49,9 @@ export default function ContractorDashboardPage() {
       setActiveView(tab as ActiveView);
     }
   }, [searchParams]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   const renderContent = () => {
     switch (activeView) {
@@ -62,6 +87,56 @@ export default function ContractorDashboardPage() {
         
         {/* Content Area */}
         <div className="p-6">
+            {/* Add simulation progress bar */}
+            {isSimulationMode && (
+              <div className="mb-6 bg-white rounded-lg shadow p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Simulation Progress
+                    </h2>
+                    <p className="text-gray-600">Day {simulationDay} of 15</p>
+                  </div>
+                  <button
+                    onClick={advanceSimulationDay}
+                    disabled={simulationDay >= 15}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+                  >
+                    {simulationDay >= 15 ? 'Completed' : `Advance to Day ${simulationDay + 1}`}
+                  </button>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500"
+                    style={{ width: `${getSimulationProgress().percentage}%` }}
+                  ></div>
+                </div>
+
+                {currentScenario && currentScenario.events && currentScenario.events.length > 0 && (
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h3 className="font-medium text-blue-900 mb-2">Today's Events:</h3>
+                    <div className="space-y-2">
+                      {currentScenario.events.map((event: any, index: number) => (
+                        <div key={index} className="flex items-start space-x-2 text-sm">
+                          <span className="text-blue-600 mt-0.5">•</span>
+                          <div>
+                            <span className="text-blue-900">{event.message || event}</span>
+                            {event.impact && (
+                              <span className="ml-2 text-green-600 font-medium">({event.impact})</span>
+                            )}
+                            {event.time && (
+                              <span className="ml-2 text-blue-700">at {event.time}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Header */}
             <div className="mb-6">
               <div className="flex items-center justify-between">
@@ -130,10 +205,10 @@ export default function ContractorDashboardPage() {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold">
-                        Day {dashboard?.summary?.daysWorked || 0} of 15
+                        Day {simulationDay} of 15
                       </div>
                       <div className="text-blue-100 text-sm">
-                        {dashboard?.summary?.completionRate ? Math.round(dashboard.summary.completionRate) : 0}% Complete
+                        {getSimulationProgress().percentage}% Complete
                       </div>
                     </div>
                   </div>
@@ -208,7 +283,7 @@ function PaymentsView() {
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Payments</h2>
-      <p className="text-gray-600">View your payment history and upcoming payments here.</p>
+      <p className="text-gray-600">View your payment history and upcoming payments.</p>
     </div>
   );
 }
@@ -217,7 +292,7 @@ function SettingsView() {
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Settings</h2>
-      <p className="text-gray-600">Manage your account settings and preferences here.</p>
+      <p className="text-gray-600">Manage your account settings and preferences.</p>
     </div>
   );
 } 

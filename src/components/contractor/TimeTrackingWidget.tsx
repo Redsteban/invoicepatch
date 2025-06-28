@@ -40,7 +40,7 @@ interface TimeEntry {
   status: 'active' | 'completed' | 'break';
 }
 
-const TimeTrackingWidget = () => {
+export default function TimeTrackingWidget() {
   const [isTracking, setIsTracking] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -54,10 +54,19 @@ const TimeTrackingWidget = () => {
 
   // Simulation context
   const { 
+    dashboard,
     isSimulationMode, 
     simulationDay, 
-    simulationData 
+    simulationData,
+    advanceSimulationDay
   } = useContractor();
+
+  const getCurrentScenario = () => {
+    if (!isSimulationMode || !simulationData.scenarios) return null;
+    return simulationData.scenarios[simulationDay] || null;
+  };
+
+  const currentScenario = getCurrentScenario();
 
   // Mock today's entries
   const [todaysEntries, setTodaysEntries] = useState<TimeEntry[]>([
@@ -77,166 +86,6 @@ const TimeTrackingWidget = () => {
       status: 'completed'
     }
   ]);
-
-  // Simulation scenarios data
-  const getSimulationScenario = () => {
-    const scenarios = {
-      1: {
-        title: 'Standard Work Day',
-        description: 'Regular 8-hour shift with standard equipment',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D',
-        notes: 'Foundation work - east section',
-        events: [],
-        nextEvent: 'Equipment maintenance scheduled for tomorrow'
-      },
-      2: {
-        title: 'Equipment Setup Day',
-        description: 'Setting up new equipment and safety protocols',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Crane 150T + Safety Equipment',
-        notes: 'Equipment setup and safety training',
-        events: ['New safety protocols implemented'],
-        nextEvent: 'Full production begins tomorrow'
-      },
-      3: {
-        title: 'Overtime Equipment Day',
-        description: 'Extended shift due to equipment maintenance requirements',
-        hours: 10,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D + Backup Equipment',
-        notes: 'Extended shift - equipment maintenance and foundation completion',
-        events: ['Overtime approved', 'Equipment maintenance completed'],
-        nextEvent: 'Rate increase notification expected'
-      },
-      4: {
-        title: 'Standard Production Day',
-        description: 'Normal production with updated safety protocols',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D',
-        notes: 'Foundation work - west section',
-        events: [],
-        nextEvent: 'Rate increase announcement today'
-      },
-      5: {
-        title: 'Rate Increase Day',
-        description: 'Rate increase notification and updated calculations',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D',
-        notes: 'Foundation work - rate increase effective today',
-        events: ['Rate increased from $72.50 to $78.00/hour'],
-        nextEvent: 'New project location assignment'
-      },
-      6: {
-        title: 'Standard Day',
-        description: 'Regular shift with new rate',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D',
-        notes: 'Foundation work - north section',
-        events: [],
-        nextEvent: 'Equipment upgrade scheduled'
-      },
-      7: {
-        title: 'Standard Day',
-        description: 'Regular shift with new rate',
-        hours: 8,
-        location: 'Calgary Downtown Tower - Site A',
-        equipment: 'Excavator 320D',
-        notes: 'Foundation work - south section',
-        events: [],
-        nextEvent: 'Location change notification'
-      },
-      8: {
-        title: 'Location Change Day',
-        description: 'Client requests move to new site location',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 320D + Transport Equipment',
-        notes: 'Site relocation - new foundation work at industrial park',
-        events: ['Location changed to Industrial Park', 'Transport costs added'],
-        nextEvent: 'New equipment delivery'
-      },
-      9: {
-        title: 'New Equipment Day',
-        description: 'New equipment delivery and setup',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D (New) + Setup Tools',
-        notes: 'New equipment setup and testing',
-        events: ['New excavator delivered', 'Equipment training completed'],
-        nextEvent: 'Weekend emergency work possibility'
-      },
-      10: {
-        title: 'Standard Production Day',
-        description: 'Normal production with new equipment',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D',
-        notes: 'Foundation work - main building',
-        events: [],
-        nextEvent: 'Weekend emergency notification'
-      },
-      11: {
-        title: 'Standard Day',
-        description: 'Regular shift with new equipment',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D',
-        notes: 'Foundation work - secondary building',
-        events: [],
-        nextEvent: 'Emergency weekend work'
-      },
-      12: {
-        title: 'Weekend Emergency Work',
-        description: 'Emergency weekend work due to client deadline',
-        hours: 6,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D + Emergency Equipment',
-        notes: 'Emergency weekend work - deadline pressure',
-        events: ['Weekend emergency work', 'Overtime rates applied', 'Deadline pressure'],
-        nextEvent: 'Project completion celebration'
-      },
-      13: {
-        title: 'Standard Day',
-        description: 'Regular shift after emergency work',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D',
-        notes: 'Foundation work - final sections',
-        events: [],
-        nextEvent: 'Project completion'
-      },
-      14: {
-        title: 'Standard Day',
-        description: 'Regular shift approaching project end',
-        hours: 8,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D',
-        notes: 'Foundation work - finishing touches',
-        events: [],
-        nextEvent: 'Final day of project'
-      },
-      15: {
-        title: 'Project Completion Day',
-        description: 'Final day of the project with completion celebration',
-        hours: 6,
-        location: 'Calgary Industrial Park - Site B',
-        equipment: 'Excavator 350D + Cleanup Equipment',
-        notes: 'Project completion - final cleanup and handover',
-        events: ['Project completed successfully', 'Client handover', 'Bonus payment'],
-        nextEvent: 'New project assignment'
-      }
-    };
-    
-    return scenarios[simulationDay as keyof typeof scenarios] || scenarios[1];
-  };
-
-  const currentScenario = getSimulationScenario();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -285,6 +134,20 @@ const TimeTrackingWidget = () => {
     setTotalBreakTime(0);
   };
 
+  const startBreak = () => {
+    setIsOnBreak(true);
+    setBreakStartTime(new Date());
+  };
+
+  const endBreak = () => {
+    if (breakStartTime) {
+      const breakDuration = currentTime.getTime() - breakStartTime.getTime();
+      setTotalBreakTime(prev => prev + breakDuration);
+    }
+    setIsOnBreak(false);
+    setBreakStartTime(null);
+  };
+
   const endWork = () => {
     if (isOnBreak) {
       // End break first
@@ -318,20 +181,6 @@ const TimeTrackingWidget = () => {
     setPhotos([]);
   };
 
-  const startBreak = () => {
-    setIsOnBreak(true);
-    setBreakStartTime(new Date());
-  };
-
-  const endBreak = () => {
-    if (breakStartTime) {
-      const breakDuration = currentTime.getTime() - breakStartTime.getTime();
-      setTotalBreakTime(prev => prev + breakDuration);
-    }
-    setIsOnBreak(false);
-    setBreakStartTime(null);
-  };
-
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -360,137 +209,85 @@ const TimeTrackingWidget = () => {
     return total.toFixed(1);
   };
 
-  const simulateWorkDay = () => {
-    if (!isSimulationMode || !currentScenario) return;
-    
-    // Auto-fill realistic data based on scenario
-    setEquipment(currentScenario.equipment);
-    setNotes(currentScenario.notes);
-    setCurrentLocation(currentScenario.location);
-    
-    // Simulate a completed work day
-    const simulatedStartTime = new Date();
-    simulatedStartTime.setHours(7, 30, 0, 0); // 7:30 AM start
-    
-    const simulatedEndTime = new Date();
-    simulatedEndTime.setHours(7 + currentScenario.hours, 30, 0, 0); // End based on scenario hours
-    
-    const simulatedEntry: TimeEntry = {
-      id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      startTime: simulatedStartTime.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' }),
-      endTime: simulatedEndTime.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' }),
-      location: {
-        lat: 51.0447,
-        lng: -114.0719,
-        address: currentScenario.location
-      },
-      equipment: currentScenario.equipment,
-      photos: [],
-      notes: currentScenario.notes,
-      status: 'completed'
-    };
-    
-    setTodaysEntries(prev => [...prev, simulatedEntry]);
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Simulation Scenario Overlay */}
+    <div className="bg-white rounded-lg shadow p-6">
+      {/* Add simulation indicator */}
       {isSimulationMode && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <Target className="w-6 h-6 text-blue-600" />
-              <div>
-                <h3 className="text-lg font-semibold text-blue-800">Day {simulationDay} Scenario</h3>
-                <p className="text-sm text-blue-600">{currentScenario.title}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-medium text-blue-700">Demo Mode</span>
-            </div>
+        <div className="mb-4 bg-blue-50 border border-blue-200 rounded p-3">
+          <div className="flex items-center justify-between">
+            <span className="text-blue-800 font-medium text-sm">
+              🎮 Simulation Day {simulationDay}
+            </span>
+            {currentScenario && (
+              <span className="text-xs text-blue-600">
+                {currentScenario.scenario_type ? currentScenario.scenario_type.replace('_', ' ').toUpperCase() : 'DEMO'}
+              </span>
+            )}
           </div>
-          
-          {/* Scenario Description */}
-          <div className="bg-white border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start space-x-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <h4 className="font-semibold text-blue-800 mb-2">Today's Scenario</h4>
-                <p className="text-sm text-blue-700 mb-3">{currentScenario.description}</p>
-                
-                {/* Scenario Details */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-blue-800">Hours:</span>
-                    <span className="text-blue-700 ml-2">{currentScenario.hours}h</span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-800">Location:</span>
-                    <span className="text-blue-700 ml-2">{currentScenario.location}</span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-800">Equipment:</span>
-                    <span className="text-blue-700 ml-2">{currentScenario.equipment}</span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-800">Rate:</span>
-                    <span className="text-blue-700 ml-2">
-                      {simulationDay >= 5 ? '$78.00' : '$72.50'}/hour
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
+      )}
 
-          {/* Simulation Events */}
-          {currentScenario.events.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-              <div className="flex items-start space-x-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Today's Events</h4>
-                  <ul className="space-y-1">
-                    {currentScenario.events.map((event, index) => (
-                      <li key={index} className="text-sm text-yellow-700 flex items-center space-x-2">
-                        <Zap className="w-3 h-3" />
-                        <span>{event}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* What Would Happen Next */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start space-x-3">
-              <ArrowRight className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <h4 className="font-semibold text-green-800 mb-2">What Would Happen Next</h4>
-                <p className="text-sm text-green-700">{currentScenario.nextEvent}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Simulate Work Day Button */}
-          <motion.button
-            onClick={simulateWorkDay}
-            whileTap={{ scale: 0.95 }}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 shadow-lg"
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">Time Tracking</h3>
+        {isSimulationMode && currentScenario && (
+          <button
+            onClick={advanceSimulationDay}
+            className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
           >
-            <Play className="w-5 h-5" />
-            <span>Simulate Work Day</span>
-          </motion.button>
+            Complete Day
+          </button>
+        )}
+      </div>
+
+      {/* Your existing time tracking content */}
+      <div className="space-y-4">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Today's Hours:</span>
+          <span className="font-semibold">
+            {isSimulationMode && currentScenario 
+              ? `${currentScenario.data_changes?.daily_hours || 8}h`
+              : `${getTotalHoursToday()}h`
+            }
+          </span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="text-gray-600">This Week:</span>
+          <span className="font-semibold">
+            {dashboard?.entries?.length ? (dashboard.entries.length * 8).toFixed(1) : '0'}h
+          </span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-gray-600">Earnings Today:</span>
+          <span className="font-semibold text-green-600">
+            ${isSimulationMode && currentScenario 
+              ? (currentScenario.data_changes?.total_earnings_day || 0).toLocaleString()
+              : (parseFloat(getTotalHoursToday()) * 72.5).toFixed(0)
+            }
+          </span>
+        </div>
+      </div>
+
+      {/* Show simulation events for current day */}
+      {isSimulationMode && currentScenario && currentScenario.events && currentScenario.events.length > 0 && (
+        <div className="mt-4 pt-4 border-t">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Day Events:</h4>
+          <div className="space-y-2">
+            {currentScenario.events.slice(0, 2).map((event: any, index: number) => (
+              <div key={index} className="text-xs bg-yellow-50 p-2 rounded">
+                <div className="font-medium text-yellow-800">{event.message || event}</div>
+                {event.impact && (
+                  <div className="text-yellow-700">{event.impact}</div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Main Timer Display */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+      <div className="mt-6">
         <div className="text-center mb-6">
           <div className="text-5xl font-mono font-bold text-gray-900 mb-2">
             {isTracking ? getCurrentWorkDuration() : '00:00'}
@@ -553,7 +350,7 @@ const TimeTrackingWidget = () => {
 
       {/* Current Session Details */}
       {isTracking && (
-        <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+        <div className="mt-6 bg-gray-50 rounded-lg p-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {isSimulationMode ? 'Demo Session' : 'Current Session'}
           </h3>
@@ -584,7 +381,7 @@ const TimeTrackingWidget = () => {
                   type="text"
                   value={equipment}
                   onChange={(e) => setEquipment(e.target.value)}
-                  placeholder={isSimulationMode ? currentScenario?.equipment : "e.g., Excavator 320D, Truck #45"}
+                  placeholder={isSimulationMode && currentScenario ? currentScenario.equipment : "e.g., Excavator 320D, Truck #45"}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 />
               </div>
@@ -598,54 +395,17 @@ const TimeTrackingWidget = () => {
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={isSimulationMode ? currentScenario?.notes : "Describe the work being performed..."}
+                placeholder={isSimulationMode && currentScenario ? currentScenario.notes : "Describe the work being performed..."}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
-            </div>
-
-            {/* Photo Upload */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Work Photos
-              </label>
-              <div className="flex items-center space-x-3">
-                <label className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg cursor-pointer transition-colors">
-                  <Camera className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">Add Photos</span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                </label>
-                {photos.length > 0 && (
-                  <span className="text-sm text-gray-600">{photos.length} photo(s) added</span>
-                )}
-              </div>
-              
-              {photos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-3">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={photo}
-                        alt={`Work photo ${index + 1}`}
-                        className="w-full h-20 object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
       )}
 
       {/* Today's Summary */}
-      <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+      <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           {isSimulationMode ? 'Demo Summary' : 'Today\'s Summary'}
         </h3>
@@ -726,6 +486,4 @@ const TimeTrackingWidget = () => {
       </div>
     </div>
   );
-};
-
-export default TimeTrackingWidget; 
+} 

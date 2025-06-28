@@ -34,15 +34,32 @@ interface SidebarItem {
   badge?: string;
 }
 
-const ContractorSidebar = () => {
+export default function ContractorSidebar() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [showSimulationMenu, setShowSimulationMenu] = useState(false);
+  
   const { 
     isSimulationMode, 
     simulationDay, 
+    simulationTemplate,
+    simulationData,
     startSimulation, 
     exitSimulation
   } = useContractor();
+
+  const getSimulationProgress = () => {
+    return {
+      percentage: Math.round((simulationDay / 15) * 100)
+    };
+  };
+
+  const getCurrentScenario = () => {
+    if (!isSimulationMode || !simulationData.scenarios) return null;
+    return simulationData.scenarios[simulationDay] || null;
+  };
+
+  const currentScenario = getCurrentScenario();
 
   const mainNavItems: SidebarItem[] = [
     {
@@ -130,6 +147,45 @@ const ContractorSidebar = () => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
+      {/* Simulation header at top */}
+      {isSimulationMode && (
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold text-blue-900">🎯 Demo Mode</div>
+              <div className="text-xs text-blue-700">
+                Day {simulationDay} of 15 • {getSimulationProgress().percentage}% Complete
+              </div>
+            </div>
+            <button
+              onClick={exitSimulation}
+              className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+            >
+              Exit Demo
+            </button>
+          </div>
+          
+          {currentScenario && (
+            <div className="mt-2 p-2 bg-white rounded text-xs">
+              <div className="font-medium text-gray-900">{currentScenario.title}</div>
+              <div className="text-gray-600">{currentScenario.description}</div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Simulation starter for non-simulation users */}
+      {!isSimulationMode && (
+        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
+          <button
+            onClick={() => setShowSimulationMenu(true)}
+            className="w-full bg-green-600 text-white text-sm font-medium py-2 px-3 rounded hover:bg-green-700"
+          >
+            🚀 Try 15-Day Demo
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -141,73 +197,6 @@ const ContractorSidebar = () => {
             <p className="text-sm text-gray-600">Work Portal</p>
           </div>
         </div>
-      </div>
-
-      {/* Simulation Mode Section */}
-      <div className="p-4 border-b border-gray-200">
-        {isSimulationMode ? (
-          <div className="space-y-3">
-            {/* Simulation Status */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-2">
-                <Target className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-semibold text-blue-800">Demo Mode</span>
-              </div>
-              <div className="text-xs text-blue-700 mb-3">
-                Day {simulationDay}/15 - Interactive Demo
-              </div>
-              <button
-                onClick={exitSimulation}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors"
-              >
-                Exit Demo
-              </button>
-            </div>
-            
-            {/* Simulation Features Highlight */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-2">
-                <Zap className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-semibold text-blue-800">Demo Features</span>
-              </div>
-              <div className="text-xs text-blue-700 space-y-1">
-                <div>• Interactive invoice generation</div>
-                <div>• Real-time calculations</div>
-                <div>• PDF preview & download</div>
-                <div>• Progressive scenarios</div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {/* Demo Call-to-Action */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center space-x-2 mb-2">
-                <Play className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-semibold text-blue-800">Try 15-Day Demo</span>
-              </div>
-              <p className="text-xs text-blue-700 mb-3">
-                Experience the full contractor workflow with interactive scenarios
-              </p>
-              <button
-                onClick={() => startSimulation('oil_gas')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors"
-              >
-                Start Demo
-              </button>
-            </div>
-            
-            {/* Quick Demo Info */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-              <div className="text-xs text-gray-600 space-y-1">
-                <div>• 15 progressive scenarios</div>
-                <div>• Real invoice generation</div>
-                <div>• PDF download & email</div>
-                <div>• No data saved</div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Navigation */}
@@ -370,8 +359,54 @@ const ContractorSidebar = () => {
           <SidebarContent />
         </div>
       </div>
+
+      {/* Simulation starter modal */}
+      {showSimulationMenu && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Experience InvoicePatch Demo
+            </h3>
+            <p className="text-gray-600 mb-6">
+              See how 15 days of contractor work flows through our system - from time tracking to final payment.
+            </p>
+            
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => {
+                  startSimulation('oil_gas');
+                  setShowSimulationMenu(false);
+                }}
+                className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300"
+              >
+                <div className="font-semibold">🛢️ Oil & Gas Contractor</div>
+                <div className="text-sm text-gray-600">Shell drilling project • $65-68/hr • Overtime scenarios</div>
+              </button>
+              
+              <button
+                onClick={() => {
+                  startSimulation('construction');
+                  setShowSimulationMenu(false);
+                }}
+                className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-300 opacity-60"
+                disabled
+              >
+                <div className="font-semibold">🏗️ Construction Manager</div>
+                <div className="text-sm text-gray-600">Coming soon</div>
+              </button>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowSimulationMenu(false)}
+                className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
-};
-
-export default ContractorSidebar; 
+} 
