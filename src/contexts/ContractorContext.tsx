@@ -10,15 +10,12 @@ import {
   updateDailyEntry,
   startTimeTracking,
   endTimeTracking,
-  uploadPhoto
+  uploadPhoto,
+  generateSimulationDashboardData,
+  generateSimulationEntries,
+  generateSimulationInvoices,
+  generateSimulationScenarios
 } from '@/lib/contractorService';
-import { 
-  generateSimulationData, 
-  generateTimeTrackingData, 
-  generateNotificationData, 
-  generateEventData,
-  SimulationTemplate 
-} from '@/lib/simulationDataGenerator';
 
 interface ContractorContextType {
   // State
@@ -30,10 +27,11 @@ interface ContractorContextType {
   // Simulation State
   isSimulationMode: boolean;
   simulationDay: number;
-  simulationTemplate: SimulationTemplate | null;
+  simulationTemplate: 'oil_gas' | 'construction' | null;
   simulationData: {
     notifications: string[];
     events: string[];
+    scenarios: any;
   };
   
   // Actions
@@ -51,7 +49,7 @@ interface ContractorContextType {
   uploadPhotoFile: (file: File) => Promise<string>;
   
   // Simulation Actions
-  startSimulation: (templateType: SimulationTemplate) => void;
+  startSimulation: (templateType: 'oil_gas' | 'construction') => void;
   advanceSimulationDay: () => void;
   exitSimulation: () => void;
   
@@ -72,10 +70,11 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
   // Simulation state
   const [isSimulationMode, setIsSimulationMode] = useState(false);
   const [simulationDay, setSimulationDay] = useState(1);
-  const [simulationTemplate, setSimulationTemplate] = useState<SimulationTemplate | null>(null);
+  const [simulationTemplate, setSimulationTemplate] = useState<'oil_gas' | 'construction' | null>(null);
   const [simulationData, setSimulationData] = useState({
     notifications: [] as string[],
-    events: [] as string[]
+    events: [] as string[],
+    scenarios: null as any
   });
 
   // Load dashboard data (real or simulation)
@@ -84,16 +83,19 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
       
-      if (isSimulationMode && simulationTemplate) {
-        // Load simulation data
-        const simData = generateSimulationData(simulationTemplate, simulationDay);
+      if (isSimulationMode) {
+        // Load simulation data using contractorService functions
+        const simData = generateSimulationDashboardData(simulationDay);
         setDashboard(simData);
         setCurrentTrialInvoiceId(trialInvoiceId);
         
-        // Update simulation notifications and events
-        const notifications = generateNotificationData(simulationTemplate, simulationDay);
-        const events = generateEventData(simulationTemplate, simulationDay);
-        setSimulationData({ notifications, events });
+        // Update simulation scenarios and notifications
+        const scenarios = generateSimulationScenarios(simulationDay);
+        setSimulationData({
+          notifications: scenarios.notifications || [],
+          events: scenarios.events || [],
+          scenarios
+        });
       } else {
         // Load real data
         const data = await getContractorDashboard(trialInvoiceId);
@@ -195,13 +197,20 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
       
-      if (isSimulationMode && simulationTemplate) {
+      if (isSimulationMode) {
         // Simulate time tracking
-        const timeEntries = generateTimeTrackingData(simulationTemplate, simulationDay);
-        const activeEntry = timeEntries.find(entry => entry.status === 'active');
-        if (activeEntry) {
-          setCurrentTimeEntry(activeEntry);
-        }
+        const timeEntry: TimeEntry = {
+          id: `sim-time-${Date.now()}`,
+          date: new Date().toISOString().split('T')[0],
+          startTime: data.startTime,
+          endTime: undefined,
+          location: data.location,
+          equipment: data.equipment,
+          photos: [],
+          notes: data.notes || '',
+          status: 'active'
+        };
+        setCurrentTimeEntry(timeEntry);
       } else {
         // Real API call
         const timeEntry = await startTimeTracking(data);
@@ -222,6 +231,10 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
       
       if (isSimulationMode) {
         // Simulate stopping time tracking
+        if (currentTimeEntry) {
+          const updatedEntry = { ...currentTimeEntry, endTime, status: 'completed' as const };
+          setCurrentTimeEntry(updatedEntry);
+        }
         setCurrentTimeEntry(null);
         
         // Refresh dashboard data
@@ -267,7 +280,7 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
   };
 
   // Simulation methods
-  const startSimulation = (templateType: SimulationTemplate) => {
+  const startSimulation = (templateType: 'oil_gas' | 'construction') => {
     setIsSimulationMode(true);
     setSimulationDay(1);
     setSimulationTemplate(templateType);
@@ -275,28 +288,34 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
     setError(null);
     
     // Load initial simulation data
-    const simData = generateSimulationData(templateType, 1);
+    const simData = generateSimulationDashboardData(1);
     setDashboard(simData);
     
-    // Set initial notifications and events
-    const notifications = generateNotificationData(templateType, 1);
-    const events = generateEventData(templateType, 1);
-    setSimulationData({ notifications, events });
+    // Set initial scenarios and notifications
+    const scenarios = generateSimulationScenarios(1);
+    setSimulationData({
+      notifications: scenarios.notifications || [],
+      events: scenarios.events || [],
+      scenarios
+    });
   };
 
   const advanceSimulationDay = () => {
-    if (simulationDay < 15 && simulationTemplate) {
+    if (simulationDay < 15) {
       const newDay = simulationDay + 1;
       setSimulationDay(newDay);
       
       // Reload simulation data for new day
-      const simData = generateSimulationData(simulationTemplate, newDay);
+      const simData = generateSimulationDashboardData(newDay);
       setDashboard(simData);
       
-      // Update notifications and events
-      const notifications = generateNotificationData(simulationTemplate, newDay);
-      const events = generateEventData(simulationTemplate, newDay);
-      setSimulationData({ notifications, events });
+      // Update scenarios and notifications
+      const scenarios = generateSimulationScenarios(newDay);
+      setSimulationData({
+        notifications: scenarios.notifications || [],
+        events: scenarios.events || [],
+        scenarios
+      });
     }
   };
 
@@ -306,20 +325,23 @@ export function ContractorProvider({ children }: { children: ReactNode }) {
     setSimulationTemplate(null);
     setDashboard(null);
     setCurrentTimeEntry(null);
-    setSimulationData({ notifications: [], events: [] });
+    setSimulationData({ notifications: [], events: [], scenarios: null });
     setError(null);
   };
 
   // Refresh data (real or simulation)
   const refreshData = async () => {
-    if (isSimulationMode && simulationTemplate) {
+    if (isSimulationMode) {
       // Refresh simulation data
-      const simData = generateSimulationData(simulationTemplate, simulationDay);
+      const simData = generateSimulationDashboardData(simulationDay);
       setDashboard(simData);
       
-      const notifications = generateNotificationData(simulationTemplate, simulationDay);
-      const events = generateEventData(simulationTemplate, simulationDay);
-      setSimulationData({ notifications, events });
+      const scenarios = generateSimulationScenarios(simulationDay);
+      setSimulationData({
+        notifications: scenarios.notifications || [],
+        events: scenarios.events || [],
+        scenarios
+      });
     } else if (currentTrialInvoiceId) {
       // Refresh real data
       await loadDashboard(currentTrialInvoiceId);

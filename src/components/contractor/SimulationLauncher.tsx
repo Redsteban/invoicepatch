@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { useContractor } from '@/contexts/ContractorContext';
-import { SimulationTemplate } from '@/lib/simulationDataGenerator';
 import { Play, HardHat, Zap, ArrowRight, Info } from 'lucide-react';
 
 interface SimulationTemplateOption {
-  id: SimulationTemplate;
+  id: 'oil_gas' | 'construction';
   name: string;
   description: string;
   icon: React.ReactNode;
@@ -55,10 +54,10 @@ const simulationTemplates: SimulationTemplateOption[] = [
 
 export default function SimulationLauncher() {
   const { startSimulation, isSimulationMode } = useContractor();
-  const [selectedTemplate, setSelectedTemplate] = useState<SimulationTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<'oil_gas' | 'construction' | null>(null);
   const [isStarting, setIsStarting] = useState(false);
 
-  const handleStartSimulation = async (template: SimulationTemplate) => {
+  const handleStartSimulation = async (template: 'oil_gas' | 'construction') => {
     setIsStarting(true);
     try {
       startSimulation(template);
@@ -183,7 +182,7 @@ export function SimulationLauncherCompact() {
   const { startSimulation, isSimulationMode } = useContractor();
   const [isStarting, setIsStarting] = useState(false);
 
-  const handleQuickStart = async (template: SimulationTemplate) => {
+  const handleQuickStart = async (template: 'oil_gas' | 'construction') => {
     setIsStarting(true);
     try {
       startSimulation(template);
