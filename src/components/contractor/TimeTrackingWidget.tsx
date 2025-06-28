@@ -40,6 +40,8 @@ interface TimeEntry {
   status: 'active' | 'completed' | 'break';
 }
 
+type BillingType = 'hourly' | 'day_rate';
+
 export default function TimeTrackingWidget() {
   const [isTracking, setIsTracking] = useState(false);
   const [isOnBreak, setIsOnBreak] = useState(false);
@@ -51,6 +53,7 @@ export default function TimeTrackingWidget() {
   const [equipment, setEquipment] = useState('');
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
+  const [billingType, setBillingType] = useState<BillingType>('hourly');
 
   // Simulation context
   const { 
@@ -209,6 +212,14 @@ export default function TimeTrackingWidget() {
     return total.toFixed(1);
   };
 
+  const getDailyRate = () => {
+    return isSimulationMode && simulationDay >= 5 ? 624 : 580; // $78/hour * 8 hours or $72.50/hour * 8 hours
+  };
+
+  const getHourlyRate = () => {
+    return isSimulationMode && simulationDay >= 5 ? 78 : 72.5;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       {/* Add simulation indicator */}
@@ -239,251 +250,355 @@ export default function TimeTrackingWidget() {
         )}
       </div>
 
-      {/* Your existing time tracking content */}
-      <div className="space-y-4">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Today's Hours:</span>
-          <span className="font-semibold">
-            {isSimulationMode && currentScenario 
-              ? `${currentScenario.data_changes?.daily_hours || 8}h`
-              : `${getTotalHoursToday()}h`
-            }
-          </span>
-        </div>
-        
-        <div className="flex justify-between">
-          <span className="text-gray-600">This Week:</span>
-          <span className="font-semibold">
-            {dashboard?.entries?.length ? (dashboard.entries.length * 8).toFixed(1) : '0'}h
-          </span>
-        </div>
-
-        <div className="flex justify-between">
-          <span className="text-gray-600">Earnings Today:</span>
-          <span className="font-semibold text-green-600">
-            ${isSimulationMode && currentScenario 
-              ? (currentScenario.data_changes?.total_earnings_day || 0).toLocaleString()
-              : (parseFloat(getTotalHoursToday()) * 72.5).toFixed(0)
-            }
-          </span>
+      {/* Billing Type Selection */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          How are you billed for this project?
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setBillingType('hourly')}
+            className={`p-4 rounded-lg border-2 transition-colors ${
+              billingType === 'hourly'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center space-x-2 mb-2">
+              <Clock className="w-5 h-5" />
+              <span className="font-medium">Hourly Rate</span>
+            </div>
+            <div className="text-sm">
+              ${getHourlyRate()}/hour
+            </div>
+          </button>
+          
+          <button
+            onClick={() => setBillingType('day_rate')}
+            className={`p-4 rounded-lg border-2 transition-colors ${
+              billingType === 'day_rate'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center space-x-2 mb-2">
+              <Calendar className="w-5 h-5" />
+              <span className="font-medium">Day Rate</span>
+            </div>
+            <div className="text-sm">
+              ${getDailyRate()}/day
+            </div>
+          </button>
         </div>
       </div>
 
-      {/* Show simulation events for current day */}
-      {isSimulationMode && currentScenario && currentScenario.events && currentScenario.events.length > 0 && (
-        <div className="mt-4 pt-4 border-t">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">Day Events:</h4>
-          <div className="space-y-2">
-            {currentScenario.events.slice(0, 2).map((event: any, index: number) => (
-              <div key={index} className="text-xs bg-yellow-50 p-2 rounded">
-                <div className="font-medium text-yellow-800">{event.message || event}</div>
-                {event.impact && (
-                  <div className="text-yellow-700">{event.impact}</div>
-                )}
+      {/* Time tracking content - only show if hourly */}
+      {billingType === 'hourly' && (
+        <>
+          <div className="space-y-4 mb-6">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Today's Hours:</span>
+              <span className="font-semibold">
+                {isSimulationMode && currentScenario 
+                  ? `${currentScenario.data_changes?.daily_hours || 8}h`
+                  : `${getTotalHoursToday()}h`
+                }
+              </span>
+            </div>
+            
+            <div className="flex justify-between">
+              <span className="text-gray-600">This Week:</span>
+              <span className="font-semibold">
+                {dashboard?.entries?.length ? (dashboard.entries.length * 8).toFixed(1) : '0'}h
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-gray-600">Earnings Today:</span>
+              <span className="font-semibold text-green-600">
+                ${isSimulationMode && currentScenario 
+                  ? (currentScenario.data_changes?.total_earnings_day || 0).toLocaleString()
+                  : (parseFloat(getTotalHoursToday()) * getHourlyRate()).toFixed(0)
+                }
+              </span>
+            </div>
+          </div>
+
+          {/* Show simulation events for current day */}
+          {isSimulationMode && currentScenario && currentScenario.events && currentScenario.events.length > 0 && (
+            <div className="mb-6 pt-4 border-t">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Day Events:</h4>
+              <div className="space-y-2">
+                {currentScenario.events.slice(0, 2).map((event: any, index: number) => (
+                  <div key={index} className="text-xs bg-yellow-50 p-2 rounded">
+                    <div className="font-medium text-yellow-800">{event.message || event}</div>
+                    {event.impact && (
+                      <div className="text-yellow-700">{event.impact}</div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Main Timer Display */}
-      <div className="mt-6">
-        <div className="text-center mb-6">
-          <div className="text-5xl font-mono font-bold text-gray-900 mb-2">
-            {isTracking ? getCurrentWorkDuration() : '00:00'}
-          </div>
-          <p className="text-lg text-gray-600">
-            {isTracking ? (isOnBreak ? 'On Break' : 'Working') : 'Not Started'}
-          </p>
-          {isOnBreak && (
-            <p className="text-sm text-orange-600">
-              Break: {getCurrentBreakDuration()}
-            </p>
+            </div>
           )}
-        </div>
 
-        {/* Control Buttons */}
-        <div className="grid grid-cols-1 gap-3">
-          {!isTracking ? (
-            <button
-              onClick={startWork}
-              className={`flex items-center justify-center space-x-2 py-4 px-6 rounded-lg font-medium transition-colors ${
-                isSimulationMode 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              }`}
-            >
-              <Play className="w-5 h-5" />
-              <span>{isSimulationMode ? 'Start Demo Work Day' : 'Start Work Day'}</span>
-            </button>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {!isOnBreak ? (
+          {/* Main Timer Display */}
+          <div className="mb-6">
+            <div className="text-center mb-6">
+              <div className="text-5xl font-mono font-bold text-gray-900 mb-2">
+                {isTracking ? getCurrentWorkDuration() : '00:00'}
+              </div>
+              <p className="text-lg text-gray-600">
+                {isTracking ? (isOnBreak ? 'On Break' : 'Working') : 'Not Started'}
+              </p>
+              {isOnBreak && (
+                <p className="text-sm text-orange-600">
+                  Break: {getCurrentBreakDuration()}
+                </p>
+              )}
+            </div>
+
+            {/* Control Buttons */}
+            <div className="grid grid-cols-1 gap-3">
+              {!isTracking ? (
                 <button
-                  onClick={startBreak}
-                  className="flex items-center justify-center space-x-2 bg-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                  onClick={startWork}
+                  className={`flex items-center justify-center space-x-2 py-4 px-6 rounded-lg font-medium transition-colors ${
+                    isSimulationMode 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                  }`}
                 >
-                  <Pause className="w-4 h-4" />
-                  <span>Start Break</span>
+                  <Play className="w-5 h-5" />
+                  <span>{isSimulationMode ? 'Start Demo Work Day' : 'Start Work Day'}</span>
                 </button>
               ) : (
-                <button
-                  onClick={endBreak}
-                  className="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                >
-                  <Play className="w-4 h-4" />
-                  <span>End Break</span>
-                </button>
+                <div className="grid grid-cols-2 gap-3">
+                  {!isOnBreak ? (
+                    <button
+                      onClick={startBreak}
+                      className="flex items-center justify-center space-x-2 bg-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors"
+                    >
+                      <Pause className="w-4 h-4" />
+                      <span>Start Break</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={endBreak}
+                      className="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      <Play className="w-4 h-4" />
+                      <span>End Break</span>
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={endWork}
+                    className="flex items-center justify-center space-x-2 bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors"
+                  >
+                    <Square className="w-4 h-4" />
+                    <span>End Work</span>
+                  </button>
+                </div>
               )}
-              
-              <button
-                onClick={endWork}
-                className="flex items-center justify-center space-x-2 bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors"
-              >
-                <Square className="w-4 h-4" />
-                <span>End Work</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Current Session Details */}
-      {isTracking && (
-        <div className="mt-6 bg-gray-50 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {isSimulationMode ? 'Demo Session' : 'Current Session'}
-          </h3>
-          
-          <div className="space-y-4">
-            {/* Location */}
-            <div className="flex items-start space-x-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <MapPin className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">Location</p>
-                <p className="text-sm text-gray-600">{currentLocation}</p>
-                <p className="text-xs text-gray-500">Started: {startTime?.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}</p>
-              </div>
-            </div>
-
-            {/* Equipment */}
-            <div className="flex items-start space-x-3">
-              <div className="bg-orange-100 p-2 rounded-lg">
-                <Truck className="w-5 h-5 text-orange-600" />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Equipment/Vehicle
-                </label>
-                <input
-                  type="text"
-                  value={equipment}
-                  onChange={(e) => setEquipment(e.target.value)}
-                  placeholder={isSimulationMode && currentScenario ? currentScenario.equipment : "e.g., Excavator 320D, Truck #45"}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Work Notes
-              </label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder={isSimulationMode && currentScenario ? currentScenario.notes : "Describe the work being performed..."}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
             </div>
           </div>
-        </div>
+
+          {/* Current Session Details */}
+          {isTracking && (
+            <div className="mb-6 bg-gray-50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {isSimulationMode ? 'Demo Session' : 'Current Session'}
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Location */}
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <MapPin className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">Location</p>
+                    <p className="text-sm text-gray-600">{currentLocation}</p>
+                    <p className="text-xs text-gray-500">Started: {startTime?.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}</p>
+                  </div>
+                </div>
+
+                {/* Equipment */}
+                <div className="flex items-start space-x-3">
+                  <div className="bg-orange-100 p-2 rounded-lg">
+                    <Truck className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Equipment/Vehicle
+                    </label>
+                    <input
+                      type="text"
+                      value={equipment}
+                      onChange={(e) => setEquipment(e.target.value)}
+                      placeholder={isSimulationMode && currentScenario ? currentScenario.equipment : "e.g., Excavator 320D, Truck #45"}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Work Notes
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder={isSimulationMode && currentScenario ? currentScenario.notes : "Describe the work being performed..."}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Today's Summary */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {isSimulationMode ? 'Demo Summary' : 'Today\'s Summary'}
+            </h3>
+            
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-emerald-600">{getTotalHoursToday()}h</div>
+                <div className="text-sm text-gray-600">Total Hours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{todaysEntries.length + (isTracking ? 1 : 0)}</div>
+                <div className="text-sm text-gray-600">Sessions</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">
+                  ${(parseFloat(getTotalHoursToday()) * getHourlyRate()).toFixed(0)}
+                </div>
+                <div className="text-sm text-gray-600">Estimated Pay</div>
+              </div>
+            </div>
+
+            {/* Today's Entries */}
+            <div className="space-y-3">
+              {todaysEntries.map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {entry.startTime} - {entry.endTime}
+                      </p>
+                      <p className="text-sm text-gray-600">{entry.location.address}</p>
+                      {entry.equipment && (
+                        <p className="text-xs text-gray-500">{entry.equipment}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900">
+                      {entry.startTime && entry.endTime ? 
+                        formatDuration(
+                          new Date(`2024-01-01 ${entry.startTime}`),
+                          new Date(`2024-01-01 ${entry.endTime}`)
+                        ) : 
+                        'In Progress'
+                      }
+                    </p>
+                  </div>
+                </div>
+              ))}
+              
+              {isTracking && (
+                <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-5 h-5 bg-emerald-600 rounded-full animate-pulse" />
+                    <div>
+                      <p className="font-medium text-emerald-900">
+                        {startTime?.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })} - Active
+                      </p>
+                      <p className="text-sm text-emerald-700">{currentLocation}</p>
+                      {equipment && (
+                        <p className="text-xs text-emerald-600">{equipment}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-emerald-900">{getCurrentWorkDuration()}</p>
+                    {isOnBreak && (
+                      <p className="text-xs text-orange-600">Break: {getCurrentBreakDuration()}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
       )}
 
-      {/* Today's Summary */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          {isSimulationMode ? 'Demo Summary' : 'Today\'s Summary'}
-        </h3>
-        
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-emerald-600">{getTotalHoursToday()}h</div>
-            <div className="text-sm text-gray-600">Total Hours</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{todaysEntries.length + (isTracking ? 1 : 0)}</div>
-            <div className="text-sm text-gray-600">Sessions</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              ${isSimulationMode && simulationDay >= 5 ? 
-                (parseFloat(getTotalHoursToday()) * 78).toFixed(0) : 
-                (parseFloat(getTotalHoursToday()) * 72.5).toFixed(0)
-              }
+      {/* Day Rate Summary */}
+      {billingType === 'day_rate' && (
+        <div className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center space-x-3 mb-3">
+              <Calendar className="w-6 h-6 text-blue-600" />
+              <h4 className="text-lg font-semibold text-blue-900">Day Rate Billing</h4>
             </div>
-            <div className="text-sm text-gray-600">Estimated Pay</div>
-          </div>
-        </div>
-
-        {/* Today's Entries */}
-        <div className="space-y-3">
-          {todaysEntries.map((entry) => (
-            <div key={entry.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-emerald-600" />
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {entry.startTime} - {entry.endTime}
-                  </p>
-                  <p className="text-sm text-gray-600">{entry.location.address}</p>
-                  {entry.equipment && (
-                    <p className="text-xs text-gray-500">{entry.equipment}</p>
-                  )}
-                </div>
+            <p className="text-blue-700 mb-4">
+              You're billed by the day, not by the hour. Time tracking is optional but can be useful for your own records.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">${getDailyRate()}</div>
+                <div className="text-sm text-blue-700">Per Day</div>
               </div>
-              <div className="text-right">
-                <p className="font-medium text-gray-900">
-                  {entry.startTime && entry.endTime ? 
-                    formatDuration(
-                      new Date(`2024-01-01 ${entry.startTime}`),
-                      new Date(`2024-01-01 ${entry.endTime}`)
-                    ) : 
-                    'In Progress'
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  ${isSimulationMode && currentScenario 
+                    ? (currentScenario.data_changes?.total_earnings_day || getDailyRate())
+                    : getDailyRate()
                   }
-                </p>
+                </div>
+                <div className="text-sm text-green-700">Today's Pay</div>
               </div>
             </div>
-          ))}
-          
-          {isTracking && (
-            <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-5 h-5 bg-emerald-600 rounded-full animate-pulse" />
-                <div>
-                  <p className="font-medium text-emerald-900">
-                    {startTime?.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })} - Active
-                  </p>
-                  <p className="text-sm text-emerald-700">{currentLocation}</p>
-                  {equipment && (
-                    <p className="text-xs text-emerald-600">{equipment}</p>
-                  )}
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-medium text-emerald-900">{getCurrentWorkDuration()}</p>
-                {isOnBreak && (
-                  <p className="text-xs text-orange-600">Break: {getCurrentBreakDuration()}</p>
-                )}
+          </div>
+
+          {/* Optional Time Tracking for Day Rate */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3">Optional Time Tracking</h4>
+            <p className="text-gray-600 mb-4">
+              Track your time for personal records (doesn't affect billing)
+            </p>
+            <button
+              onClick={() => setBillingType('hourly')}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Enable Time Tracking
+            </button>
+          </div>
+
+          {/* Show simulation events for current day */}
+          {isSimulationMode && currentScenario && currentScenario.events && currentScenario.events.length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2">Day Events:</h4>
+              <div className="space-y-2">
+                {currentScenario.events.slice(0, 2).map((event: any, index: number) => (
+                  <div key={index} className="text-xs bg-yellow-100 p-2 rounded">
+                    <div className="font-medium text-yellow-800">{event.message || event}</div>
+                    {event.impact && (
+                      <div className="text-yellow-700">{event.impact}</div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 } 
