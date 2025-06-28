@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { RoleProvider } from "@/contexts/RoleContext";
 import RoleBreadcrumb from "@/components/RoleBreadcrumb";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ContractorProvider } from "@/contexts/ContractorContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -62,9 +63,11 @@ export default function RootLayout({
       >
         <AuthProvider>
           <RoleProvider>
-            <RoleBreadcrumb />
-            {children}
-            <Analytics />
+            <ContractorProvider>
+              <RoleBreadcrumb />
+              {children}
+              <Analytics />
+            </ContractorProvider>
           </RoleProvider>
         </AuthProvider>
       </body>
