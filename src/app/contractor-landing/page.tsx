@@ -14,6 +14,10 @@ import {
   Shield,
   Fuel,
   HardHat,
+  Mail,
+  Eye,
+  EyeOff,
+  Calendar
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -21,6 +25,20 @@ import { useEffect, useState } from 'react';
 export default function ContractorLanding() {
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showTrialSignup, setShowTrialSignup] = useState(false);
+  const [trialData, setTrialData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    companyName: '',
+    firstName: '',
+    lastName: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [trialError, setTrialError] = useState('');
+  const [trialSuccess, setTrialSuccess] = useState('');
 
   useEffect(() => {
     setIsLoaded(true);
@@ -74,6 +92,61 @@ export default function ContractorLanding() {
     { step: "4", title: "Get Paid", description: "Receive payments faster with automated invoice generation." }
   ];
 
+  const handleTrialSignup = async () => {
+    setTrialError('');
+    setTrialLoading(true);
+
+    // Validation
+    if (!trialData.email || !trialData.password || !trialData.firstName || !trialData.lastName) {
+      setTrialError('Please fill in all required fields');
+      setTrialLoading(false);
+      return;
+    }
+
+    if (trialData.password !== trialData.confirmPassword) {
+      setTrialError('Passwords do not match');
+      setTrialLoading(false);
+      return;
+    }
+
+    if (trialData.password.length < 8) {
+      setTrialError('Password must be at least 8 characters long');
+      setTrialLoading(false);
+      return;
+    }
+
+    try {
+      // Create contractor trial account with immediate access
+      const response = await fetch('/api/contractor/trial-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: trialData.email,
+          password: trialData.password,
+          firstName: trialData.firstName,
+          lastName: trialData.lastName,
+          companyName: trialData.companyName || `${trialData.firstName} ${trialData.lastName}`,
+          trialDays: 15
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTrialSuccess('Account created successfully! Redirecting to your dashboard...');
+        setTimeout(() => {
+          router.push(`/contractor/dashboard`);
+        }, 2000);
+      } else {
+        setTrialError(data.message || 'Failed to create trial account');
+      }
+    } catch (error) {
+      setTrialError('Network error. Please try again.');
+    } finally {
+      setTrialLoading(false);
+    }
+  };
+
   return (
     <motion.main 
       initial={{ opacity: 0 }}
@@ -81,7 +154,7 @@ export default function ContractorLanding() {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gray-50 text-gray-800"
     >
-      {/* Hero Section */}
+      {/* Hero Section - Split Layout */}
       <div className="relative overflow-hidden border-b border-gray-200">
         <div className="absolute inset-0 bg-gradient-to-br from-white via-green-50 to-emerald-50" />
         <div className="relative max-w-7xl mx-auto px-4 py-24 sm:py-32">
@@ -89,40 +162,311 @@ export default function ContractorLanding() {
             variants={staggerChildren}
             initial="hidden"
             animate="visible"
-            className="text-center"
+            className="grid lg:grid-cols-2 gap-12 items-center"
           >
-            <motion.div variants={fadeInUp} className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center border border-green-200">
-                <HardHat className="w-10 h-10 text-green-600" />
+            {/* Left Side - Try It Now Section */}
+            <motion.div variants={fadeInUp} className="space-y-8">
+              <div className="flex items-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center border border-green-200 mr-4">
+                  <HardHat className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+                    Field Operations
+                    <span className="text-green-600 block">Simplified</span>
+                  </h1>
+                </div>
               </div>
+
+              <p className="text-xl text-gray-600 mb-8">
+                Focus on the work, not the paperwork. Get your 15-day free trial with instant access to streamlined field tickets and automated invoicing.
+              </p>
+
+              {/* Trial Signup Form */}
+              {!showTrialSignup ? (
+                <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
+                  <div className="text-center mb-6">
+                    <Sparkles className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Start Your Free 15-Day Trial
+                    </h3>
+                    <p className="text-gray-600">
+                      Create your credentials and get instant access to all features
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center text-sm text-green-600">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>Instant access to full dashboard</span>
+                    </div>
+                    <div className="flex items-center text-sm text-green-600">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>15 days of daily logging</span>
+                    </div>
+                    <div className="flex items-center text-sm text-green-600">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      <span>No credit card required</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setShowTrialSignup(true)}
+                    className="w-full bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 group"
+                  >
+                    <Play className="w-5 h-5" />
+                    <span>Try It Now - Free</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  <p className="text-center text-sm text-gray-500 mt-4">
+                    Already have an account?{' '}
+                    <button
+                      onClick={() => router.push('/contractor-trial')}
+                      className="text-green-600 hover:text-green-700 font-medium"
+                    >
+                      Sign in here
+                    </button>
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
+                  <div className="text-center mb-6">
+                    <Shield className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Create Your Credentials
+                    </h3>
+                    <p className="text-gray-600">
+                      Set up your account for 15-day free access
+                    </p>
+                  </div>
+
+                  {trialError && (
+                    <div className="mb-4 p-4 rounded-md bg-red-50 border border-red-200">
+                      <p className="text-sm text-red-600">{trialError}</p>
+                    </div>
+                  )}
+
+                  {trialSuccess && (
+                    <div className="mb-4 p-4 rounded-md bg-green-50 border border-green-200">
+                      <p className="text-sm text-green-600">{trialSuccess}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          First Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={trialData.firstName}
+                          onChange={(e) => setTrialData({...trialData, firstName: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="John"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Last Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={trialData.lastName}
+                          onChange={(e) => setTrialData({...trialData, lastName: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Smith"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <input
+                          type="email"
+                          value={trialData.email}
+                          onChange={(e) => setTrialData({...trialData, email: e.target.value})}
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="john.smith@company.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Company Name (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={trialData.companyName}
+                        onChange={(e) => setTrialData({...trialData, companyName: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        placeholder="Your Company Inc."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Password *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={trialData.password}
+                          onChange={(e) => setTrialData({...trialData, password: e.target.value})}
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Minimum 8 characters"
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Confirm Password *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={trialData.confirmPassword}
+                          onChange={(e) => setTrialData({...trialData, confirmPassword: e.target.value})}
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Confirm your password"
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      onClick={() => setShowTrialSignup(false)}
+                      className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={handleTrialSignup}
+                      disabled={trialLoading}
+                      className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                    >
+                      {trialLoading ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      ) : (
+                        <>Create Account & Start Trial</>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-center text-xs text-gray-500 mt-4">
+                    Your 15-day trial starts immediately after account creation
+                  </p>
+                </div>
+              )}
             </motion.div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Your Field Operations
-              <span className="text-green-600 block">Simplified & Automated</span>
-            </motion.h1>
+            {/* Right Side - Dashboard Preview */}
+            <motion.div variants={fadeInUp} className="relative">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Contractor Dashboard</h3>
+                    <p className="text-sm text-gray-500">Your work management hub</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  </div>
+                </div>
 
-            <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Focus on the work, not the paperwork. Streamline your field tickets, get paid faster, and manage your operations from anywhere.
-            </motion.p>
+                                 {/* Mock Dashboard Content */}
+                 <div className="space-y-4">
+                   {/* Trial Progress */}
+                   <div className="bg-blue-50 rounded-lg p-4">
+                     <div className="flex justify-between items-center mb-2">
+                       <span className="text-sm font-medium text-blue-900">15-Day Trial Progress</span>
+                       <span className="text-xs text-blue-600">12 days remaining</span>
+                     </div>
+                     <div className="w-full bg-blue-200 rounded-full h-2">
+                       <div className="bg-blue-600 h-2 rounded-full w-1/5"></div>
+                     </div>
+                   </div>
 
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => router.push('/contractor/dashboard')}
-                className="bg-green-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 group"
-              >
-                <Play className="w-5 h-5" />
-                <span>Go to Dashboard</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              
-              <button
-                onClick={() => router.push('/contractor-demo')}
-                className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 hover:border-gray-400 transition-colors flex items-center justify-center space-x-2"
-              >
-                <Sparkles className="w-5 h-5 text-green-500" />
-                <span>Try it out!</span>
-              </button>
+                  {/* Current Work Stats */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-green-600">$2,340</div>
+                      <div className="text-xs text-gray-500">Current Earnings</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-600">3</div>
+                      <div className="text-xs text-gray-500">Days Logged</div>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 bg-green-600 text-white rounded-lg">
+                      <div className="flex items-center">
+                        <Calendar className="w-5 h-5 mr-3" />
+                        <span className="text-sm font-medium">Log Today's Work</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                      <div className="flex items-center">
+                        <FileText className="w-5 h-5 mr-3 text-gray-400" />
+                        <span className="text-sm">View Time Entries</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                      <div className="flex items-center">
+                        <Receipt className="w-5 h-5 mr-3 text-gray-400" />
+                        <span className="text-sm">Generate Invoice</span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Try Demo Button */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={() => router.push('/contractor-demo')}
+                    className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    <span>Try Interactive Demo</span>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -234,7 +578,7 @@ export default function ContractorLanding() {
           </motion.div>
           <motion.div variants={fadeInUp} className="relative h-96">
              <div className="absolute inset-0 bg-white rounded-2xl border border-gray-200 p-4 shadow-lg">
-                <div className="w-full h-full bg-dots-pattern opacity-10 rounded-lg" style={{backgroundImage: 'radial-gradient(#d1d5db 1px, transparent 1px)', backgroundSize: '1rem 1rem'}}></div>
+                <div className="w-full h-full bg-gray-100 opacity-20 rounded-lg"></div>
              </div>
              <div className="absolute inset-4 bg-gray-50/80 backdrop-blur-sm rounded-lg shadow-inner p-6 flex flex-col justify-between border border-gray-200">
                 <div>
@@ -276,10 +620,10 @@ export default function ContractorLanding() {
             </motion.p>
             <motion.div variants={fadeInUp}>
               <button
-                onClick={() => router.push('/contractor-signup')}
+                onClick={() => setShowTrialSignup(true)}
                 className="bg-white text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2 group mx-auto"
               >
-                <span>Create Your Free Account</span>
+                <span>Start Your Free 15-Day Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </motion.div>
@@ -288,14 +632,4 @@ export default function ContractorLanding() {
       </div>
     </motion.main>
   );
-}
-
-// Minimalistic dot pattern for the benefits section
-const BgDotsPattern = () => (
-  <style jsx global>{`
-    .bg-dots-pattern {
-      background-image: radial-gradient(circle at 1px 1px, #cbd5e1 1px, transparent 0);
-      background-size: 1rem 1rem;
-    }
-  `}</style>
-); 
+} 
