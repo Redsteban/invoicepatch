@@ -101,7 +101,11 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
       dayRate: entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : '',
       kmsDriven: entry.kmsDriven ?? '',
       truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
-      dailyTotal: `$${((Number(entry.dayRate) + (Number(entry.kmsDriven) * Number(entry.kmsRate)) + Number(entry.truckRate))).toFixed(2)}`,
+      dailyTotal: `$${(
+        Number(entry.rate ?? 0) +
+        Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
+        Number(entry.truckRate ?? 0)
+      ).toFixed(2)}`,
       subsistence: `$${(invoiceData.totals.subsistence && invoiceData.entries.filter(e => e.worked !== false).length > 0 ? (invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked !== false).length) : 0).toFixed(2)}`,
       otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
     }));

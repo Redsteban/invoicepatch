@@ -101,7 +101,11 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
     entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
     entry.kms ? entry.kms.toString() : '',
     entry.truck ? `$${entry.truck.toFixed(2)}` : '',
-    `$${(entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck).toFixed(2)}`,
+    `$${(
+      Number(entry.rate ?? 0) +
+      Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+      Number(entry.truck ?? 0)
+    ).toFixed(2)}`,
     `$${dailySubsistence.toFixed(2)}`,
     entry.other ? `$${entry.other.toFixed(2)}` : '',
   ]);
