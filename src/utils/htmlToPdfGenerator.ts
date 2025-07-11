@@ -102,33 +102,27 @@ export function createInvoiceHTML(simulationData: any): string {
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc; font-size: 9px;">
           <thead>
             <tr style="background-color: #f5f5f5;">
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Day</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Date</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Description</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Location</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Ticket #</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Truck</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Kms Rate</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Other</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Day Rate</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">KMS driven</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Truck Rate</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Sub total</th>
               <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Subsistence</th>
-              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Total</th>
+              <th style="border: 1px solid #ccc; padding: 6px; text-align: center; font-weight: bold;">Other Charges</th>
             </tr>
           </thead>
           <tbody>
-            ${allEntries.map((entry: any, index: number) => `
+            ${allEntries.map((entry: any) => `
               <tr>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.day}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
-                <td style="border: 1px solid #ccc; padding: 6px;">${entry.worked ? (entry.description || simulationData.clientName) : 'Days Off'}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.location || '') : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.ticketNumber || '') : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.truckRate || 0).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked ? (entry.kmsDriven || 0) : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.kmsRate || 0).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${(entry.otherCharges || 0).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked ? `$${subsistence.toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right; font-weight: bold;">${entry.worked ? `$${(entry.dailyTotal || 0).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven ?? ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.dailyTotal ? `$${Number(entry.dailyTotal).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.subsistence ? `$${Number(entry.subsistence).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : ''}</td>
               </tr>
             `).join('')}
           </tbody>

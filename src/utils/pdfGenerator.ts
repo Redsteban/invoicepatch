@@ -86,28 +86,24 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     const tableColumns = [
-      { header: 'Day', dataKey: 'day' },
       { header: 'Date', dataKey: 'date' },
-      { header: 'Description', dataKey: 'description' },
       { header: 'Location', dataKey: 'location' },
-      { header: 'Ticket #', dataKey: 'ticketNumber' },
-      { header: 'Truck', dataKey: 'truckRate' },
-      { header: 'Kms', dataKey: 'kmsDriven' },
-      { header: 'Kms Rate', dataKey: 'kmsRate' },
-      { header: 'Other', dataKey: 'otherCharges' },
-      { header: 'Total', dataKey: 'dailyTotal' },
+      { header: 'Day Rate', dataKey: 'dayRate' },
+      { header: 'KMS driven', dataKey: 'kmsDriven' },
+      { header: 'Truck Rate', dataKey: 'truckRate' },
+      { header: 'Sub total', dataKey: 'dailyTotal' },
+      { header: 'Subsistence', dataKey: 'subsistence' },
+      { header: 'Other Charges', dataKey: 'otherCharges' },
     ];
-    const tableRows = invoiceData.entries.map((entry, idx) => ({
-      day: idx + 1,
+    const tableRows = invoiceData.entries.map((entry) => ({
       date: entry.date,
-      description: entry.description,
       location: entry.location || '',
-      ticketNumber: entry.ticketNumber || '',
-      truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
+      dayRate: entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : '',
       kmsDriven: entry.kmsDriven ?? '',
-      kmsRate: entry.kmsRate ? `$${Number(entry.kmsRate).toFixed(2)}` : '',
-      otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
+      truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
       dailyTotal: entry.dailyTotal ? `$${Number(entry.dailyTotal).toFixed(2)}` : '',
+      subsistence: entry.subsistence ? `$${Number(entry.subsistence).toFixed(2)}` : '',
+      otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
     }));
     
     // Dynamic import for autoTable

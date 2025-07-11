@@ -81,20 +81,17 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   yPos += 10;
 
   // Create table with exact column widths and styling
-  const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
+  const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   
   const tableData = invoiceData.entries.map(entry => [
-    entry.day.toString(),
     entry.date,
-    entry.worked ? entry.description : 'Days Off',
-    entry.worked ? entry.location : '',
-    entry.worked ? entry.ticketNumber : '',
-    entry.worked ? `$${entry.truck.toFixed(2)}` : '',
-    entry.worked ? entry.kms.toString() : '',
-    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '',
-    entry.worked ? `$${entry.other.toFixed(2)}` : '',
-    entry.worked ? `$${(invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked).length).toFixed(2)}` : '', // Daily subsistence rate
-    entry.worked ? `$${entry.total.toFixed(2)}` : ''
+    entry.location || '',
+    entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
+    entry.kms ? entry.kms.toString() : '',
+    entry.truck ? `$${entry.truck.toFixed(2)}` : '',
+    entry.total ? `$${entry.total.toFixed(2)}` : '',
+    entry.subsistence ? `$${entry.subsistence.toFixed(2)}` : '',
+    entry.other ? `$${entry.other.toFixed(2)}` : '',
   ]);
 
   // Use autoTable with exact styling to match preview

@@ -92,21 +92,18 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
 
   // Prepare table data
   const entries = invoiceData.entries;
-  const tableHeaders = [['Day', 'Date', 'Description', 'Location', 'Ticket #', 'Truck', 'Kms', 'Kms Rate', 'Other', 'Subsistence', 'Total']];
+  const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   const workedEntries = entries.filter(entry => entry.worked);
-  const dailySubsistence = invoiceData.totals.subsistence / workedEntries.length; // Calculate daily subsistence rate
+  const dailySubsistence = invoiceData.totals.subsistence / workedEntries.length;
   const tableData = entries.map((entry) => [
-    entry.day.toString(),
     entry.date,
-    entry.worked ? entry.description : 'Days Off',
-    entry.worked ? (entry.location || '') : '',
-    entry.worked ? (entry.ticketNumber || '') : '',
-    entry.worked ? `$${entry.truck.toFixed(2)}` : '',
-    entry.worked ? entry.kms.toString() : '',
-    entry.worked ? `$${entry.kmsRate.toFixed(2)}` : '',
-    entry.worked ? `$${entry.other.toFixed(2)}` : '',
-    entry.worked ? `$${dailySubsistence.toFixed(2)}` : '', // Use calculated daily subsistence rate
-    entry.worked ? `$${entry.total.toFixed(2)}` : ''
+    entry.location || '',
+    entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
+    entry.kms ? entry.kms.toString() : '',
+    entry.truck ? `$${entry.truck.toFixed(2)}` : '',
+    entry.total ? `$${entry.total.toFixed(2)}` : '',
+    entry.subsistence ? `$${entry.subsistence.toFixed(2)}` : `$${dailySubsistence.toFixed(2)}`,
+    entry.other ? `$${entry.other.toFixed(2)}` : '',
   ]);
 
   // Add work summary table
