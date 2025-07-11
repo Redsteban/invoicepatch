@@ -104,7 +104,8 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
       dailyTotal: `$${(
         Number(entry.rate ?? 0) +
         Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
-        Number(entry.truckRate ?? 0)
+        Number(entry.truckRate ?? 0) +
+        Number(entry.otherCharges ?? 0)
       ).toFixed(2)}`,
       subsistence: `$${(invoiceData.totals.subsistence && invoiceData.entries.filter(e => e.worked !== false).length > 0 ? (invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked !== false).length) : 0).toFixed(2)}`,
       otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
@@ -155,7 +156,8 @@ export function calculateInvoiceTotals(entries: InvoiceEntry[], hourlyRate: numb
   const subtotal = entries.reduce((sum, entry) => sum + (
     Number(entry.rate ?? 0) +
     Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
-    Number(entry.truckRate ?? 0)
+    Number(entry.truckRate ?? 0) +
+    Number(entry.otherCharges ?? 0)
   ), 0);
   // GST only (5%)
   const tax = subtotal * 0.05;

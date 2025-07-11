@@ -94,7 +94,8 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
     `$${(
       Number(entry.rate ?? 0) +
       Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
-      Number(entry.truck ?? 0)
+      Number(entry.truck ?? 0) +
+      Number(entry.other ?? 0)
     ).toFixed(2)}`,
     `$${dailySubsistence.toFixed(2)}`,
     entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
@@ -182,7 +183,8 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   const summarySubtotal = invoiceData.entries.reduce((sum, entry) => sum + (
     Number(entry.rate ?? 0) +
     Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
-    Number(entry.truck ?? 0)
+    Number(entry.truck ?? 0) +
+    Number(entry.other ?? 0)
   ), 0);
   doc.text('\u2296 Subtotal', 15, yPos);
   doc.text(`$${summarySubtotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });

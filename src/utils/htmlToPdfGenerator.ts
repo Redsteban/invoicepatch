@@ -80,7 +80,8 @@ export function createInvoiceHTML(simulationData: any): string {
   const subtotal = simulationData.subtotal || workedEntries.reduce((sum, entry) => sum + (
     Number(entry.rate ?? 0) +
     Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
-    Number(entry.truckRate ?? 0)
+    Number(entry.truckRate ?? 0) +
+    Number(entry.otherCharges ?? 0)
   ), 0);
   const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
@@ -127,7 +128,8 @@ export function createInvoiceHTML(simulationData: any): string {
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(
                   Number(entry.rate ?? 0) +
                   Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
-                  Number(entry.truckRate ?? 0)
+                  Number(entry.truckRate ?? 0) +
+                  Number(entry.otherCharges ?? 0)
                 ).toFixed(2)}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(workedEntries.length > 0 ? (totalSubsistence / workedEntries.length) : 0).toFixed(2)}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : ''}</td>
