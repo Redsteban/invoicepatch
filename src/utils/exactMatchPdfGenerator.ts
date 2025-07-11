@@ -84,7 +84,15 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   
   const workedEntries = invoiceData.entries.filter(entry => entry.worked);
-  const dailySubsistence = workedEntries.length > 0 ? invoiceData.totals.subsistence / workedEntries.length : 0;
+  const subtotal = workedEntries.reduce((sum, entry) => sum + (
+    Number(entry.rate ?? 0) +
+    Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+    Number(entry.truck ?? 0) +
+    Number(entry.other ?? 0)
+  ), 0);
+  const gst = subtotal * 0.05;
+  const totalSubsistence = workedEntries.length * (invoiceData.entries[0]?.subsistence ?? 0);
+  const grandTotal = subtotal + gst + totalSubsistence;
   const tableData = invoiceData.entries.map(entry => {
     if (entry.worked === false) {
       return [
@@ -194,19 +202,13 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   doc.setTextColor(60, 60, 60);
 
   // Subtotal
-  const summarySubtotal = invoiceData.entries.reduce((sum, entry) => sum + (
-    Number(entry.rate ?? 0) +
-    Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
-    Number(entry.truck ?? 0) +
-    Number(entry.other ?? 0)
-  ), 0);
   doc.text('\u2296 Subtotal', 15, yPos);
-  doc.text(`$${summarySubtotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
+  doc.text(`$${subtotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
   yPos += 8;
 
   // GST (5%)
   doc.text('% GST (5%)', 15, yPos);
-  doc.text(`$${invoiceData.totals.gst.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
+  doc.text(`$${gst.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
   yPos += 8;
 
   // Subsistence (Tax-Free) with yellow background
@@ -216,7 +218,7 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   doc.rect(10, yPos - 4, pageWidth - 20, 8, 'S');
   
   doc.text('⊕ Subsistence (Tax-Free)', 15, yPos);
-  doc.text(`$${invoiceData.totals.subsistence.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
+  doc.text(`$${totalSubsistence.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
   yPos += 15;
 
   // Grand Total with green styling
@@ -224,7 +226,7 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   doc.setFontSize(16);
   doc.setTextColor(34, 139, 34); // Green color
   doc.text('$ Grand Total', 15, yPos);
-  doc.text(`$${invoiceData.totals.grandTotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
+  doc.text(`$${grandTotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
 
   return doc;
 }

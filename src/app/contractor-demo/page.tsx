@@ -91,7 +91,7 @@ export default function ContractorTrialDemo() {
     const kmsDrivenNum = parseFloat(kmsDriven) || 0;
     const kmsRateNum = parseFloat(kmsRate) || 0;
     const otherChargesNum = parseFloat(otherCharges) || 0;
-    const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum + otherChargesNum;
+    const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum + otherChargesNum; // Exclude subsistence
     // Calculate the date for this day
     const entryDate = new Date(payPeriodStart);
     entryDate.setDate(payPeriodStart.getDate() + (day - 1));
@@ -177,7 +177,7 @@ export default function ContractorTrialDemo() {
 
   // Only include worked days in totals
   const workedEntries = dailyEntries.filter(e => e.worked);
-  const subtotal = workedEntries.reduce((acc, entry) => acc + entry.dailyTotal, 0);
+  const subtotal = workedEntries.reduce((acc, entry) => acc + (entry.rate + entry.truckRate + (entry.kmsDriven * entry.kmsRate) + entry.otherCharges), 0); // Exclude subsistence
   const gst = subtotal * GST_RATE;
   const totalSubsistence = workedEntries.length * subsistence;
   const grandTotal = subtotal + gst + totalSubsistence;
@@ -331,7 +331,7 @@ export default function ContractorTrialDemo() {
       const kmsDrivenNum = parseFloat(kmsDriven) || 0;
       const kmsRateNum = parseFloat(kmsRate) || 0;
       const otherChargesNum = parseFloat(otherCharges) || 0;
-      const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum + otherChargesNum;
+      const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum + otherChargesNum; // Exclude subsistence
       const entryDate = new Date(payPeriodStart);
       entryDate.setDate(payPeriodStart.getDate() + (i - 1));
       let ticketNumber = '';
