@@ -91,7 +91,7 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
       { header: 'Day Rate', dataKey: 'dayRate' },
       { header: 'KMS driven', dataKey: 'kmsDriven' },
       { header: 'Truck Rate', dataKey: 'truckRate' },
-      { header: 'Sub total', dataKey: 'dailyTotal' },
+      { header: 'Sub total (Tax-Free)', dataKey: 'dailyTotal' },
       { header: 'Subsistence', dataKey: 'subsistence' },
       { header: 'Other Charges', dataKey: 'otherCharges' },
     ];
@@ -101,7 +101,7 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
       dayRate: entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : '',
       kmsDriven: entry.kmsDriven ?? '',
       truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
-      dailyTotal: entry.dailyTotal ? `$${Number(entry.dailyTotal).toFixed(2)}` : '',
+      dailyTotal: (Number(entry.dayRate) + (Number(entry.kmsDriven) * Number(entry.kmsRate)) + Number(entry.truckRate)) ? `$${(Number(entry.dayRate) + (Number(entry.kmsDriven) * Number(entry.kmsRate)) + Number(entry.truckRate)).toFixed(2)}` : '',
       subsistence: entry.subsistence ? `$${Number(entry.subsistence).toFixed(2)}` : '',
       otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
     }));

@@ -91,7 +91,7 @@ export default function ContractorTrialDemo() {
     const kmsDrivenNum = parseFloat(kmsDriven) || 0;
     const kmsRateNum = parseFloat(kmsRate) || 0;
     const otherChargesNum = parseFloat(otherCharges) || 0;
-    const dailyTotal = base + truckRateNum + (kmsDrivenNum * kmsRateNum) + otherChargesNum;
+    const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum;
     // Calculate the date for this day
     const entryDate = new Date(payPeriodStart);
     entryDate.setDate(payPeriodStart.getDate() + (day - 1));
@@ -162,9 +162,8 @@ export default function ContractorTrialDemo() {
       otherCharges: parseFloat(editFields.otherCharges) || 0,
       dailyTotal:
         (editFields.payType === 'hourly' ? (editFields.hours * editFields.rate) : editFields.rate)
-        + (parseFloat(editFields.truckRate) || 0)
         + ((parseFloat(editFields.kmsDriven) || 0) * (parseFloat(editFields.kmsRate) || 0))
-        + (parseFloat(editFields.otherCharges) || 0),
+        + (parseFloat(editFields.truckRate) || 0),
       worked: editFields.worked !== undefined ? editFields.worked : true,
     } : e));
     setEditDay(null);
@@ -331,7 +330,7 @@ export default function ContractorTrialDemo() {
       const kmsDrivenNum = parseFloat(kmsDriven) || 0;
       const kmsRateNum = parseFloat(kmsRate) || 0;
       const otherChargesNum = parseFloat(otherCharges) || 0;
-      const dailyTotal = base + truckRateNum + (kmsDrivenNum * kmsRateNum) + otherChargesNum;
+      const dailyTotal = base + (kmsDrivenNum * kmsRateNum) + truckRateNum;
       const entryDate = new Date(payPeriodStart);
       entryDate.setDate(payPeriodStart.getDate() + (i - 1));
       let ticketNumber = '';
@@ -793,7 +792,7 @@ export default function ContractorTrialDemo() {
                 <h4 className="text-lg font-semibold text-gray-800 mt-6 mb-2">Financial Summary:</h4>
                 <div className="space-y-2">
                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <span className="font-medium text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Subtotal</span>
+                        <span className="font-medium text-gray-600 flex items-center"><PlusCircle className="w-4 h-4 mr-2"/>Subtotal (Tax-Free)</span>
                         <span className="font-mono font-semibold text-gray-800">${subtotal.toFixed(2)}</span>
                     </div>
                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-md">

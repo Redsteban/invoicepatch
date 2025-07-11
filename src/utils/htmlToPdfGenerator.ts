@@ -120,7 +120,7 @@ export function createInvoiceHTML(simulationData: any): string {
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven ?? ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.dailyTotal ? `$${Number(entry.dailyTotal).toFixed(2)}` : ''}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${(Number(entry.dayRate) + (Number(entry.kmsDriven) * Number(entry.kmsRate)) + Number(entry.truckRate)) ? `$${(Number(entry.dayRate) + (Number(entry.kmsDriven) * Number(entry.kmsRate)) + Number(entry.truckRate)).toFixed(2)}` : ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.subsistence ? `$${Number(entry.subsistence).toFixed(2)}` : ''}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : ''}</td>
               </tr>
