@@ -77,7 +77,11 @@ export function createInvoiceHTML(simulationData: any): string {
   const totalTruckCharges = simulationData.totalTruckCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.truckRate || 0), 0);
   const totalKmsCharges = simulationData.totalKmsCharges || workedEntries.reduce((sum: number, entry: any) => sum + ((entry.kmsDriven || 0) * (entry.kmsRate || 0)), 0);
   const totalOtherCharges = simulationData.totalOtherCharges || workedEntries.reduce((sum: number, entry: any) => sum + (entry.otherCharges || 0), 0);
-  const subtotal = simulationData.subtotal || workedEntries.reduce((sum: number, entry: any) => sum + (entry.dailyTotal || 0), 0);
+  const subtotal = simulationData.subtotal || workedEntries.reduce((sum, entry) => sum + (
+    Number(entry.rate ?? 0) +
+    Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
+    Number(entry.truckRate ?? 0)
+  ), 0);
   const gst = simulationData.gst || subtotal * 0.05;
   const subsistence = simulationData.subsistence || 50.00; // Use subsistence from data or default to 50.00
   const totalSubsistence = simulationData.totalSubsistence || workedEntries.length * subsistence;

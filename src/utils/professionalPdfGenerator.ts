@@ -98,16 +98,16 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   const tableData = entries.map((entry) => [
     entry.date,
     entry.location || '',
-    entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
+    entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
     entry.kms ? entry.kms.toString() : '',
-    entry.truck ? `$${entry.truck.toFixed(2)}` : '',
+    entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
     `$${(
       Number(entry.rate ?? 0) +
       Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
       Number(entry.truck ?? 0)
     ).toFixed(2)}`,
     `$${dailySubsistence.toFixed(2)}`,
-    entry.other ? `$${entry.other.toFixed(2)}` : '',
+    entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
   ]);
 
   // Add work summary table
@@ -182,8 +182,13 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   doc.setFontSize(11);
 
   // Subtotal
-  doc.text('⊖ Subtotal', 15, yPosition);
-  doc.text(`$${invoiceData.totals.subtotal.toFixed(2)}`, pageWidth - 30, yPosition, { align: 'right' });
+  const summarySubtotal = entries.reduce((sum, entry) => sum + (
+    Number(entry.rate ?? 0) +
+    Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+    Number(entry.truck ?? 0)
+  ), 0);
+  doc.text('\u2296 Subtotal', 15, yPosition);
+  doc.text(`$${summarySubtotal.toFixed(2)}`, pageWidth - 30, yPosition, { align: 'right' });
   yPosition += 10;
 
   // GST (5%)

@@ -98,7 +98,7 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
     const tableRows = invoiceData.entries.map((entry) => ({
       date: entry.date,
       location: entry.location || '',
-      dayRate: entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : '',
+      dayRate: entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
       kmsDriven: entry.kmsDriven ?? '',
       truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
       dailyTotal: `$${(
@@ -152,7 +152,11 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
 
 export function calculateInvoiceTotals(entries: InvoiceEntry[], hourlyRate: number = 45) {
   const totalHours = entries.reduce((sum, entry) => sum + (entry.hoursWorked ?? 0), 0);
-  const subtotal = entries.reduce((sum, entry) => sum + (entry.dailyTotal ?? 0), 0);
+  const subtotal = entries.reduce((sum, entry) => sum + (
+    Number(entry.rate ?? 0) +
+    Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
+    Number(entry.truckRate ?? 0)
+  ), 0);
   // GST only (5%)
   const tax = subtotal * 0.05;
   const total = subtotal + tax;

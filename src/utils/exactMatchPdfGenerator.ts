@@ -88,16 +88,16 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   const tableData = invoiceData.entries.map(entry => [
     entry.date,
     entry.location || '',
-    entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
+    entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
     entry.kms ? entry.kms.toString() : '',
-    entry.truck ? `$${entry.truck.toFixed(2)}` : '',
+    entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
     `$${(
       Number(entry.rate ?? 0) +
       Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
       Number(entry.truck ?? 0)
     ).toFixed(2)}`,
     `$${dailySubsistence.toFixed(2)}`,
-    entry.other ? `$${entry.other.toFixed(2)}` : '',
+    entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
   ]);
 
   // Use autoTable with exact styling to match preview
@@ -179,8 +179,13 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   doc.setTextColor(60, 60, 60);
 
   // Subtotal
-  doc.text('⊖ Subtotal', 15, yPos);
-  doc.text(`$${invoiceData.totals.subtotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
+  const summarySubtotal = invoiceData.entries.reduce((sum, entry) => sum + (
+    Number(entry.rate ?? 0) +
+    Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+    Number(entry.truck ?? 0)
+  ), 0);
+  doc.text('\u2296 Subtotal', 15, yPos);
+  doc.text(`$${summarySubtotal.toFixed(2)}`, pageWidth - 15, yPos, { align: 'right' });
   yPos += 8;
 
   // GST (5%)
