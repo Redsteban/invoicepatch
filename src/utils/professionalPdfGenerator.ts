@@ -94,15 +94,15 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   const entries = invoiceData.entries;
   const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   const workedEntries = entries.filter(entry => entry.worked);
-  const dailySubsistence = invoiceData.totals.subsistence / workedEntries.length;
+  const dailySubsistence = workedEntries.length > 0 ? invoiceData.totals.subsistence / workedEntries.length : 0;
   const tableData = entries.map((entry) => [
     entry.date,
     entry.location || '',
     entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
     entry.kms ? entry.kms.toString() : '',
     entry.truck ? `$${entry.truck.toFixed(2)}` : '',
-    (entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck) ? `$${(entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck).toFixed(2)}` : '',
-    entry.subsistence ? `$${entry.subsistence.toFixed(2)}` : `$${dailySubsistence.toFixed(2)}`,
+    `$${(entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck).toFixed(2)}`,
+    `$${dailySubsistence.toFixed(2)}`,
     entry.other ? `$${entry.other.toFixed(2)}` : '',
   ]);
 

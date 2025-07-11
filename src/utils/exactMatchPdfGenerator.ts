@@ -83,14 +83,16 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   // Create table with exact column widths and styling
   const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   
+  const workedEntries = invoiceData.entries.filter(entry => entry.worked);
+  const dailySubsistence = workedEntries.length > 0 ? invoiceData.totals.subsistence / workedEntries.length : 0;
   const tableData = invoiceData.entries.map(entry => [
     entry.date,
     entry.location || '',
     entry.dayRate ? `$${entry.dayRate.toFixed(2)}` : '',
     entry.kms ? entry.kms.toString() : '',
     entry.truck ? `$${entry.truck.toFixed(2)}` : '',
-    (entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck) ? `$${(entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck).toFixed(2)}` : '',
-    entry.subsistence ? `$${entry.subsistence.toFixed(2)}` : '',
+    `$${(entry.dayRate + (entry.kms * entry.kmsRate) + entry.truck).toFixed(2)}`,
+    `$${dailySubsistence.toFixed(2)}`,
     entry.other ? `$${entry.other.toFixed(2)}` : '',
   ]);
 
