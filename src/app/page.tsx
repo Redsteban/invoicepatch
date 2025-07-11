@@ -19,14 +19,15 @@ export default function Home() {
     }
   }, []);
 
-  const handleRoleSelection = (selectedRole: 'manager' | 'contractor') => {
-    setShowTransition(true);
-    setRole(selectedRole);
-    setTimeout(() => {
-      const targetPath = selectedRole === 'manager' ? '/manager-landing' : '/contractor-landing';
-      router.push(targetPath);
-    }, 300);
-  };
+  // Remove or comment out manager role selection
+  // const handleRoleSelection = (selectedRole: 'manager' | 'contractor') => {
+  //   setShowTransition(true);
+  //   setRole(selectedRole);
+  //   setTimeout(() => {
+  //     const targetPath = selectedRole === 'manager' ? '/manager-landing' : '/contractor-landing';
+  //     router.push(targetPath);
+  //   }, 300);
+  // };
 
   const handleSkipToDashboard = () => {
     const savedRole = localStorage.getItem('userRole');
@@ -102,36 +103,7 @@ export default function Home() {
         </motion.div>
 
         <motion.div variants={staggerChildren} initial="hidden" animate="visible" className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <motion.div variants={fadeInUp}>
-            <motion.button
-              onClick={() => handleRoleSelection('manager')}
-              variants={cardHover}
-              whileHover="hover"
-              whileTap={{ scale: 0.98 }}
-              className="w-full h-full bg-white rounded-3xl p-10 border border-gray-200 hover:border-green-600/50 hover:shadow-lg transition-all duration-300 group text-left flex flex-col"
-            >
-              <div className="flex-grow">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <Drill className="w-10 h-10 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Operations Manager</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  Process field tickets, manage approvals, reconcile costs, and access detailed operational analytics.
-                </p>
-                <div className="space-y-2 mb-6 text-sm text-gray-700">
-                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Field ticket validation</div>
-                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Sub-contractor management</div>
-                  <div className="flex items-center"><div className="w-2 h-2 bg-green-600 rounded-full mr-3"></div>Cost tracking & AFE reconciliation</div>
-                </div>
-              </div>
-              <div className="mt-auto pt-4 border-t border-gray-200">
-                <span className="font-semibold text-green-600 flex items-center">
-                  Select Manager Role <ArrowRight className="w-4 h-4 ml-2" />
-                </span>
-              </div>
-            </motion.button>
-          </motion.div>
-
+          {/* Only show contractor landing option */}
           <motion.div variants={fadeInUp}>
             <motion.button
               onClick={() => handleRoleSelection('contractor')}

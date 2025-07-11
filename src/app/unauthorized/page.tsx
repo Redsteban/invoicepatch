@@ -41,12 +41,8 @@ export default function UnauthorizedPage() {
   };
 
   const getCorrectDashboard = () => {
-    if (userRole === 'manager') {
-      return '/manager/dashboard';
-    } else if (userRole === 'contractor') {
-      return '/contractor';
-    }
-    return '/';
+    // Always return contractor dashboard
+    return '/contractor';
   };
 
   const getAlternativeRole = () => {
@@ -157,7 +153,8 @@ export default function UnauthorizedPage() {
             My Dashboard
           </button>
           
-          {(getAlternativeRole() === 'manager' || getAlternativeRole() === 'contractor') && (
+          {/* Remove or comment out switchRole button for manager */}
+          {/* {(getAlternativeRole() === 'manager' || getAlternativeRole() === 'contractor') && (
             <button
               onClick={() => switchRole(getAlternativeRole() as 'manager' | 'contractor')}
               className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium inline-flex items-center justify-center transition-colors"
@@ -174,7 +171,7 @@ export default function UnauthorizedPage() {
                 </>
               )}
             </button>
-          )}
+          )} */}
         </div>
 
         {/* Support Link */}
