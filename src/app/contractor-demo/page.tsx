@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase, Download, Mail } from 'lucide-react';
+import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase, Download, Mail, DocumentDuplicateIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FreemiumModal from '@/components/FreemiumModal';
 import dynamic from 'next/dynamic';
@@ -615,7 +615,7 @@ export default function ContractorTrialDemo() {
           <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center"><Calendar className="w-6 h-6 mr-3 text-green-600"/>Daily Work Log</h3>
             <div className="space-y-3">
-              {dailyEntries.map(entry => (
+              {dailyEntries.map((entry, idx) => (
                 <div key={entry.day} className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-green-50 rounded-lg mb-2">
                   {editDay === entry.day ? (
                     <div className="w-full">
@@ -677,6 +677,31 @@ export default function ContractorTrialDemo() {
                       </div>
                       <span className="font-mono text-gray-700">${entry.dailyTotal.toFixed(2)}</span>
                       <button onClick={() => startEditDay(entry)} className="ml-4 text-emerald-600 hover:underline">Edit</button>
+                      {/* Duplicate Icon Button */}
+                      <button
+                        className="ml-2 p-1 rounded hover:bg-green-100 group"
+                        onClick={() => {
+                          // Duplicate this entry to the next day if it exists
+                          const nextIdx = idx + 1;
+                          if (nextIdx < dailyEntries.length) {
+                            const nextDay = dailyEntries[nextIdx].day;
+                            const nextDate = dailyEntries[nextIdx].date;
+                            setDailyEntries(dailyEntries.map((e, i) =>
+                              i === nextIdx
+                                ? {
+                                    ...entry,
+                                    day: nextDay,
+                                    date: nextDate,
+                                  }
+                                : e
+                            ));
+                          }
+                        }}
+                        title="Duplicate to next day"
+                        aria-label="Duplicate to next day"
+                      >
+                        <DocumentDuplicateIcon className="w-5 h-5 text-gray-500 group-hover:text-green-600" />
+                      </button>
                       <button
                         className={`ml-4 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${entry.worked ? 'bg-green-200 text-green-800 border-green-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}
                         onClick={() => setDailyEntries(dailyEntries.map(e => e.day === entry.day ? { ...e, worked: !e.worked } : e))}
