@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase, Download, Mail, DocumentDuplicateIcon } from 'lucide-react';
+import { ArrowLeft, HardHat, Clock, FileText, Calendar, DollarSign, Percent, PlusCircle, CheckCircle, RefreshCw, Save, Settings, Briefcase, Download, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FreemiumModal from '@/components/FreemiumModal';
 import dynamic from 'next/dynamic';
 import ProfessionalPDFPreview from '@/components/ProfessionalPDFPreview';
 import { generateHTMLToPDF } from '@/utils/htmlToPdfGenerator';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 const EmailCollectionModal = dynamic(() => import('@/components/EmailCollectionModal'), { ssr: false });
 
 // @ts-ignore
