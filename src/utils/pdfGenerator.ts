@@ -95,21 +95,35 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<jsPD
       { header: 'Subsistence', dataKey: 'subsistence' },
       { header: 'Other Charges', dataKey: 'otherCharges' },
     ];
-    const tableRows = invoiceData.entries.map((entry) => ({
-      date: entry.date,
-      location: entry.location || '',
-      dayRate: entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
-      kmsDriven: entry.kmsDriven ?? '',
-      truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
-      dailyTotal: `$${(
-        Number(entry.rate ?? 0) +
-        Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
-        Number(entry.truckRate ?? 0) +
-        Number(entry.otherCharges ?? 0)
-      ).toFixed(2)}`,
-      subsistence: `$${(invoiceData.totals.subsistence && invoiceData.entries.filter(e => e.worked !== false).length > 0 ? (invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked !== false).length) : 0).toFixed(2)}`,
-      otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
-    }));
+    const tableRows = invoiceData.entries.map((entry) => {
+      if (entry.worked === false) {
+        return {
+          date: entry.date,
+          location: entry.location || '',
+          dayRate: '$0.00',
+          kmsDriven: 0,
+          truckRate: '$0.00',
+          dailyTotal: '$0.00',
+          subsistence: '$0.00',
+          otherCharges: '$0.00',
+        };
+      }
+      return {
+        date: entry.date,
+        location: entry.location || '',
+        dayRate: entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
+        kmsDriven: entry.kmsDriven ?? '',
+        truckRate: entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '',
+        dailyTotal: `$${(
+          Number(entry.rate ?? 0) +
+          Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
+          Number(entry.truckRate ?? 0) +
+          Number(entry.otherCharges ?? 0)
+        ).toFixed(2)}`,
+        subsistence: `$${(invoiceData.totals.subsistence && invoiceData.entries.filter(e => e.worked !== false).length > 0 ? (invoiceData.totals.subsistence / invoiceData.entries.filter(e => e.worked !== false).length) : 0).toFixed(2)}`,
+        otherCharges: entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '',
+      };
+    });
     
     // Dynamic import for autoTable
     try {

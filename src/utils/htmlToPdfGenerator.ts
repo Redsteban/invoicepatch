@@ -122,17 +122,17 @@ export function createInvoiceHTML(simulationData: any): string {
               <tr>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.date}</td>
                 <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.location || ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.dayRate ? `$${Number(entry.dayRate).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.kmsDriven ?? ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : ''}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked === false ? '$0.00' : (entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '')}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">${entry.worked === false ? 0 : (entry.kmsDriven ?? '')}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked === false ? '$0.00' : (entry.truckRate ? `$${Number(entry.truckRate).toFixed(2)}` : '')}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked === false ? '$0.00' : `$${(
                   Number(entry.rate ?? 0) +
                   Number(entry.kmsDriven ?? 0) * Number(entry.kmsRate ?? 0) +
                   Number(entry.truckRate ?? 0) +
                   Number(entry.otherCharges ?? 0)
-                ).toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">$${(workedEntries.length > 0 ? (totalSubsistence / workedEntries.length) : 0).toFixed(2)}</td>
-                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : ''}</td>
+                ).toFixed(2)}`}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked === false ? '$0.00' : `$${(workedEntries.length > 0 ? (totalSubsistence / workedEntries.length) : 0).toFixed(2)}`}</td>
+                <td style="border: 1px solid #ccc; padding: 6px; text-align: right;">${entry.worked === false ? '$0.00' : (entry.otherCharges ? `$${Number(entry.otherCharges).toFixed(2)}` : '')}</td>
               </tr>
             `).join('')}
           </tbody>

@@ -85,21 +85,35 @@ export async function generateExactMatchPDF(invoiceData: InvoiceData): Promise<j
   
   const workedEntries = invoiceData.entries.filter(entry => entry.worked);
   const dailySubsistence = workedEntries.length > 0 ? invoiceData.totals.subsistence / workedEntries.length : 0;
-  const tableData = invoiceData.entries.map(entry => [
-    entry.date,
-    entry.location || '',
-    entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
-    entry.kms ? entry.kms.toString() : '',
-    entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
-    `$${(
-      Number(entry.rate ?? 0) +
-      Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
-      Number(entry.truck ?? 0) +
-      Number(entry.other ?? 0)
-    ).toFixed(2)}`,
-    `$${dailySubsistence.toFixed(2)}`,
-    entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
-  ]);
+  const tableData = invoiceData.entries.map(entry => {
+    if (entry.worked === false) {
+      return [
+        entry.date,
+        entry.location || '',
+        '$0.00',
+        0,
+        '$0.00',
+        '$0.00',
+        '$0.00',
+        '$0.00',
+      ];
+    }
+    return [
+      entry.date,
+      entry.location || '',
+      entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
+      entry.kms ? entry.kms.toString() : '',
+      entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
+      `$${(
+        Number(entry.rate ?? 0) +
+        Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+        Number(entry.truck ?? 0) +
+        Number(entry.other ?? 0)
+      ).toFixed(2)}`,
+      `$${dailySubsistence.toFixed(2)}`,
+      entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
+    ];
+  });
 
   // Use autoTable with exact styling to match preview
   try {

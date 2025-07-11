@@ -95,21 +95,35 @@ export async function generateProfessionalInvoicePDF(invoiceData: InvoiceData): 
   const tableHeaders = [['Date', 'Location', 'Day Rate', 'KMS driven', 'Truck Rate', 'Sub total', 'Subsistence', 'Other Charges']];
   const workedEntries = entries.filter(entry => entry.worked);
   const dailySubsistence = workedEntries.length > 0 ? invoiceData.totals.subsistence / workedEntries.length : 0;
-  const tableData = entries.map((entry) => [
-    entry.date,
-    entry.location || '',
-    entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
-    entry.kms ? entry.kms.toString() : '',
-    entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
-    `$${(
-      Number(entry.rate ?? 0) +
-      Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
-      Number(entry.truck ?? 0) +
-      Number(entry.other ?? 0)
-    ).toFixed(2)}`,
-    `$${dailySubsistence.toFixed(2)}`,
-    entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
-  ]);
+  const tableData = entries.map((entry) => {
+    if (entry.worked === false) {
+      return [
+        entry.date,
+        entry.location || '',
+        '$0.00',
+        0,
+        '$0.00',
+        '$0.00',
+        '$0.00',
+        '$0.00',
+      ];
+    }
+    return [
+      entry.date,
+      entry.location || '',
+      entry.rate ? `$${Number(entry.rate).toFixed(2)}` : '',
+      entry.kms ? entry.kms.toString() : '',
+      entry.truck ? `$${Number(entry.truck).toFixed(2)}` : '',
+      `$${(
+        Number(entry.rate ?? 0) +
+        Number(entry.kms ?? 0) * Number(entry.kmsRate ?? 0) +
+        Number(entry.truck ?? 0) +
+        Number(entry.other ?? 0)
+      ).toFixed(2)}`,
+      `$${dailySubsistence.toFixed(2)}`,
+      entry.other ? `$${Number(entry.other).toFixed(2)}` : '',
+    ];
+  });
 
   // Add work summary table
   try {
